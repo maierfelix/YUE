@@ -1,0 +1,22 @@
+{
+  "name": "yue",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "version": "0.0.1",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w"
+  },
+  "devDependencies": {
+    "@types/node": "^14.6.0",
+    "@webgpu/types": "^0.0.31",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "@webgpu/glslang": "^0.0.15",
+    "eventemitter3": "^4.0.4",
+    "gl-matrix": "^3.3.0",
+    "inertial-turntable-camera": "^2.0.4",
+    "normalized-interaction-events": "^2.0.1"
+  }
+}

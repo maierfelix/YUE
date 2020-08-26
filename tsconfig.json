@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "target": "esnext",
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "allowJs": true,
+    "strictNullChecks": false,
+    "lib": ["dom", "es2018"],
+    "noImplicitAny": true,
+    "sourceMap": true,
+    "outDir": "dist",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*"]
+    }
+  },
+  "exclude": [
+    "dist",
+    "node_modules"
+  ],
+  "include": [
+    "src"
+  ],
+  "typeRoots": [
+    "./node_modules/@webgpu/types/"
+  ]
+}
