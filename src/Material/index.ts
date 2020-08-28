@@ -2,16 +2,11 @@ import { EventEmitter } from "../utils";
 import { SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE } from "../constants";
 import { Shader } from "../";
 import { RenderPipelineGenerator, IRenderPipeline, IBindGroupResource } from "./RenderPipelineGenerator";
-import { Renderer } from "../Renderer";
-
-interface IUniformUpdateEntry {
-  id: number;
-  data: any;
-};
+import { Renderer, IUniformUpdateEntry } from "../Renderer";
 
 export interface IMaterialUniformOptions {
+  id: number;
   name: string;
-  id?: number;
   type: SHADER_UNIFORM;
   visibility?: SHADER_STAGE;
   isShared?: boolean;
@@ -19,8 +14,8 @@ export interface IMaterialUniformOptions {
 };
 
 const MATERIAL_UNIFORM_DEFAULT_OPTIONS: IMaterialUniformOptions = {
+  id: 0,
   name: null,
-  id: -1,
   type: SHADER_UNIFORM.NONE,
   visibility: SHADER_STAGE.NONE,
   isShared: false,
@@ -28,12 +23,14 @@ const MATERIAL_UNIFORM_DEFAULT_OPTIONS: IMaterialUniformOptions = {
 };
 
 export interface IMaterialAttributeOptions {
+  id: number;
   name: string;
   type: SHADER_ATTRIBUTE;
   byteOffset?: number;
 };
 
 const MATERIAL_ATTRIBUTE_DEFAULT_OPTIONS: IMaterialAttributeOptions = {
+  id: 0,
   name: null,
   type: SHADER_ATTRIBUTE.NONE,
   byteOffset: -1
@@ -153,22 +150,21 @@ export class Material extends EventEmitter {
         const secondUniform = (
           duplicates[0] !== uniform ? duplicates[0] : duplicates[1]
         );
+        // Make sure the ids are identical
+        if (uniform.id !== secondUniform.id)
+        throw new Error(`Ids of multi-uniforms '${uniform.name}' are not identical`);
         // Make sure the shared states are identical
-        if (uniform.isShared !== secondUniform.isShared) {
+        else if (uniform.isShared !== secondUniform.isShared)
           throw new Error(`Invalid visibility state for uniform '${uniform.name}'`);
-        }
         // Make sure the visibilities are not identical
-        if (uniform.visibility === secondUniform.visibility) {
+        else if (uniform.visibility === secondUniform.visibility)
           throw new Error(`Duplicated uniform '${uniform.name}'`);
-        }
         // Make sure the types are identical
-        if (uniform.type !== secondUniform.type) {
+        else if (uniform.type !== secondUniform.type)
           throw new Error(`Types of multi-uniforms '${uniform.name}' are not identical`);
-        }
         // Make sure the bytelengths are identical
-        if (uniform.byteLength !== secondUniform.byteLength) {
+        else if (uniform.byteLength !== secondUniform.byteLength)
           throw new Error(`Sizes of multi-uniforms '${uniform.name}' are not identical`);
-        }
         // Make uniform visible to both stages
         uniform.visibility = SHADER_STAGE.VERTEX | SHADER_STAGE.FRAGMENT;
         // Remove second uniform
@@ -237,7 +233,7 @@ export class Material extends EventEmitter {
    * @param name The name of the shader uniform
    * @param data The data to update with
    */
-  public setUniformData(name: string, data: any): void {
+  public updateUniform(name: string, data: any): void {
     let uniform = this.getUniformByName(name);
     if (uniform === null)
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
@@ -308,6 +304,7 @@ export class Material extends EventEmitter {
     this._sharedUniformResources = RenderPipelineGenerator.generateBindGroupResources(
       this, true, renderer.getDevice()
     );
+    this.update(renderer);
     // Disable further rebuilds
     this.resetRebuild();
     this.emit("build");
@@ -318,18 +315,11 @@ export class Material extends EventEmitter {
    * Used to e.g. process pending uniform resource updates
    * @param renderer 
    */
-  public update(renderer: Renderer): void {
-    // Process and dequeue the entries from the uniform update queue
-    const uniformUpdateQueue = this._uniformUpdateQueue;
-    for (let ii = 0; ii < uniformUpdateQueue.length; ++ii) {
-      const {id, data} = uniformUpdateQueue[ii];
-      const uniformResource = this.getSharedUniformResourceById(id);
-      const buffer = uniformResource.resource as GPUBuffer;
-      // Enqueue copy operation
-      renderer.enqueueBufferCopyOperation(buffer, data, 0x0, null);
-      // Remove from queue after we processed it
-      uniformUpdateQueue.splice(ii, 1);
-    };
+  public update(renderer: Renderer) {
+    renderer.processUniformUpdateQueue(
+      this._uniformUpdateQueue,
+      this._sharedUniformResources
+    );
   }
 
   /**

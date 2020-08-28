@@ -5,30 +5,28 @@ import { AbstractRenderer, IRendererOptions } from "./AbstractRenderer";
 import { performance } from "perf_hooks";
 import { Scene } from "../Scene";
 import { AbstractCamera } from "../Camera";
+import { IBindGroupResource, RenderPipelineGenerator } from "../Material/RenderPipelineGenerator";
+import { Sampler } from "../Sampler";
+import { Texture } from "../Texture";
+import { QueueCommander } from "../QueueCommander";
 
-interface IBufferCopyOperation {
-  buffer: GPUBuffer;
-  data: ArrayBufferView;
-  offset: number;
-  callback: Function;
+export interface IUniformUpdateEntry {
+  id: number;
+  data: any;
 };
-
-const SRC_COPY_BUFFER_SIZE = 2 ** 16;
 
 export class Renderer extends AbstractRenderer {
 
-  private _device: GPUDevice;
-  private _adapter: GPUAdapter;
-  private _context: GPUCanvasContext;
-  private _swapchain: GPUSwapChain;
+  private _device: GPUDevice = null;
+  private _adapter: GPUAdapter = null;
+  private _context: GPUCanvasContext = null;
+  private _swapchain: GPUSwapChain = null;
   private _depthAttachment: GPUTextureView = null;
 
   private _beginFrameTimestamp: number;
   private _lastFrameTimestamp: number;
 
-  private _copyBuffer: GPUBuffer = null;
-
-  private _bufferCopyOperations: IBufferCopyOperation[] = [];
+  private _queueCommander: QueueCommander = null;
 
   /**
    * @param options Create options
@@ -42,6 +40,7 @@ export class Renderer extends AbstractRenderer {
   public getContext(): GPUCanvasContext { return this._context; }
   public getSwapchain(): GPUSwapChain { return this._swapchain; }
   public getDepthAttachment(): GPUTextureView { return this._depthAttachment; }
+  public getQueueCommander(): QueueCommander { return this._queueCommander; }
 
   private getBeginFrameTimestamp(): number { return this._beginFrameTimestamp; }
   private setBeginFrameTimestamp(value: number): void { this._beginFrameTimestamp = value; }
@@ -49,16 +48,12 @@ export class Renderer extends AbstractRenderer {
   private getLastFrameTimestamp(): number { return this._lastFrameTimestamp; }
   private setLastFrameTimestamp(value: number): void { this._lastFrameTimestamp = value; }
 
-  private getCopyBuffer(): GPUBuffer { return this._copyBuffer; }
-
-  private getBufferCopyOperations(): IBufferCopyOperation[] { return this._bufferCopyOperations; }
-
   public async create(): Promise<Renderer> {
     this._adapter = await this.createAdapter();
     this._device = await this.createDevice();
     this._context = this.createContext();
     this._swapchain = this.createSwapchain();
-    this._copyBuffer = await this.createCopyBuffer();
+    this._queueCommander = new QueueCommander(this.getDevice());
     this.setBeginFrameTimestamp(performance.now());
     this.setLastFrameTimestamp(performance.now());
     // Perform an initial resize
@@ -113,18 +108,6 @@ export class Renderer extends AbstractRenderer {
     if (!(swapchain instanceof GPUSwapChain))
       throw new ReferenceError(`Failed to configure GPU swapchain`);
     return swapchain;
-  }
-
-  /**
-   * Create buffer for chunked CPU -> GPU data copies
-   */
-  private async createCopyBuffer(): Promise<GPUBuffer> {
-    const buffer = this.getDevice().createBuffer({
-      size: SRC_COPY_BUFFER_SIZE,
-      usage: GPUBufferUsage.COPY_SRC | GPUBufferUsage.MAP_WRITE,
-      mappedAtCreation: false
-    });
-    return buffer;
   }
 
   /**
@@ -193,64 +176,62 @@ export class Renderer extends AbstractRenderer {
    * Flushes all pending operations such as buffer copies
    */
   public async flush(): Promise<void> {
-    const device = this.getDevice();
-    const queue = device.defaultQueue;
-    const bufferCopyOperations = this.getBufferCopyOperations();
-    // Abort here if there's nothing to do
-    if (!bufferCopyOperations.length) return;
-
-    // Buffer for CPU -> GPU copy operations
-    const srcCopyBuffer = this.getCopyBuffer();
-    // Map buffer to be CPU writeable
-    await srcCopyBuffer.mapAsync(GPUMapMode.WRITE, 0x0, SRC_COPY_BUFFER_SIZE);
-    // Create array view into mapped buffer
-    const srcCopyData = new Uint8Array(srcCopyBuffer.getMappedRange(0x0, SRC_COPY_BUFFER_SIZE));
-
-    // Record enqueued operations
-    const commandEncoder = device.createCommandEncoder({});
-    // Record buffer copy operations
-    {
-      let byteOffset = 0x0;
-      for (const {buffer, data, offset} of bufferCopyOperations) {
-        // Need resize
-        if (byteOffset + data.byteLength > srcCopyData.byteLength) {
-          // TODO: Use queue writeBuffer for large copy data
-          throw new Error(`Copy buffer is not large enough to hold data`);
-        }
-        // copy into CPU mapped buffer
-        srcCopyData.set(new Uint8Array(data.buffer), byteOffset);
-        // record CPU -> GPU copy operation
-        commandEncoder.copyBufferToBuffer(
-          srcCopyBuffer, byteOffset, buffer, offset, data.byteLength
-        );
-        byteOffset += data.byteLength;
-      };
-    }
-    // Unmap buffer
-    srcCopyBuffer.unmap();
-    // Execute recorded commands
-    queue.submit([commandEncoder.finish()]);
-    // Trigger callbacks if necessary
-    for (const {callback} of bufferCopyOperations) {
-      if (callback instanceof Function) callback();
-    };
-    // Free after we performed the operations
-    bufferCopyOperations.length = 0;
+    await this.getQueueCommander().flush();
   }
 
   /**
-   * Enqueue a new buffer copy operation to perform
-   * @param buffer The buffer to copy the data into
-   * @param data The data to copy
-   * @param byteOffset The starting byte offset into the buffer
+   * 
+   * @param queue The uniform queue to process
+   * @param resources The bound uniform resources
    */
-  public enqueueBufferCopyOperation(
-    buffer: GPUBuffer,
-    data: ArrayBufferView,
-    byteOffset: number = 0x0,
-    callback: Function = null
-  ): void {
-    this.getBufferCopyOperations().push({ buffer, data, offset: byteOffset, callback });
+  public processUniformUpdateQueue(queue: IUniformUpdateEntry[], uniformResources: IBindGroupResource[]): void {
+    const device = this.getDevice();
+    // Samplers and Texture updates can trigger a rebuild
+    // Process and dequeue the entries from the uniform update queue
+    for (let ii = 0; ii < queue.length; ++ii) {
+      const {id, data} = queue[ii];
+      const uniformResource = uniformResources.find(
+        resource => resource ? resource.id === id : false
+      );
+      if (uniformResource === null)
+        throw new ReferenceError(`Failed to resolve uniform resource for uniform '${id}'`);
+      const {resource} = uniformResource;
+      // Enqueue buffer copy operation
+      if (resource instanceof GPUBuffer) {
+        this.getQueueCommander().transferDataToBuffer(
+          resource, data, 0x0, null
+        );
+      }
+      // Bind sampler
+      else if (data instanceof Sampler) {
+        const samplerDescriptor = RenderPipelineGenerator.GenerateSamplerDescriptor(data);
+        const instance = device.createSampler(samplerDescriptor);
+        if (!uniformResource.resource) uniformResource.resource = instance;
+      }
+      // Bind texture
+      else if (data instanceof Texture) {
+        const textureDescriptor = RenderPipelineGenerator.GenerateTextureDescriptor(data);
+        if (!uniformResource.resource) {
+          let texture = device.createTexture(textureDescriptor);
+          uniformResource.resource = texture.createView();
+          // Hack to save reference to texture, beautify this
+          (uniformResource.resource as any).texture = texture;
+        }
+        const width = data.getWidth();
+        const height = data.getHeight();
+        const depth = data.getDepth();
+        const imageData = data.getData() as Uint8Array;
+        const bytesPerRow = data.getBytesPerRow();
+        this.getQueueCommander().transferDataToTexture(
+          (uniformResource.resource as any).texture, imageData, width, height, depth, bytesPerRow, null
+        );
+      }
+      else {
+        throw new TypeError(`Unexpected type '${typeof data}'`);
+      }
+      // Remove queue item
+      queue.splice(ii--, 1);
+    };
   }
 
   /**
@@ -262,8 +243,6 @@ export class Renderer extends AbstractRenderer {
     this._context = null;
     this._swapchain = null;
     this._depthAttachment = null;
-    this._copyBuffer = null;
-    this._bufferCopyOperations = null;
     super.destroy();
   }
 

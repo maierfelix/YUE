@@ -1,13 +1,8 @@
 import { EventEmitter } from "../utils";
 import { Material } from "../Material";
 import { vec3, quat, mat4 } from "gl-matrix";
-import { Renderer } from "../Renderer";
+import { Renderer, IUniformUpdateEntry } from "../Renderer";
 import { IBindGroupResource, RenderPipelineGenerator } from "../Material/RenderPipelineGenerator";
-
-interface IUniformUpdateEntry {
-  id: number;
-  data: any;
-};
 
 export interface IMeshOptions {
   name?: string;
@@ -45,6 +40,7 @@ export class Mesh extends EventEmitter {
 
   private _uniformBindGroup: GPUBindGroup;
   private _uniformResources: IBindGroupResource[] = [];
+
   private _uniformUpdateQueue: IUniformUpdateEntry[] = [];
 
   private _indexBuffer: GPUBuffer = null;
@@ -181,44 +177,6 @@ export class Mesh extends EventEmitter {
   }
 
   /**
-   * Allocate an index buffer and copy the indices data over
-   * @param renderer 
-   */
-  public createIndexBuffer(renderer: Renderer): GPUBuffer {
-    const device = renderer.getDevice();
-    const data = this._indices;
-    const out = device.createBuffer({
-      size: data.byteLength,
-      usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
-    });
-    // Enqueue copy operation
-    renderer.enqueueBufferCopyOperation(out, data, 0x0, () => {
-      // Free after the indices are uploaded to the GPU
-      this._indices = null;
-    });
-    return out;
-  }
-
-  /**
-   * Allocate an attribute buffer and copy the attribute data over
-   * @param renderer 
-   */
-  public createAttributeBuffer(renderer: Renderer): GPUBuffer {
-    const device = renderer.getDevice();
-    const data = this._attributes;
-    const out = device.createBuffer({
-      size: data.byteLength,
-      usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
-    });
-    // Enqueue copy operation
-    renderer.enqueueBufferCopyOperation(out, data, 0x0, () => {
-      // Free after the attributes are uploaded to the GPU
-      this._attributes = null;
-    });
-    return out;
-  }
-
-  /**
    * Generates and returns a model matrix
    */
   public getModelMatrix(): mat4 {
@@ -246,19 +204,6 @@ export class Mesh extends EventEmitter {
   }
 
   /**
-   * Returns the given uniform resource based on the provided id
-   * @param id The id to lookup for
-   */
-  private getUniformResourceById(id: number): IBindGroupResource {
-    let uniformResources = this._uniformResources;
-    for (let ii = 0; ii < uniformResources.length; ++ii) {
-      let resource = uniformResources[ii];
-      if (resource !== null && resource.id === id) return resource;
-    };
-    return null;
-  }
-
-  /**
    * Add a new data update to the uniform update queue
    * @param id The uniform id
    * @param data The data to update with
@@ -272,13 +217,29 @@ export class Mesh extends EventEmitter {
    * @param name The name of the shader uniform
    * @param data The data to update with
    */
-  public setUniformData(name: string, data: any): void {
+  public updateUniform(name: string, data: any): void {
     let uniform = this.getMaterial().getUniformByName(name);
     if (uniform === null)
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
     if (uniform.isShared)
       throw new Error(`Uniform '${name}' is declared as shared and must be accessed through its material`);
     this.enqueueUniformUpdate(uniform.id, data);
+  }
+
+  /**
+   * Update the mesh indices
+   * @param data The index data to update with
+   */
+  public updateIndices(data: ArrayBufferView): void {
+    this._indices = data;
+  }
+
+  /**
+   * Update the mesh attributes
+   * @param data The attribute data to update with
+   */
+  public updateAttributes(data: ArrayBufferView): void {
+    this._attributes = data;
   }
 
   /**
@@ -294,15 +255,25 @@ export class Mesh extends EventEmitter {
     this._uniformResources = RenderPipelineGenerator.generateBindGroupResources(
       material, false, renderer.getDevice()
     );
+    this.update(renderer);
     // Build bind group
     this._uniformBindGroup = RenderPipelineGenerator.generateBindGroup(
       material, this._uniformResources, renderer.getDevice()
     );
     // Build mesh buffers
-    this._indexBuffer = this.createIndexBuffer(renderer);
-    this._attributeBuffer = this.createAttributeBuffer(renderer);
-    // Save index count
-    this._indexCount = (this._indices as Uint32Array).length;
+    if (this._indices !== null) {
+      this._indexCount = (this._indices as Uint32Array).length;
+      this._indexBuffer = renderer.getDevice().createBuffer({
+        size: this._indices.byteLength,
+        usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
+      });
+    }
+    if (this._attributes) {
+      this._attributeBuffer = renderer.getDevice().createBuffer({
+        size: this._attributes.byteLength,
+        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+      });
+    }
     // After the build we disable further builds
     this.resetRebuild();
     this.emit("build");
@@ -316,17 +287,35 @@ export class Mesh extends EventEmitter {
   public update(renderer: Renderer): void {
     // Update the assigned material
     this.getMaterial().update(renderer);
-    // Process and dequeue the entries from the uniform update queue
-    const uniformUpdateQueue = this._uniformUpdateQueue;
-    for (let ii = 0; ii < uniformUpdateQueue.length; ++ii) {
-      const {id, data} = uniformUpdateQueue[ii];
-      const uniformResource = this.getUniformResourceById(id);
-      const buffer = uniformResource.resource as GPUBuffer;
-      // Enqueue copy operation
-      renderer.enqueueBufferCopyOperation(buffer, data, 0x0, null);
-      // Remove from queue after we processed it
-      uniformUpdateQueue.splice(ii, 1);
-    };
+    renderer.processUniformUpdateQueue(
+      this._uniformUpdateQueue,
+      this._uniformResources
+    );
+    // Enqueue copy operation
+    if (this._indices !== null) {
+      // Create index buffer if necessary
+      if (this._indexBuffer === null) {
+        this._indexBuffer = renderer.getDevice().createBuffer({
+          size: this._indices.byteLength,
+          usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
+        });
+      }
+      this._indexCount = (this._indices as Uint32Array).length;
+      renderer.getQueueCommander().transferDataToBuffer(this._indexBuffer, this._indices, 0x0);
+      this._indices = null;
+    }
+    // Enqueue copy operation
+    if (this._attributes !== null) {
+      // Create attribute buffer if necessary
+      if (this._attributeBuffer === null) {
+        this._attributeBuffer = renderer.getDevice().createBuffer({
+          size: this._attributes.byteLength,
+          usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
+        });
+      }
+      renderer.getQueueCommander().transferDataToBuffer(this._attributeBuffer, this._attributes, 0x0);
+      this._attributes = null;
+    }
   }
 
   /**
@@ -335,12 +324,15 @@ export class Mesh extends EventEmitter {
    */
   public render(encoder: GPURenderPassEncoder): void {
     const material = this.getMaterial();
-    const {pipeline} = material.getRenderPipeline();
-    encoder.setPipeline(pipeline);
-    encoder.setBindGroup(0, this._uniformBindGroup);
-    encoder.setVertexBuffer(0, this._attributeBuffer);
-    encoder.setIndexBuffer(this._indexBuffer);
-    encoder.drawIndexed(this.getIndexCount(), 1, 0, 0, 0);
+    // make sure the material's render pipeline is ready
+    if (material.getRenderPipeline() !== null) {
+      const {pipeline} = material.getRenderPipeline();
+      encoder.setPipeline(pipeline);
+      encoder.setBindGroup(0, this._uniformBindGroup);
+      encoder.setVertexBuffer(0, this._attributeBuffer);
+      encoder.setIndexBuffer(this._indexBuffer);
+      encoder.drawIndexed(this.getIndexCount(), 1, 0, 0, 0);
+    }
     this.emit("render");
   }
 

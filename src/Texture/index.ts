@@ -1,25 +1,14 @@
 import { EventEmitter } from "../utils";
-import { TEXTURE_FORMAT, TEXTURE_FILTER_MODE, TEXTURE_WRAP_MODE } from "../constants";
-
-type TextureDataType = (
-  ArrayBuffer |
-  ArrayBufferView
-);
-
-export interface ITextureAdressModeOptions {
-  U: TEXTURE_WRAP_MODE;
-  V: TEXTURE_WRAP_MODE;
-  W: TEXTURE_WRAP_MODE;
-};
+import { TEXTURE_FORMAT } from "../constants";
 
 export interface ITextureOptions {
   name?: string;
-  data: TextureDataType;
+  data?: ArrayBufferView;
   width: number;
   height: number;
+  depth?: number;
+  bytesPerRow: number;
   format: TEXTURE_FORMAT;
-  addressMode?: ITextureAdressModeOptions;
-  filterMode?: TEXTURE_FILTER_MODE;
 };
 
 const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
@@ -27,24 +16,20 @@ const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
   data: null,
   width: 0,
   height: 0,
-  format: TEXTURE_FORMAT.NONE,
-  addressMode: {
-    U: TEXTURE_WRAP_MODE.REPEAT,
-    V: TEXTURE_WRAP_MODE.REPEAT,
-    W: TEXTURE_WRAP_MODE.REPEAT
-  },
-  filterMode: TEXTURE_FILTER_MODE.LINEAR
+  depth: 1,
+  bytesPerRow: 0,
+  format: TEXTURE_FORMAT.NONE
 };
 
 export class Texture extends EventEmitter {
 
   private _name: string;
-  private _data: TextureDataType;
+  private _data: ArrayBufferView;
   private _width: number;
   private _height: number;
+  private _depth: number;
+  private _bytesPerRow: number;
   private _format: TEXTURE_FORMAT;
-  private _addressMode: ITextureAdressModeOptions;
-  private _filterMode: TEXTURE_FILTER_MODE;
 
   /**
    * @param options Create options
@@ -58,9 +43,9 @@ export class Texture extends EventEmitter {
     this._data = options.data;
     this._width = options.width;
     this._height = options.height;
+    this._depth = options.depth;
+    this._bytesPerRow = options.bytesPerRow;
     this._format = options.format;
-    this._addressMode = Object.assign({}, options.addressMode);
-    this._filterMode = Object.assign({}, options.filterMode);
   }
 
   /**
@@ -74,12 +59,41 @@ export class Texture extends EventEmitter {
   public setName(value: string): void { this._name = value; }
 
   /**
+   * The texture data
+   */
+  public getData(): ArrayBufferView { return this._data; }
+
+  /**
+   * The texture width
+   */
+  public getWidth(): number { return this._width; }
+
+  /**
+   * The texture height
+   */
+  public getHeight(): number { return this._height; }
+
+  /**
+   * The texture depth
+   */
+  public getDepth(): number { return this._depth; }
+
+  /**
+   * The texture format
+   */
+  public getFormat(): TEXTURE_FORMAT { return this._format; }
+
+  /**
+   * The texture bytes per row
+   */
+  public getBytesPerRow(): TEXTURE_FORMAT { return this._bytesPerRow; }
+
+  /**
    * Destroy this Object
    */
   public destroy(): void {
     this._name = null;
     this._data = null;
-    this._addressMode = null;
     this.emit("destroy");
   }
 

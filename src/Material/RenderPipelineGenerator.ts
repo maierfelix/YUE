@@ -1,8 +1,9 @@
 import { Material } from ".";
 
-import { SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE } from "../constants";
-import { IMaterialUniformOptions } from "..";
-import { Warn } from "../utils";
+import { SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT } from "../constants";
+import { Unreachable } from "../utils";
+import { Sampler } from "../Sampler";
+import { Texture } from "../Texture";
 
 function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   let flags: GPUShaderStageFlags = 0;
@@ -25,11 +26,14 @@ function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
       return "storage-buffer";
     case SHADER_UNIFORM.STORAGE_BUFFER_READONLY:
       return "readonly-storage-buffer";
+    case SHADER_UNIFORM.SAMPLER:
+      return "sampler";
     case SHADER_UNIFORM.TEXTURE:
       return "sampled-texture";
     case SHADER_UNIFORM.STORAGE_TEXTURE:
       return "readonly-storage-texture";
   };
+  Unreachable();
 }
 
 function ToWGPUVertexFormat(attributeType: SHADER_ATTRIBUTE): GPUVertexFormat {
@@ -97,6 +101,135 @@ function ToWGPUVertexFormat(attributeType: SHADER_ATTRIBUTE): GPUVertexFormat {
     case SHADER_ATTRIBUTE.INT4:
       return "int4";
   };
+  Unreachable();
+};
+
+function ToWGPUAddressMode(wrappingMode: SAMPLER_WRAP_MODE): GPUAddressMode {
+  switch (wrappingMode) {
+    case SAMPLER_WRAP_MODE.NONE:
+      throw new Error(`'SAMPLER_WRAP_MODE.NONE' is not a valid wrapping mode`);
+    case SAMPLER_WRAP_MODE.CLAMP_TO_EDGE:
+      return "clamp-to-edge";
+    case SAMPLER_WRAP_MODE.REPEAT:
+      return "repeat";
+    case SAMPLER_WRAP_MODE.MIRROR_REPEAT:
+      return "mirror-repeat";
+  };
+  Unreachable();
+};
+
+function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode {
+  switch (filterMode) {
+    case SAMPLER_FILTER_MODE.NONE:
+      throw new Error(`'SAMPLER_FILTER_MODE.NONE' is not a valid filtering mode`);
+    case SAMPLER_FILTER_MODE.NEAREST:
+      return "nearest";
+    case SAMPLER_FILTER_MODE.LINEAR:
+      return "linear";
+  };
+  Unreachable();
+};
+
+function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
+  switch (textureFormat) {
+    case TEXTURE_FORMAT.NONE:
+      throw new Error(`'TEXTURE_FORMAT.NONE' is not a valid texture format`);
+    case TEXTURE_FORMAT.R8_UNORM:
+      return "r8unorm";
+    case TEXTURE_FORMAT.R8_SNORM:
+      return "r8snorm";
+    case TEXTURE_FORMAT.R8_UINT:
+      return "r8uint";
+    case TEXTURE_FORMAT.R8_SINT:
+      return "r8sint";
+    case TEXTURE_FORMAT.R16_UINT:
+      return "r16uint";
+    case TEXTURE_FORMAT.R16_SINT:
+      return "r16sint";
+    case TEXTURE_FORMAT.R16_FLOAT:
+      return "r16float";
+    case TEXTURE_FORMAT.RG8_UNORM:
+      return "rg8unorm";
+    case TEXTURE_FORMAT.RG8_SNORM:
+      return "rg8snorm";
+    case TEXTURE_FORMAT.RG8_UINT:
+      return "rg8uint";
+    case TEXTURE_FORMAT.RG8_SINT:
+      return "rg8sint";
+    case TEXTURE_FORMAT.R32_UINT:
+      return "r32uint";
+    case TEXTURE_FORMAT.R32_SINT:
+      return "r32sint";
+    case TEXTURE_FORMAT.R32_FLOAT:
+      return "r32float";
+    case TEXTURE_FORMAT.RG16_UINT:
+      return "rg16uint";
+    case TEXTURE_FORMAT.RG16_SINT:
+      return "rg16sint";
+    case TEXTURE_FORMAT.RG16_FLOAT:
+      return "rg16float";
+    case TEXTURE_FORMAT.RGBA8_UNORM:
+      return "rgba8unorm";
+    case TEXTURE_FORMAT.RGBA8_UNORM_SRGB:
+      return "rgba8unorm-srgb";
+    case TEXTURE_FORMAT.RGBA8_SNORM:
+      return "rgba8snorm";
+    case TEXTURE_FORMAT.RGBA8_UINT:
+      return "rgba8uint";
+    case TEXTURE_FORMAT.RGBA8_SINT:
+      return "rgba8sint";
+    case TEXTURE_FORMAT.BGRA8_UNORM:
+      return "bgra8unorm";
+    case TEXTURE_FORMAT.BGRA8_UNORM_SRGB:
+      return "bgra8unorm-srgb";
+    case TEXTURE_FORMAT.RG32_UINT:
+      return "rg32uint";
+    case TEXTURE_FORMAT.RG32_SINT:
+      return "rg32sint";
+    case TEXTURE_FORMAT.RG32_FLOAT:
+      return "rg32float";
+    case TEXTURE_FORMAT.RGBA16_UINT:
+      return "rgba16uint";
+    case TEXTURE_FORMAT.RGBA16_SINT:
+      return "rgba16sint";
+    case TEXTURE_FORMAT.RGBA16_FLOAT:
+      return "rgba16float";
+    case TEXTURE_FORMAT.RGBA32_UINT:
+      return "rgba32uint";
+    case TEXTURE_FORMAT.RGBA32_SINT:
+      return "rgba32sint";
+    case TEXTURE_FORMAT.RGBA32_FLOAT:
+      return "rgba32float";
+    case TEXTURE_FORMAT.BC1_RGBA_UNORM:
+      return "bc1-rgba-unorm";
+    case TEXTURE_FORMAT.BC1_RGBA_UNORM_SRGB:
+      return "bc1-rgba-unorm-srgb";
+    case TEXTURE_FORMAT.BC2_RGBA_UNORM:
+      return "bc2-rgba-unorm";
+    case TEXTURE_FORMAT.BC2_RGBA_UNORM_SRGB:
+      return "bc2-rgba-unorm-srgb";
+    case TEXTURE_FORMAT.BC3_RGBA_UNORM:
+      return "bc3-rgba-unorm";
+    case TEXTURE_FORMAT.BC3_RGBA_UNORM_SRGB:
+      return "bc3-rgba-unorm-srgb";
+    case TEXTURE_FORMAT.BC4_R_UNORM:
+      return "bc4-r-unorm";
+    case TEXTURE_FORMAT.BC4_R_SNORM:
+      return "bc4-r-snorm";
+    case TEXTURE_FORMAT.BC5_RG_UNORM:
+      return "bc5-rg-unorm";
+    case TEXTURE_FORMAT.BC5_RG_SNORM:
+      return "bc5-rg-snorm";
+    case TEXTURE_FORMAT.BC6H_RGB_UFLOAT:
+      return "bc6h-rgb-ufloat";
+    case TEXTURE_FORMAT.BC6H_RGB_FLOAT:
+      return "bc6h-rgb-sfloat";
+    case TEXTURE_FORMAT.BC7_RGBA_UNORM:
+      return "bc7-rgba-unorm";
+    case TEXTURE_FORMAT.BC7_RGBA_UNORM_SRGB:
+      return "bc7-rgba-unorm-srgb";
+  };
+  Unreachable();
 };
 
 function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): number {
@@ -138,6 +271,7 @@ function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): numb
     case SHADER_ATTRIBUTE.INT4:
       return 4;
   };
+  Unreachable();
 };
 
 function GetShaderAttributeComponentSize(attributeType: SHADER_ATTRIBUTE): number {
@@ -179,6 +313,7 @@ function GetShaderAttributeComponentSize(attributeType: SHADER_ATTRIBUTE): numbe
     case SHADER_ATTRIBUTE.INT4:
       return Uint32Array.BYTES_PER_ELEMENT;
   };
+  Unreachable();
 };
 
 export interface IBindGroupResource {
@@ -194,26 +329,64 @@ export interface IRenderPipeline {
 export class RenderPipelineGenerator {
 
   /**
+   * Generates the descriptor to construct a new GPUSampler
+   * @param sampler 
+   */
+  public static GenerateSamplerDescriptor(sampler: Sampler): GPUSamplerDescriptor {
+    const addressMode = sampler.getAddressMode();
+    const out: GPUSamplerDescriptor = {
+      magFilter: ToWGPUFilterMode(sampler.getFilterMode()),
+      minFilter: ToWGPUFilterMode(sampler.getFilterMode()),
+      addressModeU: ToWGPUAddressMode(addressMode.U),
+      addressModeV: ToWGPUAddressMode(addressMode.V),
+      addressModeW: ToWGPUAddressMode(addressMode.W)
+    };
+    return out;
+  }
+
+  /**
+   * Generates the descriptor to constructor a new GPUTexture
+   * @param texture 
+   */
+  public static GenerateTextureDescriptor(texture: Texture): GPUTextureDescriptor {
+    // TODO: add other texture dimensions etc.
+    const out: GPUTextureDescriptor = {
+      size: {
+        width: texture.getWidth(),
+        height: texture.getHeight(),
+        depth: texture.getDepth()
+      },
+      mipLevelCount: 1,
+      sampleCount: 1,
+      dimension: "2d",
+      format: ToWGPUTextureFormat(texture.getFormat()),
+      usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.SAMPLED
+    };
+    return out;
+  }
+
+  /**
    * Generates the vertex state descriptor for the passed material
    * @param material 
    */
   public static generateVertexStateDescriptor(material: Material): GPUVertexStateDescriptor {
     const attributes: GPUVertexAttributeDescriptor[] = [];
-    let location = 0;
     let totalByteOffset = 0x0;
+    let locationId = 0;
+    // Generate vertex attributes
     for (const attribute of material.getAttributes()) {
-      const {type, byteOffset} = attribute;
-      // if no byte offset is defined, then use the calculated one
+      const {id, type, byteOffset} = attribute;
+      // if no byte offset is defined then use the calculated one
       const offset = (byteOffset === -1 ? totalByteOffset : byteOffset);
       attributes.push({
-        shaderLocation: location,
+        shaderLocation: (id === -1 ? locationId : id),
         format: ToWGPUVertexFormat(type),
         offset: offset
       });
       const attribComponentCount = GetShaderAttributeComponentCount(type);
       const attribComponentSize = GetShaderAttributeComponentSize(type);
       totalByteOffset += attribComponentCount * attribComponentSize;
-      location++;
+      locationId++;
     };
     const out: GPUVertexStateDescriptor = {
       indexFormat: "uint32", // TODO: do better
@@ -228,26 +401,19 @@ export class RenderPipelineGenerator {
     return out;
   }
 
-  public static generateBindGroupLayoutEntry(bindingId: number, visibility: GPUShaderStageFlags, uniform: IMaterialUniformOptions): GPUBindGroupLayoutEntry {
-    let {id, type} = uniform;
-    const binding = (id === -1 ? bindingId : id);
-    const out: GPUBindGroupLayoutEntry = {
-      binding,
-      visibility,
-      type: ToWGPUBindingType(type)
-    };
-    return out;
-  }
-
   public static generateBindGroupLayoutDescriptor(material: Material): GPUBindGroupLayoutDescriptor {
     const bindGroupEntries: GPUBindGroupLayoutEntry[] = [];
     let bindingId = 0;
     // Generate bindgroup layouts
     for (const uniform of material.getUniforms()) {
+      const {id, type} = uniform;
       const stage = ToWGPUShaderStage(uniform.visibility);
-      bindGroupEntries.push(
-        RenderPipelineGenerator.generateBindGroupLayoutEntry(bindingId, stage, uniform)
-      );
+      const bindGroupEntry: GPUBindGroupLayoutEntry = {
+        binding: (id === -1 ? bindingId : id),
+        visibility: stage,
+        type: ToWGPUBindingType(type)
+      };
+      bindGroupEntries.push(bindGroupEntry);
       bindingId++;
     };
     const out: GPUBindGroupLayoutDescriptor = {
@@ -281,9 +447,14 @@ export class RenderPipelineGenerator {
           });
           out.push({ id, resource: buffer });
         } break;
-        case SHADER_UNIFORM.TEXTURE:
+        case SHADER_UNIFORM.SAMPLER: {
+          out.push({ id, resource: null });
+        } break;
+        case SHADER_UNIFORM.TEXTURE: {
+          out.push({ id, resource: null });
+        } break;
         case SHADER_UNIFORM.STORAGE_TEXTURE: {
-          Warn("TODO");
+          out.push({ id, resource: null });
         } break;
       };
     };
@@ -310,9 +481,22 @@ export class RenderPipelineGenerator {
             resource: { buffer: resource as GPUBuffer }
           });
         } break;
+        case SHADER_UNIFORM.SAMPLER: {
+          if (resource === null)
+            throw new ReferenceError(`No sampler bound`);
+          bindGroupEntries.push({
+            binding: id,
+            resource: resource as GPUSampler
+          });
+        } break;
         case SHADER_UNIFORM.TEXTURE:
         case SHADER_UNIFORM.STORAGE_TEXTURE: {
-          Warn("TODO");
+          if (resource === null)
+            throw new ReferenceError(`No texture bound`);
+          bindGroupEntries.push({
+            binding: id,
+            resource: resource as GPUTextureView
+          });
         } break;
       };
     };

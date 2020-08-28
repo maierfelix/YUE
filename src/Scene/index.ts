@@ -6,16 +6,22 @@ import { AbstractCamera } from "../Camera";
 export interface ISceneOptions {
   name?: string;
   camera?: AbstractCamera;
+  clearColor?: ClearColorType;
 };
 
 const SCENE_DEFAULT_OPTIONS: ISceneOptions = {
   name: null,
-  camera: null
+  camera: null,
+  clearColor: [0, 0, 0, 1.0]
 };
+
+type ClearColorType = [number, number, number, number];
 
 export class Scene extends EventEmitter {
 
   private _name: string;
+
+  private _clearColor: ClearColorType;
 
   private _camera: AbstractCamera;
   private _children: Mesh[] = [];
@@ -30,6 +36,7 @@ export class Scene extends EventEmitter {
     // Process options
     this.setName(options.name);
     this._camera = options.camera;
+    this._clearColor = options.clearColor;
   }
 
   /**
@@ -46,6 +53,7 @@ export class Scene extends EventEmitter {
    * The scene's attached camera
    */
   public getAttachedCamera(): AbstractCamera { return this._camera; }
+
   /**
    * Attaches a camera which is used to render this scene
    * @param camera The camera to use in this scene
@@ -114,11 +122,12 @@ export class Scene extends EventEmitter {
 
     // Initial clear
     {
+      const [r, g, b, a] = this._clearColor;
       const commandEncoder = device.createCommandEncoder({});
       const renderPass = commandEncoder.beginRenderPass({
         colorAttachments: [{
           attachment: backBufferView,
-          loadValue: { r: 0.75, g: 0.75, b: 0.75, a: 1.0 },
+          loadValue: { r, g, b, a },
           storeOp: "store"
         }],
         depthStencilAttachment: {

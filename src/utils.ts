@@ -38,6 +38,10 @@ export function Error(...args: any[]) {
   console.error(...args);
 };
 
+export function Unreachable(): void {
+  throw new ReferenceError(`Unreachable code hit`);
+};
+
 export function GetStringHash(str: string): number {
   let hash = 0;
   for (let ii = 0; ii < str.length; ++ii) {

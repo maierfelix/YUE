@@ -52,6 +52,7 @@ export enum SHADER_UNIFORM {
   UNIFORM_BUFFER,
   STORAGE_BUFFER,
   STORAGE_BUFFER_READONLY,
+  SAMPLER,
   TEXTURE,
   STORAGE_TEXTURE
 };
@@ -74,18 +75,18 @@ export enum MATERIAL_BLEND_MODE {
 };
 
 /**
- * Supported texture filtering modes
+ * Supported sampler filtering modes
  */
-export enum TEXTURE_FILTER_MODE {
+export enum SAMPLER_FILTER_MODE {
   NONE,
   NEAREST,
   LINEAR
 };
 
 /**
- * Supported texture wrapping modes
+ * Supported sampler wrapping modes
  */
-export enum TEXTURE_WRAP_MODE {
+export enum SAMPLER_WRAP_MODE {
   NONE,
   CLAMP_TO_EDGE,
   REPEAT,
@@ -116,6 +117,7 @@ export enum TEXTURE_FORMAT {
   R32_FLOAT,
   RG16_UINT,
   RG16_SINT,
+  RG16_FLOAT,
   RGBA8_UNORM,
   RGBA8_UNORM_SRGB,
   RGBA8_SNORM,

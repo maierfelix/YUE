@@ -1,4 +1,4 @@
-import { mat4 } from "gl-matrix";
+import { mat4, vec3 } from "gl-matrix";
 
 import { AbstractCamera, ICameraOptions } from "./AbstractCamera";
 
@@ -8,6 +8,8 @@ const IntertialTurntableCamera = require("inertial-turntable-camera");
 export class SphericalCamera extends AbstractCamera {
 
   private _instance: any;
+
+  private _translation: vec3;
   private _viewProjectionMatrix: mat4;
 
   /**
@@ -36,20 +38,30 @@ export class SphericalCamera extends AbstractCamera {
       instance.params.distance = prevYRange / Math.tan(instance.params.fovY * 0.5);
     }
     this._instance = instance;
+    this._translation = vec3.create();
     this._viewProjectionMatrix = mat4.create();
   }
 
   private getInstance(): any { return this._instance; }
 
   /**
-   * Multiplies the camera's view and projection matrix
+   * Updates and caches the transforms
    */
-  private updateTransformMatrix(): void {
+  private updateTransforms(): void {
+    // View-Projection matrix
     const mView = this.getInstance().state.view;
     const mProjection = this.getInstance().state.projection;
     const mViewProjection = this.getViewProjectionMatrix();
     mat4.multiply(mViewProjection, mProjection, mView);
+    // Translation vector
+    const vTranslation = this.getInstance().state.eye;
+    vec3.copy(this._translation, vTranslation);
   }
+
+  /**
+   * Returns the translation of the camera
+   */
+  public getTranslation(): vec3 { return this._translation; }
 
   /**
    * Returns the view-projection matrix of the camera
@@ -110,8 +122,17 @@ export class SphericalCamera extends AbstractCamera {
       near: this.getInstance().params.distance * 0.01,
       far: this.getInstance().params.distance * 2 + 200
     });
-    this.updateTransformMatrix();
+    this.updateTransforms();
     this.emit("update");
+  }
+
+  /**
+   * Destroy this Object
+   */
+  public destroy(): void {
+    this._instance = null;
+    this._viewProjectionMatrix = null;  
+    super.destroy();
   }
 
 };
