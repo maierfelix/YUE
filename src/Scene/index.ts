@@ -1,15 +1,15 @@
-import { EventEmitter, Warn } from "../utils";
-import { Mesh } from "../Mesh";
-import { Renderer } from "../Renderer";
-import { AbstractCamera } from "../Camera";
+import {EventEmitter, Warn} from "../utils";
+import {Mesh} from "../Mesh";
+import {Renderer} from "../Renderer";
+import {AbstractCamera} from "../Camera";
 
 export interface ISceneOptions {
   name?: string;
   camera?: AbstractCamera;
   clearColor?: ClearColorType;
-};
+}
 
-const SCENE_DEFAULT_OPTIONS: ISceneOptions = {
+export const SCENE_DEFAULT_OPTIONS: ISceneOptions = {
   name: null,
   camera: null,
   clearColor: [0, 0, 0, 1.0]
@@ -27,7 +27,7 @@ export class Scene extends EventEmitter {
   private _children: Mesh[] = [];
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: ISceneOptions) {
     super();
@@ -45,7 +45,7 @@ export class Scene extends EventEmitter {
   public getName(): string { return this._name; }
   /**
    * Update the shader name
-   * @param value 
+   * @param value - The new shader name
    */
   public setName(value: string): void { this._name = value; }
 
@@ -56,7 +56,7 @@ export class Scene extends EventEmitter {
 
   /**
    * Attaches a camera which is used to render this scene
-   * @param camera The camera to use in this scene
+   * @param camera - The camera to use in this scene
    */
   public attachCamera(camera: AbstractCamera): void {
     this._camera = camera;
@@ -64,7 +64,7 @@ export class Scene extends EventEmitter {
 
   /**
    * Add a child to the scene
-   * @param mesh 
+   * @param mesh - The mesh to add
    */
   public addChild(mesh: Mesh): void {
     if (this._children.indexOf(mesh) === -1) {
@@ -76,7 +76,7 @@ export class Scene extends EventEmitter {
 
   /**
    * Remove a child from the scene
-   * @param mesh 
+   * @param mesh - The mesh to remove
    */
   public removeChild(mesh: Mesh): void {
     const childIndex = this._children.indexOf(mesh);
@@ -97,7 +97,7 @@ export class Scene extends EventEmitter {
       const child = children[ii];
       child.build(renderer);
       child.update(renderer);
-    };
+    }
     // Flush the renderer (E.g. flushes buffer copy queue)
     await renderer.flush();
     this.emit("update");
@@ -114,9 +114,9 @@ export class Scene extends EventEmitter {
     const backBufferView = renderer.getSwapchain().getCurrentTexture().createView();
 
     // No camera attached, abort
-    if (!(camera instanceof AbstractCamera)) {
-      return;
-    }
+    if (!(camera instanceof AbstractCamera)) return;
+
+    this.emit("beforerender");
 
     camera.update();
 
@@ -127,7 +127,7 @@ export class Scene extends EventEmitter {
       const renderPass = commandEncoder.beginRenderPass({
         colorAttachments: [{
           attachment: backBufferView,
-          loadValue: { r, g, b, a },
+          loadValue: {r, g, b, a},
           storeOp: "store"
         }],
         depthStencilAttachment: {
@@ -139,7 +139,7 @@ export class Scene extends EventEmitter {
         }
       });
       renderPass.endPass();
-      device.defaultQueue.submit([ commandEncoder.finish() ]);
+      device.defaultQueue.submit([commandEncoder.finish()]);
     }
 
     // Render each child
@@ -162,11 +162,11 @@ export class Scene extends EventEmitter {
       const child = children[ii];
       child.render(renderPass);
       renderPass.endPass();
-    };
+    }
 
-    device.defaultQueue.submit([ commandEncoder.finish() ]);
+    device.defaultQueue.submit([commandEncoder.finish()]);
 
-    this.emit("render");
+    this.emit("afterrender");
   }
 
   /**
@@ -179,4 +179,4 @@ export class Scene extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}

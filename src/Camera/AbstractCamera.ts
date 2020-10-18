@@ -1,13 +1,13 @@
-import { mat4 } from "gl-matrix";
+import {mat4} from "gl-matrix";
 
-import { EventEmitter } from "../utils";
+import {EventEmitter} from "../utils";
 
 export interface ICameraOptions {
   width?: number;
   height?: number;
-};
+}
 
-const CAMERA_DEFAULT_OPTIONS: ICameraOptions = {
+export const CAMERA_DEFAULT_OPTIONS: ICameraOptions = {
   width: 0,
   height: 0
 };
@@ -18,7 +18,7 @@ export abstract class AbstractCamera extends EventEmitter {
   private _height: number;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: ICameraOptions) {
     super();
@@ -35,7 +35,7 @@ export abstract class AbstractCamera extends EventEmitter {
   public getWidth(): number { return this._width; }
   /**
    * Update the camera width
-   * @param value 
+   * @param value - The new camera width 
    */
   public setWidth(value: number): void { this._width = value; }
 
@@ -43,9 +43,10 @@ export abstract class AbstractCamera extends EventEmitter {
    * The camera height
    */
   public getHeight(): number { return this._height; }
+
   /**
    * Update the camera height
-   * @param value 
+   * @param value - The new camera height
    */
   public setHeight(value: number): void { this._height = value; }
 
@@ -73,8 +74,8 @@ export abstract class AbstractCamera extends EventEmitter {
 
   /**
    * Resize the camera
-   * @param width The destination width after resize
-   * @param height The destination height after resize
+   * @param width - The destination width after resize
+   * @param height - The destination height after resize
    */
   public resize(width: number, height: number) {
     this._width = width;
@@ -82,4 +83,4 @@ export abstract class AbstractCamera extends EventEmitter {
     this.emit("resize");
   }
 
-};
+}

@@ -1,8 +1,8 @@
-import { EventEmitter } from "../utils";
-import { Material } from "../Material";
-import { vec3, quat, mat4 } from "gl-matrix";
-import { Renderer, IUniformUpdateEntry } from "../Renderer";
-import { IBindGroupResource, RenderPipelineGenerator } from "../Material/RenderPipelineGenerator";
+import {EventEmitter} from "../utils";
+import {Material} from "../Material";
+import {vec3, quat, mat4} from "gl-matrix";
+import {Renderer, IUniformUpdateEntry} from "../Renderer";
+import {IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
 
 export interface IMeshOptions {
   name?: string;
@@ -12,9 +12,9 @@ export interface IMeshOptions {
   scale?: vec3;
   indices?: ArrayBufferView;
   attributes?: ArrayBufferView;
-};
+}
 
-const MESH_DEFAULT_OPTIONS: IMeshOptions = {
+export const MESH_DEFAULT_OPTIONS: IMeshOptions = {
   name: null,
   material: null,
   translation: null,
@@ -49,7 +49,7 @@ export class Mesh extends EventEmitter {
   private _needsRebuildState: boolean;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: IMeshOptions) {
     super();
@@ -69,9 +69,10 @@ export class Mesh extends EventEmitter {
    * The mesh name
    */
   public getName(): string { return this._name; }
+
   /**
    * Update the mesh name
-   * @param value 
+   * @param value - The new mesh name
    */
   public setName(value: string): void { this._name = value; }
 
@@ -79,15 +80,16 @@ export class Mesh extends EventEmitter {
    * The mesh's assigned material
    */
   public getMaterial(): Material { return this._material; }
+
   /**
    * Update the mesh's material
-   * @param value 
+   * @param value - The new material
    */
   public setMaterial(value: Material): void {
     // In case a new material got assigned, trigger a full rebuild
-    if (this.getMaterial() !== value) this.triggerRebuild();
+    if (this.getMaterial() !== value) this._triggerRebuild();
     this._material = value;
-  };
+  }
 
   /**
    * The mesh's count
@@ -98,9 +100,10 @@ export class Mesh extends EventEmitter {
    * The mesh's translation
    */
   public getTranslation(): vec3 { return this._translation; }
+
   /**
    * Update the mesh's translation
-   * @param value 
+   * @param value - The new mesh translation
    */
   public setTranslation(value: vec3): void { this._translation = value; }
 
@@ -108,9 +111,10 @@ export class Mesh extends EventEmitter {
    * The mesh's rotation
    */
   public getRotation(): quat { return this._rotation; }
+
   /**
    * Update the mesh's rotation
-   * @param value 
+   * @param value - The new mesh rotation
    */
   public setRotation(value: quat): void { this._rotation = value; }
 
@@ -118,34 +122,37 @@ export class Mesh extends EventEmitter {
    * The mesh's scale
    */
   public getScale(): vec3 { return this._scale; }
+
   /**
    * Update the mesh's scale
-   * @param value 
+   * @param value - The new mesh scale
    */
   public setScale(value: vec3): void { this._scale = value; }
 
   /**
    * Determines if the mesh has to be rebuilt
    */
-  private needsRebuild(): boolean {
+  private _needsRebuild(): boolean {
     return this._needsRebuildState;
   }
+
   /**
    * Triggers a rebuild of the mesh
    */
-  private triggerRebuild(): void {
+  private _triggerRebuild(): void {
     this._needsRebuildState = true;
   }
+
   /**
    * Disables the rebuild trigger
    */
-  private resetRebuild(): void {
+  private _resetRebuild(): void {
     this._needsRebuildState = false;
   }
 
   /**
    * Translates this mesh
-   * @param value 
+   * @param value - A vector to translate by
    */
   public translate(value: vec3): void {
     const translation = this._translation;
@@ -156,7 +163,7 @@ export class Mesh extends EventEmitter {
 
   /**
    * Rotates this mesh
-   * @param value 
+   * @param value - A quaternion to rotate by
    */
   public rotate(value: quat): void {
     const rotation = this._rotation;
@@ -167,7 +174,7 @@ export class Mesh extends EventEmitter {
 
   /**
    * Scales this mesh
-   * @param value 
+   * @param value - A vector to scale by
    */
   public scale(value: vec3): void {
     const scale = this._scale;
@@ -180,11 +187,11 @@ export class Mesh extends EventEmitter {
    * Generates and returns a model matrix
    */
   public getModelMatrix(): mat4 {
-    let mModel = this._modelMatrix;
-    let mRotation = this._rotationMatrix;
-    let translation = this._translation;
-    let rotation = this._rotation;
-    let scale = this._scale;
+    const mModel = this._modelMatrix;
+    const mRotation = this._rotationMatrix;
+    const translation = this._translation;
+    const rotation = this._rotation;
+    const scale = this._scale;
     mat4.identity(mModel);
     mat4.identity(mRotation);
     // translation
@@ -205,20 +212,20 @@ export class Mesh extends EventEmitter {
 
   /**
    * Add a new data update to the uniform update queue
-   * @param id The uniform id
-   * @param data The data to update with
+   * @param id - The uniform id
+   * @param data - The data to update with
    */
   public enqueueUniformUpdate(id: number, data: any): void {
-    this._uniformUpdateQueue.push({ id, data });
+    this._uniformUpdateQueue.push({id, data});
   }
 
   /**
    * Updates a shader uniform
-   * @param name The name of the shader uniform
-   * @param data The data to update with
+   * @param name - The name of the shader uniform
+   * @param data - The data to update with
    */
   public updateUniform(name: string, data: any): void {
-    let uniform = this.getMaterial().getUniformByName(name);
+    const uniform = this.getMaterial().getUniformByName(name);
     if (uniform === null)
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
     if (uniform.isShared)
@@ -228,7 +235,7 @@ export class Mesh extends EventEmitter {
 
   /**
    * Update the mesh indices
-   * @param data The index data to update with
+   * @param data - The index data to update with
    */
   public updateIndices(data: ArrayBufferView): void {
     this._indices = data;
@@ -236,7 +243,7 @@ export class Mesh extends EventEmitter {
 
   /**
    * Update the mesh attributes
-   * @param data The attribute data to update with
+   * @param data - The attribute data to update with
    */
   public updateAttributes(data: ArrayBufferView): void {
     this._attributes = data;
@@ -244,11 +251,11 @@ export class Mesh extends EventEmitter {
 
   /**
    * Build everything required to render this mesh
-   * @param renderer 
+   * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
     // Abort if the mesh doesn't need a rebuild
-    if (!this.needsRebuild()) return;
+    if (!this._needsRebuild()) return;
     const material = this.getMaterial();
     material.build(renderer);
     // Build bind group resources
@@ -275,14 +282,14 @@ export class Mesh extends EventEmitter {
       });
     }
     // After the build we disable further builds
-    this.resetRebuild();
+    this._resetRebuild();
     this.emit("build");
   }
 
   /**
    * Update this mesh
    * Used to e.g. process pending uniform resource updates
-   * @param renderer 
+   * @param renderer - Renderer instance
    */
   public update(renderer: Renderer): void {
     // Update the assigned material
@@ -320,20 +327,21 @@ export class Mesh extends EventEmitter {
 
   /**
    * Render this mesh
-   * @param encoder 
+   * @param encoder - Encoder object to add commands to
    */
   public render(encoder: GPURenderPassEncoder): void {
     const material = this.getMaterial();
+    this.emit("beforerender");
     // make sure the material's render pipeline is ready
     if (material.getRenderPipeline() !== null) {
       const {pipeline} = material.getRenderPipeline();
       encoder.setPipeline(pipeline);
       encoder.setBindGroup(0, this._uniformBindGroup);
       encoder.setVertexBuffer(0, this._attributeBuffer);
-      encoder.setIndexBuffer(this._indexBuffer);
+      encoder.setIndexBuffer(this._indexBuffer, "uint32", 0x0, this.getIndexCount() * Uint32Array.BYTES_PER_ELEMENT);
       encoder.drawIndexed(this.getIndexCount(), 1, 0, 0, 0);
     }
-    this.emit("render");
+    this.emit("afterrender");
   }
 
   /**
@@ -357,4 +365,4 @@ export class Mesh extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}

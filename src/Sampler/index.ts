@@ -1,19 +1,19 @@
-import { EventEmitter } from "../utils";
-import { SAMPLER_FILTER_MODE, SAMPLER_WRAP_MODE } from "../constants";
+import {EventEmitter} from "../utils";
+import {SAMPLER_FILTER_MODE, SAMPLER_WRAP_MODE} from "../constants";
 
 export interface ISamplerAdressModeOptions {
   U: SAMPLER_WRAP_MODE;
   V: SAMPLER_WRAP_MODE;
   W: SAMPLER_WRAP_MODE;
-};
+}
 
 export interface ISamplerOptions {
   name?: string;
   addressMode?: ISamplerAdressModeOptions;
   filterMode?: SAMPLER_FILTER_MODE;
-};
+}
 
-const SAMPLER_DEFAULT_OPTIONS: ISamplerOptions = {
+export const SAMPLER_DEFAULT_OPTIONS: ISamplerOptions = {
   name: null,
   addressMode: {
     U: SAMPLER_WRAP_MODE.REPEAT,
@@ -30,7 +30,7 @@ export class Sampler extends EventEmitter {
   private _filterMode: SAMPLER_FILTER_MODE;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: ISamplerOptions) {
     super();
@@ -48,7 +48,7 @@ export class Sampler extends EventEmitter {
   public getName(): string { return this._name; }
   /**
    * Update the sampler name
-   * @param value 
+   * @param value - The new sampler name
    */
   public setName(value: string): void { this._name = value; }
 
@@ -71,4 +71,4 @@ export class Sampler extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}

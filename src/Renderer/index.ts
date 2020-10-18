@@ -1,19 +1,18 @@
-import { mat4 } from "gl-matrix";
+import {AbstractRenderer, IRendererOptions} from "./AbstractRenderer";
 
-import { AbstractRenderer, IRendererOptions } from "./AbstractRenderer";
+import {Scene} from "../Scene";
+import {AbstractCamera} from "../Camera";
+import {IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
+import {Sampler} from "../Sampler";
+import {Texture} from "../Texture";
+import {QueueCommander} from "../QueueCommander";
 
-import { performance } from "perf_hooks";
-import { Scene } from "../Scene";
-import { AbstractCamera } from "../Camera";
-import { IBindGroupResource, RenderPipelineGenerator } from "../Material/RenderPipelineGenerator";
-import { Sampler } from "../Sampler";
-import { Texture } from "../Texture";
-import { QueueCommander } from "../QueueCommander";
+import {LoadGLSLang, GetTimeStamp} from "../utils";
 
 export interface IUniformUpdateEntry {
   id: number;
   data: any;
-};
+}
 
 export class Renderer extends AbstractRenderer {
 
@@ -29,7 +28,7 @@ export class Renderer extends AbstractRenderer {
   private _queueCommander: QueueCommander = null;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: IRendererOptions) {
     super(options);
@@ -42,29 +41,33 @@ export class Renderer extends AbstractRenderer {
   public getDepthAttachment(): GPUTextureView { return this._depthAttachment; }
   public getQueueCommander(): QueueCommander { return this._queueCommander; }
 
-  private getBeginFrameTimestamp(): number { return this._beginFrameTimestamp; }
-  private setBeginFrameTimestamp(value: number): void { this._beginFrameTimestamp = value; }
+  private _getBeginFrameTimestamp(): number { return this._beginFrameTimestamp; }
+  private _setBeginFrameTimestamp(value: number): void { this._beginFrameTimestamp = value; }
 
-  private getLastFrameTimestamp(): number { return this._lastFrameTimestamp; }
-  private setLastFrameTimestamp(value: number): void { this._lastFrameTimestamp = value; }
+  private _getLastFrameTimestamp(): number { return this._lastFrameTimestamp; }
+  private _setLastFrameTimestamp(value: number): void { this._lastFrameTimestamp = value; }
 
   public async create(): Promise<Renderer> {
-    this._adapter = await this.createAdapter();
-    this._device = await this.createDevice();
-    this._context = this.createContext();
-    this._swapchain = this.createSwapchain();
+    await LoadGLSLang();
+    this._adapter = await this._createAdapter();
+    this._device = await this._createDevice();
+    this._context = this._createContext();
+    this._swapchain = this._createSwapchain();
     this._queueCommander = new QueueCommander(this.getDevice());
-    this.setBeginFrameTimestamp(performance.now());
-    this.setLastFrameTimestamp(performance.now());
+    this._setBeginFrameTimestamp(GetTimeStamp());
+    this._setLastFrameTimestamp(GetTimeStamp());
     // Perform an initial resize
     this.resize(this.getCanvas().width, this.getCanvas().height);
     return this;
   }
 
-  private async createAdapter(): Promise<GPUAdapter> {
+  private async _createAdapter(): Promise<GPUAdapter> {
     // Make sure WebGPU is available
-    if (!(navigator.gpu instanceof GPU))
-      throw new ReferenceError(`WebGPU is not available`);
+    if (
+      typeof GPU === "undefined" ||
+      navigator.gpu === void 0 ||
+      !(navigator.gpu instanceof GPU)
+    ) throw new ReferenceError(`WebGPU is not available`);
     // Everything seems fine, request the GPUAdapter
     const adapter = await navigator.gpu.requestAdapter();
     // Make sure the adapter was created successfully
@@ -73,7 +76,7 @@ export class Renderer extends AbstractRenderer {
     return adapter;
   }
 
-  private async createDevice(): Promise<GPUDevice> {
+  private async _createDevice(): Promise<GPUDevice> {
     // Make sure the required extensions are available
     if (!this.getAdapter().extensions.includes("texture-compression-bc"))
       throw new ReferenceError(`Required extension 'texture-compression-bc' is unavailable`);
@@ -85,12 +88,12 @@ export class Renderer extends AbstractRenderer {
     if (!(device instanceof GPUDevice))
       throw new ReferenceError(`Failed to create GPU device`);
     device.addEventListener("uncapturederror", (error) => {
-      this.onDeviceError(error);
+      this._onDeviceError(error);
     });
     return device;
   }
 
-  private createContext(): GPUCanvasContext {
+  private _createContext(): GPUCanvasContext {
     const context = this.getCanvas().getContext("gpupresent");
     // Make sure the context was created successfully
     if (!(context instanceof GPUCanvasContext))
@@ -98,7 +101,7 @@ export class Renderer extends AbstractRenderer {
     return context;
   }
 
-  private createSwapchain(): GPUSwapChain {
+  private _createSwapchain(): GPUSwapChain {
     const swapchain = this.getContext().configureSwapChain({
       device: this.getDevice(),
       format: "bgra8unorm",
@@ -112,8 +115,8 @@ export class Renderer extends AbstractRenderer {
 
   /**
    * Resize the rendering surface and depth texture
-   * @param width The destination width after resize
-   * @param height The destination height after resize
+   * @param width - The destination width after resize
+   * @param height - The destination height after resize
    */
   public resize(width: number, height: number) {
     // Make sure render surface is at least 1x1
@@ -121,8 +124,8 @@ export class Renderer extends AbstractRenderer {
     if (height === 0) height = 1;
     super.resize(width, height);
     // resize depth attachment
-    let depthAttachment = this.getDevice().createTexture({
-      size: { width: width, height: height, depth: 1 },
+    const depthAttachment = this.getDevice().createTexture({
+      size: {width: width, height: height, depth: 1},
       format: "depth24plus-stencil8",
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT
     }).createView();
@@ -131,22 +134,22 @@ export class Renderer extends AbstractRenderer {
 
   /**
    * Called in case of an device error
-   * @param error The error message
+   * @param error - The error message
    */
-  private onDeviceError(error: Event): void {
+  private _onDeviceError(error: Event): void {
     this.emit("deviceerror", error);
   }
 
   /**
    * Render the scene
-   * @param camera The camera to be used to render the scene
+   * @param camera - The camera to be used to render the scene
    */
   public async render(scene: Scene): Promise<void> {
-    const now = performance.now();
-    const delta = (now - this.getLastFrameTimestamp()) / 1e3;
-    const begin = this.getBeginFrameTimestamp();
+    const now = GetTimeStamp();
+    const delta = (now - this._getLastFrameTimestamp()) / 1e3;
+    const begin = this._getBeginFrameTimestamp();
     const time = (now - begin) / 1e3;
-    this.emit("beforerender", { time, delta });
+    this.emit("beforerender", {time, delta});
     // Make sure a scene object is provided
     if (!(scene instanceof Scene))
       throw TypeError(`Unexpected type for argument 1 in 'render', expected instance of 'AbstractCamera'`);
@@ -163,13 +166,13 @@ export class Renderer extends AbstractRenderer {
     if (!this.getAdapter() || !this.getDevice())
       throw new ReferenceError(`Method 'create' must be called on 'Renderer' before usage`);
     // Take the scene's combined camera matrix
-    const matrix: mat4 = camera.getViewProjectionMatrix();
+    //const matrix: mat4 = camera.getViewProjectionMatrix();
     // Update the scene
     await scene.update(this);
     // Render the scene
     scene.render(this);
-    this.setLastFrameTimestamp(now);
-    this.emit("afterrender", { time, delta });
+    this._setLastFrameTimestamp(now);
+    this.emit("afterrender", {time, delta});
   }
 
   /**
@@ -181,8 +184,8 @@ export class Renderer extends AbstractRenderer {
 
   /**
    * 
-   * @param queue The uniform queue to process
-   * @param resources The bound uniform resources
+   * @param queue - The uniform queue to process
+   * @param resources - The bound uniform resources
    */
   public processUniformUpdateQueue(queue: IUniformUpdateEntry[], uniformResources: IBindGroupResource[]): void {
     const device = this.getDevice();
@@ -212,7 +215,7 @@ export class Renderer extends AbstractRenderer {
       else if (data instanceof Texture) {
         const textureDescriptor = RenderPipelineGenerator.GenerateTextureDescriptor(data);
         if (!uniformResource.resource) {
-          let texture = device.createTexture(textureDescriptor);
+          const texture = device.createTexture(textureDescriptor);
           uniformResource.resource = texture.createView();
           // Hack to save reference to texture, beautify this
           (uniformResource.resource as any).texture = texture;
@@ -231,7 +234,7 @@ export class Renderer extends AbstractRenderer {
       }
       // Remove queue item
       queue.splice(ii--, 1);
-    };
+    }
   }
 
   /**
@@ -246,4 +249,4 @@ export class Renderer extends AbstractRenderer {
     super.destroy();
   }
 
-};
+}

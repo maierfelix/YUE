@@ -1,5 +1,5 @@
-import { EventEmitter } from "../utils";
-import { TEXTURE_FORMAT } from "../constants";
+import {EventEmitter} from "../utils";
+import {TEXTURE_FORMAT} from "../constants";
 
 export interface ITextureOptions {
   name?: string;
@@ -9,9 +9,9 @@ export interface ITextureOptions {
   depth?: number;
   bytesPerRow: number;
   format: TEXTURE_FORMAT;
-};
+}
 
-const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
+export const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
   name: null,
   data: null,
   width: 0,
@@ -32,7 +32,7 @@ export class Texture extends EventEmitter {
   private _format: TEXTURE_FORMAT;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: ITextureOptions) {
     super();
@@ -54,7 +54,7 @@ export class Texture extends EventEmitter {
   public getName(): string { return this._name; }
   /**
    * Update the texture name
-   * @param value 
+   * @param value - The new texture name
    */
   public setName(value: string): void { this._name = value; }
 
@@ -97,4 +97,4 @@ export class Texture extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}

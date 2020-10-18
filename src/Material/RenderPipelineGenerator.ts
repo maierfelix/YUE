@@ -1,9 +1,9 @@
-import { Material } from ".";
+import {Material} from ".";
 
-import { SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT } from "../constants";
-import { Unreachable } from "../utils";
-import { Sampler } from "../Sampler";
-import { Texture } from "../Texture";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT} from "../constants";
+import {Unreachable} from "../utils";
+import {Sampler} from "../Sampler";
+import {Texture} from "../Texture";
 
 function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   let flags: GPUShaderStageFlags = 0;
@@ -14,7 +14,7 @@ function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
     flags |= GPUShaderStage.FRAGMENT;
   }
   return flags;
-};
+}
 
 function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
   switch (uniformType) {
@@ -32,7 +32,7 @@ function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
       return "sampled-texture";
     case SHADER_UNIFORM.STORAGE_TEXTURE:
       return "readonly-storage-texture";
-  };
+  }
   Unreachable();
 }
 
@@ -100,9 +100,9 @@ function ToWGPUVertexFormat(attributeType: SHADER_ATTRIBUTE): GPUVertexFormat {
       return "int3";
     case SHADER_ATTRIBUTE.INT4:
       return "int4";
-  };
+  }
   Unreachable();
-};
+}
 
 function ToWGPUAddressMode(wrappingMode: SAMPLER_WRAP_MODE): GPUAddressMode {
   switch (wrappingMode) {
@@ -114,9 +114,9 @@ function ToWGPUAddressMode(wrappingMode: SAMPLER_WRAP_MODE): GPUAddressMode {
       return "repeat";
     case SAMPLER_WRAP_MODE.MIRROR_REPEAT:
       return "mirror-repeat";
-  };
+  }
   Unreachable();
-};
+}
 
 function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode {
   switch (filterMode) {
@@ -126,9 +126,9 @@ function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode {
       return "nearest";
     case SAMPLER_FILTER_MODE.LINEAR:
       return "linear";
-  };
+  }
   Unreachable();
-};
+}
 
 function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
   switch (textureFormat) {
@@ -228,9 +228,9 @@ function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
       return "bc7-rgba-unorm";
     case TEXTURE_FORMAT.BC7_RGBA_UNORM_SRGB:
       return "bc7-rgba-unorm-srgb";
-  };
+  }
   Unreachable();
-};
+}
 
 function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): number {
   switch (attributeType) {
@@ -270,9 +270,9 @@ function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): numb
     case SHADER_ATTRIBUTE.UINT4:
     case SHADER_ATTRIBUTE.INT4:
       return 4;
-  };
+  }
   Unreachable();
-};
+}
 
 function GetShaderAttributeComponentSize(attributeType: SHADER_ATTRIBUTE): number {
   switch (attributeType) {
@@ -312,25 +312,25 @@ function GetShaderAttributeComponentSize(attributeType: SHADER_ATTRIBUTE): numbe
     case SHADER_ATTRIBUTE.INT3:
     case SHADER_ATTRIBUTE.INT4:
       return Uint32Array.BYTES_PER_ELEMENT;
-  };
+  }
   Unreachable();
-};
+}
 
 export interface IBindGroupResource {
   id: number;
   resource: GPUBuffer | GPUSampler | GPUTextureView;
-};
+}
 
 export interface IRenderPipeline {
   pipeline: GPURenderPipeline;
   bindGroupLayout: GPUBindGroupLayout;
-};
+}
 
 export class RenderPipelineGenerator {
 
   /**
    * Generates the descriptor to construct a new GPUSampler
-   * @param sampler 
+   * @param sampler - Sampler object
    */
   public static GenerateSamplerDescriptor(sampler: Sampler): GPUSamplerDescriptor {
     const addressMode = sampler.getAddressMode();
@@ -346,7 +346,7 @@ export class RenderPipelineGenerator {
 
   /**
    * Generates the descriptor to constructor a new GPUTexture
-   * @param texture 
+   * @param texture - Texture object
    */
   public static GenerateTextureDescriptor(texture: Texture): GPUTextureDescriptor {
     // TODO: add other texture dimensions etc.
@@ -367,7 +367,7 @@ export class RenderPipelineGenerator {
 
   /**
    * Generates the vertex state descriptor for the passed material
-   * @param material 
+   * @param material - Material object
    */
   public static generateVertexStateDescriptor(material: Material): GPUVertexStateDescriptor {
     const attributes: GPUVertexAttributeDescriptor[] = [];
@@ -387,9 +387,8 @@ export class RenderPipelineGenerator {
       const attribComponentSize = GetShaderAttributeComponentSize(type);
       totalByteOffset += attribComponentCount * attribComponentSize;
       locationId++;
-    };
+    }
     const out: GPUVertexStateDescriptor = {
-      indexFormat: "uint32", // TODO: do better
       vertexBuffers: [
         {
           arrayStride: totalByteOffset,
@@ -415,7 +414,7 @@ export class RenderPipelineGenerator {
       };
       bindGroupEntries.push(bindGroupEntry);
       bindingId++;
-    };
+    }
     const out: GPUBindGroupLayoutDescriptor = {
       entries: bindGroupEntries
     };
@@ -437,7 +436,7 @@ export class RenderPipelineGenerator {
             size: byteLength,
             usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
           });
-          out.push({ id, resource: buffer });
+          out.push({id, resource: buffer});
         } break;
         case SHADER_UNIFORM.STORAGE_BUFFER:
         case SHADER_UNIFORM.STORAGE_BUFFER_READONLY: {
@@ -445,19 +444,19 @@ export class RenderPipelineGenerator {
             size: byteLength,
             usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
           });
-          out.push({ id, resource: buffer });
+          out.push({id, resource: buffer});
         } break;
         case SHADER_UNIFORM.SAMPLER: {
-          out.push({ id, resource: null });
+          out.push({id, resource: null});
         } break;
         case SHADER_UNIFORM.TEXTURE: {
-          out.push({ id, resource: null });
+          out.push({id, resource: null});
         } break;
         case SHADER_UNIFORM.STORAGE_TEXTURE: {
-          out.push({ id, resource: null });
+          out.push({id, resource: null});
         } break;
-      };
-    };
+      }
+    }
     return out;
   }
 
@@ -465,7 +464,7 @@ export class RenderPipelineGenerator {
     const bindGroupEntries: GPUBindGroupEntry[] = [];
     const uniforms = material.getUniforms();
     for (let ii = 0; ii < uniforms.length; ++ii) {
-      const {name, id, type, isShared} = uniforms[ii];
+      const {id, type, isShared} = uniforms[ii];
       let bindGroupResource = null;
       // If the uniform is shared, pick its resource from the material
       if (isShared) bindGroupResource = material.getSharedUniformResourceById(id);
@@ -478,7 +477,7 @@ export class RenderPipelineGenerator {
         case SHADER_UNIFORM.STORAGE_BUFFER_READONLY: {
           bindGroupEntries.push({
             binding: id,
-            resource: { buffer: resource as GPUBuffer }
+            resource: {buffer: resource as GPUBuffer}
           });
         } break;
         case SHADER_UNIFORM.SAMPLER: {
@@ -498,8 +497,8 @@ export class RenderPipelineGenerator {
             resource: resource as GPUTextureView
           });
         } break;
-      };
-    };
+      }
+    }
     const {bindGroupLayout} = material.getRenderPipeline();
     const out = device.createBindGroup({
       layout: bindGroupLayout,
@@ -540,7 +539,7 @@ export class RenderPipelineGenerator {
       RenderPipelineGenerator.generateBindGroupLayoutDescriptor(material)
     );
     const layout = device.createPipelineLayout({
-      bindGroupLayouts: [ bindGroupLayout ]
+      bindGroupLayouts: [bindGroupLayout]
     });
     const renderPipelineDescriptor: GPURenderPipelineDescriptor = {
       layout,
@@ -553,7 +552,7 @@ export class RenderPipelineGenerator {
       colorStates: colorStatesDescriptor
     };
     const pipeline = device.createRenderPipeline(renderPipelineDescriptor);
-    return { pipeline, bindGroupLayout };
+    return {pipeline, bindGroupLayout};
   }
 
-};
+}

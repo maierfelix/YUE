@@ -1,5 +1,5 @@
-import { EventEmitter, CompileGLSL } from "../utils";
-import { SHADER_STAGE } from "../constants";
+import {CompileGLSL, EventEmitter} from "../utils";
+import {SHADER_STAGE} from "../constants";
 
 type ShaderCodeType = (
   Uint32Array | // SPIRV
@@ -10,9 +10,9 @@ export interface IShaderOptions {
   name?: string;
   stage: SHADER_STAGE;
   code: ShaderCodeType;
-};
+}
 
-const SHADER_DEFAULT_OPTIONS: IShaderOptions = {
+export const SHADER_DEFAULT_OPTIONS: IShaderOptions = {
   name: null,
   stage: SHADER_STAGE.NONE,
   code: null
@@ -26,14 +26,14 @@ function ToShaderStageString(stage: SHADER_STAGE): string {
       return "vertex";
     case SHADER_STAGE.FRAGMENT:
       return "fragment";
-  };
-};
+  }
+}
 
 export class Shader extends EventEmitter {
 
   private _name: string;
   private _stage: SHADER_STAGE;
-  private _code: Uint32Array;
+  private _code: ShaderCodeType;
 
   /**
    * @param options Create options
@@ -64,9 +64,9 @@ export class Shader extends EventEmitter {
   public setName(value: string): void { this._name = value; }
 
   /**
-   * Returns the shader's SPIRV code
+   * Returns the shader's GLSL or SPIRV code
    */
-  public getCode(): Uint32Array { return this._code; }
+  public getCode(): ShaderCodeType { return this._code; }
 
   /**
    * Returns the shader's stage
@@ -82,4 +82,4 @@ export class Shader extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}

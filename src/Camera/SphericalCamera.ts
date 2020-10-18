@@ -1,9 +1,11 @@
-import { mat4, vec3 } from "gl-matrix";
+import {mat4, vec3} from "gl-matrix";
 
-import { AbstractCamera, ICameraOptions } from "./AbstractCamera";
+import {AbstractCamera, ICameraOptions} from "./AbstractCamera";
 
-const InteractionEvents = require("normalized-interaction-events");
-const IntertialTurntableCamera = require("inertial-turntable-camera");
+/// <reference path="normalized-interaction-events.d.ts" />
+import * as InteractionEvents from "normalized-interaction-events";
+/// <reference path="inertial-turntable-camera.d.ts" />
+import * as IntertialTurntableCamera from "inertial-turntable-camera";
 
 export class SphericalCamera extends AbstractCamera {
 
@@ -13,12 +15,12 @@ export class SphericalCamera extends AbstractCamera {
   private _viewProjectionMatrix: mat4;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: ICameraOptions) {
     super(options);
     // Setup camera
-    const instance = IntertialTurntableCamera({
+    const instance = IntertialTurntableCamera.default({
       phi: 0.5,
       theta: 1,
       aspectRatio: this.getAspect(),
@@ -42,19 +44,22 @@ export class SphericalCamera extends AbstractCamera {
     this._viewProjectionMatrix = mat4.create();
   }
 
-  private getInstance(): any { return this._instance; }
+  /**
+   * The instance of the spherical camera
+   */
+  public getInstance(): any { return this._instance; }
 
   /**
    * Updates and caches the transforms
    */
-  private updateTransforms(): void {
+  private _updateTransforms(): void {
     // View-Projection matrix
-    const mView = this.getInstance().state.view;
-    const mProjection = this.getInstance().state.projection;
+    const mView = this._instance.state.view;
+    const mProjection = this._instance.state.projection;
     const mViewProjection = this.getViewProjectionMatrix();
     mat4.multiply(mViewProjection, mProjection, mView);
     // Translation vector
-    const vTranslation = this.getInstance().state.eye;
+    const vTranslation = this._instance.state.eye;
     vec3.copy(this._translation, vTranslation);
   }
 
@@ -70,30 +75,30 @@ export class SphericalCamera extends AbstractCamera {
 
   /**
    * Attaches controls to the provided element
-   * @param element HTML canvas element to listen for events
+   * @param element - HTML canvas element to listen for events
    */
   public attachControl(element: HTMLCanvasElement): void {
-    InteractionEvents(element)
+    InteractionEvents.default(element)
     // Listen for mouse wheel events
-    .on("wheel", (e:any) => {
-      this.getInstance().zoom(e.x, e.y, Math.exp(-e.dy * 0.5) - 1.0);
+    .on("wheel", (e: any) => {
+      this._instance.zoom(e.x, e.y, Math.exp(-e.dy * 0.5) - 1.0);
       e.originalEvent.preventDefault();
     })
     // Listen for mouse move events
-    .on("mousemove", (e:any) => {
+    .on("mousemove", (e: any) => {
       if (!e.active) return;
       // Left mouse button pressed
       if (e.buttons === 1) {
         // Translate camera when shift is pressed
         if (e.mods.shift) {
-          this.getInstance().pan(e.dx, e.dy);
+          this._instance.pan(e.dx, e.dy);
         // Rotate camera
         } else {
-          this.getInstance().rotate(-e.dx * Math.PI * 0.5, -e.dy * Math.PI * 0.5);
+          this._instance.rotate(-e.dx * Math.PI * 0.5, -e.dy * Math.PI * 0.5);
         }
       // Translate camera when middle mouse button is pressed
       } else if (e.buttons === 4) {
-        this.getInstance().pan(e.dx, e.dy);
+        this._instance.pan(e.dx, e.dy);
       }
       e.originalEvent.preventDefault();
     });
@@ -106,11 +111,11 @@ export class SphericalCamera extends AbstractCamera {
 
   /**
    * Resize the camera
-   * @param width 
-   * @param height 
+   * @param width - The new camera width
+   * @param height - The new camera height
    */
   public resize(width: number, height: number): void {
-    this.getInstance().resize(width / height);
+    this._instance.resize(width / height);
     super.resize(width, height);
   }
 
@@ -120,9 +125,9 @@ export class SphericalCamera extends AbstractCamera {
   public update(): void {
     this.getInstance().tick({
       near: this.getInstance().params.distance * 0.01,
-      far: this.getInstance().params.distance * 2 + 200
+      far: (this.getInstance().params.distance * 2) + 200
     });
-    this.updateTransforms();
+    this._updateTransforms();
     this.emit("update");
   }
 
@@ -135,4 +140,4 @@ export class SphericalCamera extends AbstractCamera {
     super.destroy();
   }
 
-};
+}

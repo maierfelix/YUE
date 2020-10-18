@@ -1,27 +1,25 @@
 {
   "compilerOptions": {
-    "strict": true,
+    "target": "es2017",
+    "module": "esnext",
     "declaration": true,
-    "target": "esnext",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "allowJs": true,
+    "declarationMap": true,
+    "strict": true,
     "strictNullChecks": false,
-    "lib": ["dom", "es2018"],
     "noImplicitAny": true,
-    "sourceMap": true,
-    "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*"]
-    }
+    "noEmit": true,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "outDir": "dist"
   },
-  "exclude": [
-    "dist",
-    "node_modules"
-  ],
   "include": [
     "src"
+  ],
+  "exclude": [
+    "dist",
+    "build",
+    "node_modules",
+    "rollup.config.js"
   ],
   "typeRoots": [
     "./node_modules/@webgpu/types/"

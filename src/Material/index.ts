@@ -1,8 +1,8 @@
-import { EventEmitter } from "../utils";
-import { SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE } from "../constants";
-import { Shader } from "../";
-import { RenderPipelineGenerator, IRenderPipeline, IBindGroupResource } from "./RenderPipelineGenerator";
-import { Renderer, IUniformUpdateEntry } from "../Renderer";
+import {EventEmitter} from "../utils";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE} from "../constants";
+import {Shader} from "../";
+import {RenderPipelineGenerator, IRenderPipeline, IBindGroupResource} from "./RenderPipelineGenerator";
+import {Renderer, IUniformUpdateEntry} from "../Renderer";
 
 export interface IMaterialUniformOptions {
   id: number;
@@ -11,9 +11,9 @@ export interface IMaterialUniformOptions {
   visibility?: SHADER_STAGE;
   isShared?: boolean;
   byteLength?: number;
-};
+}
 
-const MATERIAL_UNIFORM_DEFAULT_OPTIONS: IMaterialUniformOptions = {
+export const MATERIAL_UNIFORM_DEFAULT_OPTIONS: IMaterialUniformOptions = {
   id: 0,
   name: null,
   type: SHADER_UNIFORM.NONE,
@@ -24,10 +24,10 @@ const MATERIAL_UNIFORM_DEFAULT_OPTIONS: IMaterialUniformOptions = {
 
 export interface IMaterialAttributeOptions {
   id: number;
-  name: string;
+  name?: string;
   type: SHADER_ATTRIBUTE;
   byteOffset?: number;
-};
+}
 
 const MATERIAL_ATTRIBUTE_DEFAULT_OPTIONS: IMaterialAttributeOptions = {
   id: 0,
@@ -39,7 +39,7 @@ const MATERIAL_ATTRIBUTE_DEFAULT_OPTIONS: IMaterialAttributeOptions = {
 export interface IMaterialShaderOptions {
   shader: Shader;
   uniforms?: IMaterialUniformOptions[];
-};
+}
 
 const MATERIAL_SHADER_DEFAULT_OPTIONS: IMaterialShaderOptions = {
   shader: null,
@@ -53,7 +53,7 @@ export interface IMaterialOptions {
   blendMode?: MATERIAL_BLEND_MODE;
   vertexShader: IMaterialShaderOptions;
   fragmentShader: IMaterialShaderOptions;
-};
+}
 
 const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
   name: null,
@@ -81,7 +81,7 @@ export class Material extends EventEmitter {
   private _needsRebuildState: boolean;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: IMaterialOptions) {
     super();
@@ -98,16 +98,16 @@ export class Material extends EventEmitter {
     this._blendMode = options.blendMode;
     this._vertexShader = options.vertexShader.shader;
     this._fragmentShader = options.fragmentShader.shader;
-    this._uniforms = this.generateUniforms(options);
+    this._uniforms = this._generateUniforms(options);
     // Trigger an initial build on creation
-    this.triggerRebuild();
+    this._triggerRebuild();
   }
 
   /**
    * Generates unified uniforms and determines their visibilities
-   * @param options 
+   * @param options - The material options
    */
-  private generateUniforms(options: IMaterialOptions): IMaterialUniformOptions[] {
+  private _generateUniforms(options: IMaterialOptions): IMaterialUniformOptions[] {
     const out: IMaterialUniformOptions[] = [];
     const {vertexShader, fragmentShader} = options;
     let bindingId = 0;
@@ -123,7 +123,7 @@ export class Material extends EventEmitter {
       normalized.id = bindingId;
       out.push(normalized);
       bindingId++;
-    };
+    }
     // Generate fragment shader uniforms
     for (const uniform of fragmentShader.uniforms) {
       const normalized = Object.assign({}, MATERIAL_UNIFORM_DEFAULT_OPTIONS, uniform);
@@ -136,7 +136,7 @@ export class Material extends EventEmitter {
       normalized.id = bindingId;
       out.push(normalized);
       bindingId++;
-    };
+    }
     // Uniforms can be duplicated across stages, try to fixup these
     for (const uniform of out) {
       const duplicates = out.filter(v => v.name === uniform.name);
@@ -174,9 +174,9 @@ export class Material extends EventEmitter {
       else {
         throw new Error(`Uniform misusage for '${uniform.name}'`);
       }
-    };
+    }
     return out;
-  };
+  }
 
   /**
    * The material name
@@ -184,57 +184,57 @@ export class Material extends EventEmitter {
   public getName(): string { return this._name; }
   /**
    * Update the material name
-   * @param value 
+   * @param value - The new material name
    */
   public setName(value: string): void { this._name = value; }
 
   /**
    * The shader material uniforms
    */
-  public getUniforms(): IMaterialUniformOptions[] { return this._uniforms; };
+  public getUniforms(): IMaterialUniformOptions[] { return this._uniforms; }
 
   /**
    * Returns the given shader uniform based on the provided name
-   * @param name The shader uniform name
+   * @param name - The shader uniform name
    */
   public getUniformByName(name: string): IMaterialUniformOptions {
     const uniforms = this.getUniforms();
     for (let ii = 0; ii < uniforms.length; ++ii) {
-      let uniform = uniforms[ii];
+      const uniform = uniforms[ii];
       if (uniform.name === name) return uniform;
-    };
+    }
     return null;
   }
 
   /**
    * Returns the given uniform resource based on the provided id
-   * @param id The id to lookup for
+   * @param id - The id to lookup for
    */
   public getSharedUniformResourceById(id: number): IBindGroupResource {
-    let uniformResources = this._sharedUniformResources;
+    const uniformResources = this._sharedUniformResources;
     for (let ii = 0; ii < uniformResources.length; ++ii) {
-      let resource = uniformResources[ii];
+      const resource = uniformResources[ii];
       if (resource !== null && resource.id === id) return resource;
-    };
+    }
     return null;
   }
 
   /**
    * Add a new data update to the uniform update queue
-   * @param id The uniform id
-   * @param data The data to update with
+   * @param id - The uniform id
+   * @param data - The data to update with
    */
   public enqueueUniformUpdate(id: number, data: any): void {
-    this._uniformUpdateQueue.push({ id, data });
+    this._uniformUpdateQueue.push({id, data});
   }
 
   /**
    * Updates a shader uniform
-   * @param name The name of the shader uniform
-   * @param data The data to update with
+   * @param name - The name of the shader uniform
+   * @param data - The data to update with
    */
   public updateUniform(name: string, data: any): void {
-    let uniform = this.getUniformByName(name);
+    const uniform = this.getUniformByName(name);
     if (uniform === null)
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
     if (!uniform.isShared)
@@ -245,59 +245,59 @@ export class Material extends EventEmitter {
   /**
    * The material attributes
    */
-  public getAttributes(): IMaterialAttributeOptions[] { return this._attributes; };
+  public getAttributes(): IMaterialAttributeOptions[] { return this._attributes; }
 
   /**
    * The material culling mode
    */
-  public getCullMode(): MATERIAL_CULL_MODE { return this._cullMode; };
+  public getCullMode(): MATERIAL_CULL_MODE { return this._cullMode; }
 
   /**
    * The material blending mode
    */
-  public getBlendMode(): MATERIAL_BLEND_MODE { return this._blendMode; };
+  public getBlendMode(): MATERIAL_BLEND_MODE { return this._blendMode; }
 
   /**
    * The material vertex shader
    */
-  public getVertexShader(): Shader { return this._vertexShader; };
+  public getVertexShader(): Shader { return this._vertexShader; }
 
   /**
    * The material fragment shader
    */
-  public getFragmentShader(): Shader { return this._fragmentShader; };
+  public getFragmentShader(): Shader { return this._fragmentShader; }
 
   /**
    * The material render pipeline
    */
-  public getRenderPipeline(): IRenderPipeline { return this._renderPipeline; };
+  public getRenderPipeline(): IRenderPipeline { return this._renderPipeline; }
 
   /**
    * Determines if the material has to build a new pipeline
    */
-  private needsRebuild(): boolean {
+  private _needsRebuild(): boolean {
     return this._needsRebuildState;
   }
   /**
    * Triggers a rebuild of the material's pipeline
    */
-  private triggerRebuild(): void {
+  private _triggerRebuild(): void {
     this._needsRebuildState = true;
   }
   /**
    * Disables the rebuild trigger
    */
-  private resetRebuild(): void {
+  private _resetRebuild(): void {
     this._needsRebuildState = false;
   }
 
   /**
    * Build and compile the material into a render pipeline
-   * @param renderer 
+   * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
     // Abort if the material pipeline doesn't need a rebuild
-    if (!this.needsRebuild()) return;
+    if (!this._needsRebuild()) return;
     // Generate a new pipeline
     this._renderPipeline = RenderPipelineGenerator.generate(this, renderer.getDevice());
     // Build bind group resources
@@ -306,14 +306,14 @@ export class Material extends EventEmitter {
     );
     this.update(renderer);
     // Disable further rebuilds
-    this.resetRebuild();
+    this._resetRebuild();
     this.emit("build");
   }
 
   /**
    * Update this material
    * Used to e.g. process pending uniform resource updates
-   * @param renderer 
+   * @param renderer - Renderer instance
    */
   public update(renderer: Renderer) {
     renderer.processUniformUpdateQueue(
@@ -337,4 +337,4 @@ export class Material extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}

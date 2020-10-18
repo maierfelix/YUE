@@ -1,11 +1,11 @@
-import { EventEmitter } from "../utils";
-import { Scene, ISceneOptions } from "../Scene";
+import {EventEmitter} from "../utils";
+import {Scene, ISceneOptions} from "../Scene";
 
 export interface IRendererOptions {
   canvas?: HTMLCanvasElement;
-};
+}
 
-const RENDERER_DEFAULT_OPTIONS: IRendererOptions = {
+export const RENDERER_DEFAULT_OPTIONS: IRendererOptions = {
   canvas: null
 };
 
@@ -17,7 +17,7 @@ export abstract class AbstractRenderer extends EventEmitter {
   private _canvas: HTMLCanvasElement;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: IRendererOptions) {
     super();
@@ -51,8 +51,8 @@ export abstract class AbstractRenderer extends EventEmitter {
 
   /**
    * Resize the rendering surface
-   * @param width The destination width after resize
-   * @param height The destination height after resize
+   * @param width - The destination width after resize
+   * @param height - The destination height after resize
    */
   public resize(width: number, height: number) {
     this._canvas.width = width;
@@ -69,7 +69,7 @@ export abstract class AbstractRenderer extends EventEmitter {
    * Create a new scene
    */
   public createScene(options?: ISceneOptions): Scene {
-    options = Object.assign({ renderer: this }, options);
+    options = Object.assign({renderer: this}, options);
     return new Scene(options);
   }
 
@@ -81,4 +81,4 @@ export abstract class AbstractRenderer extends EventEmitter {
     this.emit("destroy");
   }
 
-};
+}
