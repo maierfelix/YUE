@@ -14,7 +14,7 @@ const CANVAS_DEFAULT_HEIGHT = 320;
 
 export abstract class AbstractRenderer extends EventEmitter {
 
-  private _canvas: HTMLCanvasElement;
+  private _canvas: HTMLCanvasElement = null;
 
   /**
    * @param options - Create options

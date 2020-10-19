@@ -31,12 +31,12 @@ function ToShaderStageString(stage: SHADER_STAGE): string {
 
 export class Shader extends EventEmitter {
 
-  private _name: string;
-  private _stage: SHADER_STAGE;
-  private _code: ShaderCodeType;
+  private _name: string = null;
+  private _stage: SHADER_STAGE = SHADER_STAGE.NONE;
+  private _code: ShaderCodeType = null;
 
   /**
-   * @param options Create options
+   * @param options - Create options
    */
   public constructor(options?: IShaderOptions) {
     super();
@@ -57,9 +57,10 @@ export class Shader extends EventEmitter {
    * The shader name
    */
   public getName(): string { return this._name; }
+
   /**
    * Update the shader name
-   * @param value 
+   * @param value - The new shader name
    */
   public setName(value: string): void { this._name = value; }
 

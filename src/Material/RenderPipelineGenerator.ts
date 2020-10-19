@@ -5,7 +5,7 @@ import {Unreachable} from "../utils";
 import {Sampler} from "../Sampler";
 import {Texture} from "../Texture";
 
-function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
+export function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   let flags: GPUShaderStageFlags = 0;
   if (stages & SHADER_STAGE.VERTEX) {
     flags |= GPUShaderStage.VERTEX;
@@ -16,7 +16,7 @@ function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   return flags;
 }
 
-function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
+export function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
   switch (uniformType) {
     case SHADER_UNIFORM.NONE:
       throw new Error(`'SHADER_UNIFORM.NONE' is not a valid binding type`);
@@ -36,7 +36,7 @@ function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
   Unreachable();
 }
 
-function ToWGPUVertexFormat(attributeType: SHADER_ATTRIBUTE): GPUVertexFormat {
+export function ToWGPUVertexFormat(attributeType: SHADER_ATTRIBUTE): GPUVertexFormat {
   switch (attributeType) {
     case SHADER_ATTRIBUTE.NONE:
       throw new Error(`'SHADER_ATTRIBUTE.NONE' is not a valid attribute type`);
@@ -104,7 +104,7 @@ function ToWGPUVertexFormat(attributeType: SHADER_ATTRIBUTE): GPUVertexFormat {
   Unreachable();
 }
 
-function ToWGPUAddressMode(wrappingMode: SAMPLER_WRAP_MODE): GPUAddressMode {
+export function ToWGPUAddressMode(wrappingMode: SAMPLER_WRAP_MODE): GPUAddressMode {
   switch (wrappingMode) {
     case SAMPLER_WRAP_MODE.NONE:
       throw new Error(`'SAMPLER_WRAP_MODE.NONE' is not a valid wrapping mode`);
@@ -118,7 +118,7 @@ function ToWGPUAddressMode(wrappingMode: SAMPLER_WRAP_MODE): GPUAddressMode {
   Unreachable();
 }
 
-function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode {
+export function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode {
   switch (filterMode) {
     case SAMPLER_FILTER_MODE.NONE:
       throw new Error(`'SAMPLER_FILTER_MODE.NONE' is not a valid filtering mode`);
@@ -130,7 +130,7 @@ function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode {
   Unreachable();
 }
 
-function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
+export function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
   switch (textureFormat) {
     case TEXTURE_FORMAT.NONE:
       throw new Error(`'TEXTURE_FORMAT.NONE' is not a valid texture format`);
@@ -232,7 +232,7 @@ function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
   Unreachable();
 }
 
-function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): number {
+export function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): number {
   switch (attributeType) {
     case SHADER_ATTRIBUTE.NONE:
       throw new Error(`'SHADER_ATTRIBUTE.NONE' is not a valid attribute type`);
@@ -274,7 +274,7 @@ function GetShaderAttributeComponentCount(attributeType: SHADER_ATTRIBUTE): numb
   Unreachable();
 }
 
-function GetShaderAttributeComponentSize(attributeType: SHADER_ATTRIBUTE): number {
+export function GetShaderAttributeComponentSize(attributeType: SHADER_ATTRIBUTE): number {
   switch (attributeType) {
     case SHADER_ATTRIBUTE.NONE:
       throw new Error(`'SHADER_ATTRIBUTE.NONE' is not a valid attribute type`);
@@ -526,7 +526,7 @@ export class RenderPipelineGenerator {
     const depthStencilStateDescriptor: GPUDepthStencilStateDescriptor = {
       depthWriteEnabled: true,
       depthCompare: "less",
-      format: "depth24plus-stencil8"
+      format: "depth32float"
     };
     const rasterizationStateDescriptor: GPURasterizationStateDescriptor = {
       cullMode: "none"

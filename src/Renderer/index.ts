@@ -22,8 +22,8 @@ export class Renderer extends AbstractRenderer {
   private _swapchain: GPUSwapChain = null;
   private _depthAttachment: GPUTextureView = null;
 
-  private _beginFrameTimestamp: number;
-  private _lastFrameTimestamp: number;
+  private _beginFrameTimestamp: number = 0;
+  private _lastFrameTimestamp: number = 0;
 
   private _queueCommander: QueueCommander = null;
 
@@ -126,7 +126,7 @@ export class Renderer extends AbstractRenderer {
     // resize depth attachment
     const depthAttachment = this.getDevice().createTexture({
       size: {width: width, height: height, depth: 1},
-      format: "depth24plus-stencil8",
+      format: "depth32float",
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT
     }).createView();
     this._depthAttachment = depthAttachment;

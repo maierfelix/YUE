@@ -23,13 +23,13 @@ export const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
 
 export class Texture extends EventEmitter {
 
-  private _name: string;
-  private _data: ArrayBufferView;
-  private _width: number;
-  private _height: number;
-  private _depth: number;
-  private _bytesPerRow: number;
-  private _format: TEXTURE_FORMAT;
+  private _name: string = null;
+  private _data: ArrayBufferView = null;
+  private _width: number = 0;
+  private _height: number = 0;
+  private _depth: number = 0;
+  private _bytesPerRow: number = 0;
+  private _format: TEXTURE_FORMAT = TEXTURE_FORMAT.NONE;
 
   /**
    * @param options - Create options

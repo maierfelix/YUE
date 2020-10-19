@@ -43,7 +43,7 @@ export interface IMaterialShaderOptions {
 
 const MATERIAL_SHADER_DEFAULT_OPTIONS: IMaterialShaderOptions = {
   shader: null,
-  uniforms: null
+  uniforms: []
 };
 
 export interface IMaterialOptions {
@@ -66,19 +66,21 @@ const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
 
 export class Material extends EventEmitter {
 
-  private _name: string;
-  private _attributes: IMaterialAttributeOptions[];
-  private _cullMode: MATERIAL_CULL_MODE;
-  private _blendMode: MATERIAL_BLEND_MODE;
-  private _vertexShader: Shader;
-  private _fragmentShader: Shader;
+  private _name: string = null;
+  private _attributes: IMaterialAttributeOptions[] = [];
+  private _cullMode: MATERIAL_CULL_MODE = MATERIAL_CULL_MODE.NONE;
+  private _blendMode: MATERIAL_BLEND_MODE = MATERIAL_BLEND_MODE.NONE;
+  private _vertexShader: Shader = null;
+  private _fragmentShader: Shader = null;
 
-  private _uniforms: IMaterialUniformOptions[];
+  private _uniforms: IMaterialUniformOptions[] = [];
   private _renderPipeline: IRenderPipeline = null;
   private _uniformUpdateQueue: IUniformUpdateEntry[] = [];
   private _sharedUniformResources: IBindGroupResource[] = [];
 
-  private _needsRebuildState: boolean;
+  private _attributeLayoutByteStride: number = 0;
+
+  private _needsRebuildState: boolean = false;
 
   /**
    * @param options - Create options
@@ -99,8 +101,162 @@ export class Material extends EventEmitter {
     this._vertexShader = options.vertexShader.shader;
     this._fragmentShader = options.fragmentShader.shader;
     this._uniforms = this._generateUniforms(options);
+    // Save the attribute layout bytestride
+    this._attributeLayoutByteStride = (
+      (RenderPipelineGenerator.generateVertexStateDescriptor(this) as any).vertexBuffers[0].arrayStride
+    );
+    // Make sure the attribute layout contains a position attribute
+    if (!this._attributes.find(l => l.name === "Position")) {
+      throw new ReferenceError(`Attribute layout for material must contain a 'Position' entry`);
+    }
     // Trigger an initial build on creation
     this._triggerRebuild();
+  }
+
+  /**
+   * The material name
+   */
+  public getName(): string { return this._name; }
+  /**
+   * Update the material name
+   * @param value - The new material name
+   */
+  public setName(value: string): void { this._name = value; }
+
+  /**
+   * The shader material uniforms
+   */
+  public getUniforms(): IMaterialUniformOptions[] { return this._uniforms; }
+
+  /**
+   * Returns the given shader uniform based on the provided name
+   * @param name - The shader uniform name
+   */
+  public getUniformByName(name: string): IMaterialUniformOptions {
+    const uniforms = this.getUniforms();
+    for (let ii = 0; ii < uniforms.length; ++ii) {
+      const uniform = uniforms[ii];
+      if (uniform.name === name) return uniform;
+    }
+    return null;
+  }
+
+  /**
+   * Returns the given uniform resource based on the provided id
+   * @param id - The id to lookup for
+   */
+  public getSharedUniformResourceById(id: number): IBindGroupResource {
+    const uniformResources = this._sharedUniformResources;
+    for (let ii = 0; ii < uniformResources.length; ++ii) {
+      const resource = uniformResources[ii];
+      if (resource !== null && resource.id === id) return resource;
+    }
+    return null;
+  }
+
+  /**
+   * Add a new data update to the uniform update queue
+   * @param id - The uniform id
+   * @param data - The data to update with
+   */
+  public enqueueUniformUpdate(id: number, data: any): void {
+    this._uniformUpdateQueue.push({id, data});
+  }
+
+  /**
+   * Updates a shader uniform
+   * @param name - The name of the shader uniform
+   * @param data - The data to update with
+   */
+  public updateUniform(name: string, data: any): void {
+    const uniform = this.getUniformByName(name);
+    if (uniform === null)
+      throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
+    if (!uniform.isShared)
+      throw new Error(`Uniform '${name}' isn't declared as shared and must be accessed through its mesh`);
+    if (data !== null)
+      this.enqueueUniformUpdate(uniform.id, data);
+  }
+
+  /**
+   * The material attributes
+   */
+  public getAttributes(): IMaterialAttributeOptions[] { return this._attributes; }
+
+  /**
+   * The material culling mode
+   */
+  public getCullMode(): MATERIAL_CULL_MODE { return this._cullMode; }
+
+  /**
+   * The material blending mode
+   */
+  public getBlendMode(): MATERIAL_BLEND_MODE { return this._blendMode; }
+
+  /**
+   * The material vertex shader
+   */
+  public getVertexShader(): Shader { return this._vertexShader; }
+
+  /**
+   * The material fragment shader
+   */
+  public getFragmentShader(): Shader { return this._fragmentShader; }
+
+  /**
+   * The material render pipeline
+   */
+  public getRenderPipeline(): IRenderPipeline { return this._renderPipeline; }
+
+  /**
+   * The byte stride of the attribute layout
+   */
+  public getAttributeLayoutByteStride(): number { return this._attributeLayoutByteStride; }
+
+  /**
+   * Build and compile the material into a render pipeline
+   * @param renderer - Renderer instance
+   */
+  public build(renderer: Renderer): void {
+    // Abort if the material pipeline doesn't need a rebuild
+    if (!this._needsRebuild()) return;
+    // Generate a new pipeline
+    this._renderPipeline = RenderPipelineGenerator.generate(this, renderer.getDevice());
+    // Build bind group resources
+    this._sharedUniformResources = RenderPipelineGenerator.generateBindGroupResources(
+      this, true, renderer.getDevice()
+    );
+    this.update(renderer);
+    // Disable further rebuilds
+    this._resetRebuild();
+    this.emit("build");
+  }
+
+  /**
+   * Update this material
+   * Used to e.g. process pending uniform resource updates
+   * @param renderer - Renderer instance
+   */
+  public update(renderer: Renderer) {
+    renderer.processUniformUpdateQueue(
+      this._uniformUpdateQueue,
+      this._sharedUniformResources
+    );
+  }
+
+  /**
+   * Destroy this Object
+   */
+  public destroy(): void {
+    this._name = null;
+    this._attributes = null;
+    this._vertexShader = null;
+    this._fragmentShader = null;
+    this._uniforms = null;
+    this._renderPipeline = null;
+    this._uniformUpdateQueue = null;
+    this._sharedUniformResources = null;
+    this.emit("destroy");
   }
 
   /**
@@ -179,100 +335,6 @@ export class Material extends EventEmitter {
   }
 
   /**
-   * The material name
-   */
-  public getName(): string { return this._name; }
-  /**
-   * Update the material name
-   * @param value - The new material name
-   */
-  public setName(value: string): void { this._name = value; }
-
-  /**
-   * The shader material uniforms
-   */
-  public getUniforms(): IMaterialUniformOptions[] { return this._uniforms; }
-
-  /**
-   * Returns the given shader uniform based on the provided name
-   * @param name - The shader uniform name
-   */
-  public getUniformByName(name: string): IMaterialUniformOptions {
-    const uniforms = this.getUniforms();
-    for (let ii = 0; ii < uniforms.length; ++ii) {
-      const uniform = uniforms[ii];
-      if (uniform.name === name) return uniform;
-    }
-    return null;
-  }
-
-  /**
-   * Returns the given uniform resource based on the provided id
-   * @param id - The id to lookup for
-   */
-  public getSharedUniformResourceById(id: number): IBindGroupResource {
-    const uniformResources = this._sharedUniformResources;
-    for (let ii = 0; ii < uniformResources.length; ++ii) {
-      const resource = uniformResources[ii];
-      if (resource !== null && resource.id === id) return resource;
-    }
-    return null;
-  }
-
-  /**
-   * Add a new data update to the uniform update queue
-   * @param id - The uniform id
-   * @param data - The data to update with
-   */
-  public enqueueUniformUpdate(id: number, data: any): void {
-    this._uniformUpdateQueue.push({id, data});
-  }
-
-  /**
-   * Updates a shader uniform
-   * @param name - The name of the shader uniform
-   * @param data - The data to update with
-   */
-  public updateUniform(name: string, data: any): void {
-    const uniform = this.getUniformByName(name);
-    if (uniform === null)
-      throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
-    if (!uniform.isShared)
-      throw new Error(`Uniform '${name}' isn't declared as shared and must be accessed through its mesh`);
-    this.enqueueUniformUpdate(uniform.id, data);
-  }
-
-  /**
-   * The material attributes
-   */
-  public getAttributes(): IMaterialAttributeOptions[] { return this._attributes; }
-
-  /**
-   * The material culling mode
-   */
-  public getCullMode(): MATERIAL_CULL_MODE { return this._cullMode; }
-
-  /**
-   * The material blending mode
-   */
-  public getBlendMode(): MATERIAL_BLEND_MODE { return this._blendMode; }
-
-  /**
-   * The material vertex shader
-   */
-  public getVertexShader(): Shader { return this._vertexShader; }
-
-  /**
-   * The material fragment shader
-   */
-  public getFragmentShader(): Shader { return this._fragmentShader; }
-
-  /**
-   * The material render pipeline
-   */
-  public getRenderPipeline(): IRenderPipeline { return this._renderPipeline; }
-
-  /**
    * Determines if the material has to build a new pipeline
    */
   private _needsRebuild(): boolean {
@@ -289,52 +351,6 @@ export class Material extends EventEmitter {
    */
   private _resetRebuild(): void {
     this._needsRebuildState = false;
-  }
-
-  /**
-   * Build and compile the material into a render pipeline
-   * @param renderer - Renderer instance
-   */
-  public build(renderer: Renderer): void {
-    // Abort if the material pipeline doesn't need a rebuild
-    if (!this._needsRebuild()) return;
-    // Generate a new pipeline
-    this._renderPipeline = RenderPipelineGenerator.generate(this, renderer.getDevice());
-    // Build bind group resources
-    this._sharedUniformResources = RenderPipelineGenerator.generateBindGroupResources(
-      this, true, renderer.getDevice()
-    );
-    this.update(renderer);
-    // Disable further rebuilds
-    this._resetRebuild();
-    this.emit("build");
-  }
-
-  /**
-   * Update this material
-   * Used to e.g. process pending uniform resource updates
-   * @param renderer - Renderer instance
-   */
-  public update(renderer: Renderer) {
-    renderer.processUniformUpdateQueue(
-      this._uniformUpdateQueue,
-      this._sharedUniformResources
-    );
-  }
-
-  /**
-   * Destroy this Object
-   */
-  public destroy(): void {
-    this._name = null;
-    this._attributes = null;
-    this._vertexShader = null;
-    this._fragmentShader = null;
-    this._uniforms = null;
-    this._renderPipeline = null;
-    this._uniformUpdateQueue = null;
-    this._sharedUniformResources = null;
-    this.emit("destroy");
   }
 
 }

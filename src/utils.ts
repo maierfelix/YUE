@@ -24,27 +24,6 @@ export function CompileGLSL(glsl: string, type: string): Uint32Array {
 }
 
 /**
- * Fixates a number at the provided range
- * @param value - The value to fixate
- * @param range - The range to fixate
- */
-export function FixateToZero(value: number, range: number): number {
-  if (value > 0 && value <= range) return 0.0;
-  if (value < 0 && value >= -range) return 0.0;
-  return value;
-}
-
-/**
- * Clamps a value between the provided min and max range
- * @param value - The value to clamp
- * @param min - The minimum range
- * @param max - The maximum range
- */
-export function Clamp(value: number, min: number, max: number): number {
-  return Math.max(Math.min(max, value), min);
-}
-
-/**
  * Fetches a text from the provided path
  * @param path - The path to fetch the text from
  */
@@ -110,4 +89,25 @@ export function GetTimeStamp(): number {
   }*/
   // browser environment
   return (performance as any).now();
+}
+
+/**
+ * Fixates a number at the provided range
+ * @param value - The value to fixate
+ * @param range - The range to fixate
+ */
+export function FixateToZero(value: number, range: number): number {
+  if (value > 0 && value <= range) return 0.0;
+  if (value < 0 && value >= -range) return 0.0;
+  return value;
+}
+
+/**
+ * Clamps a value between the provided min and max range
+ * @param value - The value to clamp
+ * @param min - The minimum range
+ * @param max - The maximum range
+ */
+export function Clamp(value: number, min: number, max: number): number {
+  return Math.max(Math.min(max, value), min);
 }

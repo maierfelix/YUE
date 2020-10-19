@@ -1,8 +1,11 @@
-import {EventEmitter} from "../utils";
 import {Material} from "../Material";
 import {vec3, quat, mat4} from "gl-matrix";
 import {Renderer, IUniformUpdateEntry} from "../Renderer";
-import {IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
+import {GetShaderAttributeComponentSize, IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
+import {IRayTriangleIntersection, Ray, TRIANGLE_FACING} from "../Ray";
+import {Container} from "../Container";
+
+export * from "./StaticMesh";
 
 export interface IMeshOptions {
   name?: string;
@@ -12,6 +15,7 @@ export interface IMeshOptions {
   scale?: vec3;
   indices?: ArrayBufferView;
   attributes?: ArrayBufferView;
+  freeAfterUpload?: boolean;
 }
 
 export const MESH_DEFAULT_OPTIONS: IMeshOptions = {
@@ -21,24 +25,18 @@ export const MESH_DEFAULT_OPTIONS: IMeshOptions = {
   rotation: null,
   scale: null,
   indices: null,
-  attributes: null
+  attributes: null,
+  freeAfterUpload: false,
 };
 
-export class Mesh extends EventEmitter {
+export class Mesh extends Container {
 
-  private _name: string;
-  private _material: Material;
-  private _translation: vec3;
-  private _rotation: quat;
-  private _scale: vec3;
-  private _indices: ArrayBufferView;
-  private _attributes: ArrayBufferView;
+  private _material: Material = null;
+  private _indices: ArrayBufferView = null;
+  private _attributes: ArrayBufferView = null;
   private _indexCount: number = 0;
 
-  private _modelMatrix: mat4 = mat4.create();
-  private _rotationMatrix: mat4 = mat4.create();
-
-  private _uniformBindGroup: GPUBindGroup;
+  private _uniformBindGroup: GPUBindGroup = null;
   private _uniformResources: IBindGroupResource[] = [];
 
   private _uniformUpdateQueue: IUniformUpdateEntry[] = [];
@@ -46,35 +44,23 @@ export class Mesh extends EventEmitter {
   private _indexBuffer: GPUBuffer = null;
   private _attributeBuffer: GPUBuffer = null;
 
-  private _needsRebuildState: boolean;
+  private _freeAfterUpload: boolean = false;
+  private _needsRebuildState: boolean = false;
 
   /**
    * @param options - Create options
    */
   public constructor(options?: IMeshOptions) {
-    super();
+    super(options);
     // Normalize options
     options = Object.assign({}, MESH_DEFAULT_OPTIONS, options);
     // Process options
     this.setName(options.name);
     this.setMaterial(options.material);
-    this._translation = options.translation ? options.translation : vec3.create();
-    this._rotation = options.rotation ? options.rotation : quat.create();
-    this._scale = options.scale ? options.scale : vec3.fromValues(1, 1, 1);
     this._indices = options.indices;
     this._attributes = options.attributes;
+    this._freeAfterUpload = options.freeAfterUpload;
   }
-
-  /**
-   * The mesh name
-   */
-  public getName(): string { return this._name; }
-
-  /**
-   * Update the mesh name
-   * @param value - The new mesh name
-   */
-  public setName(value: string): void { this._name = value; }
 
   /**
    * The mesh's assigned material
@@ -97,117 +83,61 @@ export class Mesh extends EventEmitter {
   public getIndexCount(): number { return this._indexCount; }
 
   /**
-   * The mesh's translation
+   * Returns the intersection point in world-space between the mesh and the provided ray
+   * @param ray - The ray to intersection with
    */
-  public getTranslation(): vec3 { return this._translation; }
-
-  /**
-   * Update the mesh's translation
-   * @param value - The new mesh translation
-   */
-  public setTranslation(value: vec3): void { this._translation = value; }
-
-  /**
-   * The mesh's rotation
-   */
-  public getRotation(): quat { return this._rotation; }
-
-  /**
-   * Update the mesh's rotation
-   * @param value - The new mesh rotation
-   */
-  public setRotation(value: quat): void { this._rotation = value; }
-
-  /**
-   * The mesh's scale
-   */
-  public getScale(): vec3 { return this._scale; }
-
-  /**
-   * Update the mesh's scale
-   * @param value - The new mesh scale
-   */
-  public setScale(value: vec3): void { this._scale = value; }
-
-  /**
-   * Determines if the mesh has to be rebuilt
-   */
-  private _needsRebuild(): boolean {
-    return this._needsRebuildState;
-  }
-
-  /**
-   * Triggers a rebuild of the mesh
-   */
-  private _triggerRebuild(): void {
-    this._needsRebuildState = true;
-  }
-
-  /**
-   * Disables the rebuild trigger
-   */
-  private _resetRebuild(): void {
-    this._needsRebuildState = false;
-  }
-
-  /**
-   * Translates this mesh
-   * @param value - A vector to translate by
-   */
-  public translate(value: vec3): void {
-    const translation = this._translation;
-    translation[0] += value[0];
-    translation[1] += value[1];
-    translation[2] += value[2];
-  }
-
-  /**
-   * Rotates this mesh
-   * @param value - A quaternion to rotate by
-   */
-  public rotate(value: quat): void {
-    const rotation = this._rotation;
-    quat.rotateX(rotation, rotation, value[0] * Math.PI / 180);
-    quat.rotateY(rotation, rotation, value[1] * Math.PI / 180);
-    quat.rotateZ(rotation, rotation, value[2] * Math.PI / 180);
-  }
-
-  /**
-   * Scales this mesh
-   * @param value - A vector to scale by
-   */
-  public scale(value: vec3): void {
-    const scale = this._scale;
-    scale[0] *= value[0];
-    scale[1] *= value[1];
-    scale[2] *= value[2];
-  }
-
-  /**
-   * Generates and returns a model matrix
-   */
-  public getModelMatrix(): mat4 {
-    const mModel = this._modelMatrix;
-    const mRotation = this._rotationMatrix;
-    const translation = this._translation;
-    const rotation = this._rotation;
-    const scale = this._scale;
-    mat4.identity(mModel);
-    mat4.identity(mRotation);
-    // translation
-    mat4.translate(mModel, mModel, translation);
-    // rotation
-    quat.normalize(rotation, rotation);
-    mat4.fromQuat(mRotation, rotation);
-    mat4.multiply(mModel, mModel, mRotation);
-    // scale
-    mat4.scale(
-      mModel,
-      mModel,
-      scale
-    );
-    // TODO: apply parent transforms?
-    return mModel;
+  public intersectRay(ray: Ray): IRayTriangleIntersection {
+    // In case the mesh data gets freed after upload, we no longer can do this
+    if (this._freeAfterUpload) return null;
+    const indices = this._indices as Uint32Array;
+    const attributes = this._attributes as Float32Array;
+    const material = this.getMaterial();
+    const attributeLayout = material.getAttributes();
+    const mModel = this.getModelMatrix();
+    //const mModelInverse = this.getModelInverseMatrix();
+    const v0 = vec3.create();
+    const v1 = vec3.create();
+    const v2 = vec3.create();
+    const positionLayout = attributeLayout.find(l => l.name === "Position");
+    const positionByteOffset = positionLayout.byteOffset;
+    const attributeView = new DataView(attributes.buffer, attributes.byteOffset, attributes.byteLength);
+    const attributeComponentSize = GetShaderAttributeComponentSize(positionLayout.type);
+    const attributeByteStride = material.getAttributeLayoutByteStride();
+    let backfaceIntersection: IRayTriangleIntersection = null;
+    for (let ii = 0; ii < indices.length / 3; ++ii) {
+      const i0 = positionByteOffset + (((indices[(ii * 3) + 0])) * attributeByteStride);
+      const i1 = positionByteOffset + (((indices[(ii * 3) + 1])) * attributeByteStride);
+      const i2 = positionByteOffset + (((indices[(ii * 3) + 2])) * attributeByteStride);
+      // Vertex 0
+      v0[0] = attributeView.getFloat32(i0 + (attributeComponentSize * 0), true);
+      v0[1] = attributeView.getFloat32(i0 + (attributeComponentSize * 1), true);
+      v0[2] = attributeView.getFloat32(i0 + (attributeComponentSize * 2), true);
+      // Vertex 1
+      v1[0] = attributeView.getFloat32(i1 + (attributeComponentSize * 0), true);
+      v1[1] = attributeView.getFloat32(i1 + (attributeComponentSize * 1), true);
+      v1[2] = attributeView.getFloat32(i1 + (attributeComponentSize * 2), true);
+      // Vertex 2
+      v2[0] = attributeView.getFloat32(i2 + (attributeComponentSize * 0), true);
+      v2[1] = attributeView.getFloat32(i2 + (attributeComponentSize * 1), true);
+      v2[2] = attributeView.getFloat32(i2 + (attributeComponentSize * 2), true);
+      vec3.transformMat4(v0, v0, mModel);
+      vec3.transformMat4(v1, v1, mModel);
+      vec3.transformMat4(v2, v2, mModel);
+      const intersection = ray.intersectTriangle(v0, v1, v2);
+      if (intersection !== null) {
+        // We got a backface intersection, but we prefer front face intersections
+        // Cache the backface intersection and continue until we get a front-face intersection
+        if (intersection.facing === TRIANGLE_FACING.BACK) {
+          backfaceIntersection = intersection;
+        }
+        // Found a front face intersection, we can abort now
+        else {
+          return intersection;
+        }
+      }
+    }
+    // In case no intersection or a back-face intersection happened
+    return backfaceIntersection;
   }
 
   /**
@@ -230,7 +160,8 @@ export class Mesh extends EventEmitter {
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
     if (uniform.isShared)
       throw new Error(`Uniform '${name}' is declared as shared and must be accessed through its material`);
-    this.enqueueUniformUpdate(uniform.id, data);
+    if (data !== null)
+      this.enqueueUniformUpdate(uniform.id, data);
   }
 
   /**
@@ -254,6 +185,7 @@ export class Mesh extends EventEmitter {
    * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
+    super.build(renderer);
     // Abort if the mesh doesn't need a rebuild
     if (!this._needsRebuild()) return;
     const material = this.getMaterial();
@@ -283,7 +215,6 @@ export class Mesh extends EventEmitter {
     }
     // After the build we disable further builds
     this._resetRebuild();
-    this.emit("build");
   }
 
   /**
@@ -292,6 +223,7 @@ export class Mesh extends EventEmitter {
    * @param renderer - Renderer instance
    */
   public update(renderer: Renderer): void {
+    super.update(renderer);
     // Update the assigned material
     this.getMaterial().update(renderer);
     renderer.processUniformUpdateQueue(
@@ -309,7 +241,7 @@ export class Mesh extends EventEmitter {
       }
       this._indexCount = (this._indices as Uint32Array).length;
       renderer.getQueueCommander().transferDataToBuffer(this._indexBuffer, this._indices, 0x0);
-      this._indices = null;
+      if (this._freeAfterUpload) this._indices = null;
     }
     // Enqueue copy operation
     if (this._attributes !== null) {
@@ -321,7 +253,7 @@ export class Mesh extends EventEmitter {
         });
       }
       renderer.getQueueCommander().transferDataToBuffer(this._attributeBuffer, this._attributes, 0x0);
-      this._attributes = null;
+      if (this._freeAfterUpload) this._attributes = null;
     }
   }
 
@@ -330,8 +262,8 @@ export class Mesh extends EventEmitter {
    * @param encoder - Encoder object to add commands to
    */
   public render(encoder: GPURenderPassEncoder): void {
+    super.render(encoder);
     const material = this.getMaterial();
-    this.emit("beforerender");
     // make sure the material's render pipeline is ready
     if (material.getRenderPipeline() !== null) {
       const {pipeline} = material.getRenderPipeline();
@@ -341,28 +273,42 @@ export class Mesh extends EventEmitter {
       encoder.setIndexBuffer(this._indexBuffer, "uint32", 0x0, this.getIndexCount() * Uint32Array.BYTES_PER_ELEMENT);
       encoder.drawIndexed(this.getIndexCount(), 1, 0, 0, 0);
     }
-    this.emit("afterrender");
   }
 
   /**
    * Destroy this Object
    */
   public destroy(): void {
-    this._name = null;
+    super.destroy();
     this._material = null;
-    this._translation = null;
-    this._rotation = null;
-    this._scale = null;
     this._indices = null;
     this._attributes = null;
-    this._modelMatrix = null;
-    this._rotationMatrix = null;
     this._uniformBindGroup = null;
     this._uniformResources = null;
     this._uniformUpdateQueue = null;
     this._indexBuffer = null;
     this._attributeBuffer = null;
-    this.emit("destroy");
+  }
+
+  /**
+   * Determines if the mesh has to be rebuilt
+   */
+  private _needsRebuild(): boolean {
+    return this._needsRebuildState;
+  }
+
+  /**
+   * Triggers a rebuild of the mesh
+   */
+  private _triggerRebuild(): void {
+    this._needsRebuildState = true;
+  }
+
+  /**
+   * Disables the rebuild trigger
+   */
+  private _resetRebuild(): void {
+    this._needsRebuildState = false;
   }
 
 }

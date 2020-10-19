@@ -1,5 +1,5 @@
 import {EventEmitter, Warn} from "../utils";
-import {Mesh} from "../Mesh";
+import {Container} from "../Container";
 import {Renderer} from "../Renderer";
 import {AbstractCamera} from "../Camera";
 
@@ -19,12 +19,12 @@ type ClearColorType = [number, number, number, number];
 
 export class Scene extends EventEmitter {
 
-  private _name: string;
+  private _name: string = null;
 
-  private _clearColor: ClearColorType;
+  private _clearColor: ClearColorType = null;
 
-  private _camera: AbstractCamera;
-  private _children: Mesh[] = [];
+  private _camera: AbstractCamera = null;
+  private _children: Container[] = [];
 
   /**
    * @param options - Create options
@@ -43,6 +43,7 @@ export class Scene extends EventEmitter {
    * The shader name
    */
   public getName(): string { return this._name; }
+
   /**
    * Update the shader name
    * @param value - The new shader name
@@ -66,7 +67,7 @@ export class Scene extends EventEmitter {
    * Add a child to the scene
    * @param mesh - The mesh to add
    */
-  public addChild(mesh: Mesh): void {
+  public addChild(mesh: Container): void {
     if (this._children.indexOf(mesh) === -1) {
       this._children.push(mesh);
     } else {
@@ -78,7 +79,7 @@ export class Scene extends EventEmitter {
    * Remove a child from the scene
    * @param mesh - The mesh to remove
    */
-  public removeChild(mesh: Mesh): void {
+  public removeChild(mesh: Container): void {
     const childIndex = this._children.indexOf(mesh);
     if (childIndex !== -1) {
       this._children.splice(childIndex, 1);

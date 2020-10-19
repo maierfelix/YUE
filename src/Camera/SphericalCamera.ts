@@ -9,10 +9,7 @@ import * as IntertialTurntableCamera from "inertial-turntable-camera";
 
 export class SphericalCamera extends AbstractCamera {
 
-  private _instance: any;
-
-  private _translation: vec3;
-  private _viewProjectionMatrix: mat4;
+  private _instance: any = null;
 
   /**
    * @param options - Create options
@@ -40,38 +37,12 @@ export class SphericalCamera extends AbstractCamera {
       instance.params.distance = prevYRange / Math.tan(instance.params.fovY * 0.5);
     }
     this._instance = instance;
-    this._translation = vec3.create();
-    this._viewProjectionMatrix = mat4.create();
   }
 
   /**
    * The instance of the spherical camera
    */
   public getInstance(): any { return this._instance; }
-
-  /**
-   * Updates and caches the transforms
-   */
-  private _updateTransforms(): void {
-    // View-Projection matrix
-    const mView = this._instance.state.view;
-    const mProjection = this._instance.state.projection;
-    const mViewProjection = this.getViewProjectionMatrix();
-    mat4.multiply(mViewProjection, mProjection, mView);
-    // Translation vector
-    const vTranslation = this._instance.state.eye;
-    vec3.copy(this._translation, vTranslation);
-  }
-
-  /**
-   * Returns the translation of the camera
-   */
-  public getTranslation(): vec3 { return this._translation; }
-
-  /**
-   * Returns the view-projection matrix of the camera
-   */
-  public getViewProjectionMatrix(): mat4 { return this._viewProjectionMatrix; }
 
   /**
    * Attaches controls to the provided element
@@ -127,7 +98,9 @@ export class SphericalCamera extends AbstractCamera {
       near: this.getInstance().params.distance * 0.01,
       far: (this.getInstance().params.distance * 2) + 200
     });
-    this._updateTransforms();
+    const mView = this._instance.state.view;
+    const mProjection = this._instance.state.projection;
+    this.updateTransforms(mView, mProjection);
     this.emit("update");
   }
 
@@ -136,8 +109,19 @@ export class SphericalCamera extends AbstractCamera {
    */
   public destroy(): void {
     this._instance = null;
-    this._viewProjectionMatrix = null;  
     super.destroy();
+  }
+
+  /**
+   * Updates the internal transforms and matrices
+   * @param mCameraView - The view matrix of the camera model
+   * @param mCameraProjection - The projection matrix of the camera model
+   */
+  public updateTransforms(mCameraView: mat4, mCameraProjection: mat4): void {
+    super.updateTransforms(mCameraView, mCameraProjection);
+    // Translation vector
+    const vTranslation = this._instance.state.eye;
+    vec3.copy(this.getTranslation(), vTranslation);
   }
 
 }

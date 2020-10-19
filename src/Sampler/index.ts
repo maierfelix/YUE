@@ -25,9 +25,9 @@ export const SAMPLER_DEFAULT_OPTIONS: ISamplerOptions = {
 
 export class Sampler extends EventEmitter {
 
-  private _name: string;
-  private _addressMode: ISamplerAdressModeOptions;
-  private _filterMode: SAMPLER_FILTER_MODE;
+  private _name: string = null;
+  private _addressMode: ISamplerAdressModeOptions = null;
+  private _filterMode: SAMPLER_FILTER_MODE = SAMPLER_FILTER_MODE.NONE;
 
   /**
    * @param options - Create options
@@ -46,6 +46,7 @@ export class Sampler extends EventEmitter {
    * The sampler name
    */
   public getName(): string { return this._name; }
+
   /**
    * Update the sampler name
    * @param value - The new sampler name
