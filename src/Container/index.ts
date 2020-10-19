@@ -201,6 +201,15 @@ export class Container {
   }
 
   /**
+   * Check if the container contains a child
+   * @param child - The child to check
+   */
+  public hasChild(child: Container): boolean {
+    const childIndex = this._children.indexOf(child);
+    return childIndex !== -1;
+  }
+
+  /**
    * Remove a child from the container
    * @param child - The child to remove
    */

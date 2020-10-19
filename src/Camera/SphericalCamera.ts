@@ -59,7 +59,7 @@ export class SphericalCamera extends AbstractCamera {
     .on("mousemove", (e: any) => {
       if (!e.active) return;
       // Left mouse button pressed
-      if (e.buttons === 1) {
+      if (e.buttons === 2) {
         // Translate camera when shift is pressed
         if (e.mods.shift) {
           this._instance.pan(e.dx, e.dy);
