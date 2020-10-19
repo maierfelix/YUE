@@ -47,6 +47,9 @@ export class Renderer extends AbstractRenderer {
   private _getLastFrameTimestamp(): number { return this._lastFrameTimestamp; }
   private _setLastFrameTimestamp(value: number): void { this._lastFrameTimestamp = value; }
 
+  /**
+   * Create the renderer
+   */
   public async create(): Promise<Renderer> {
     await LoadGLSLang();
     this._adapter = await this._createAdapter();
@@ -61,6 +64,9 @@ export class Renderer extends AbstractRenderer {
     return this;
   }
 
+  /**
+   * Creates a WGPU adapter
+   */
   private async _createAdapter(): Promise<GPUAdapter> {
     // Make sure WebGPU is available
     if (
@@ -76,6 +82,9 @@ export class Renderer extends AbstractRenderer {
     return adapter;
   }
 
+  /**
+   * Creates a WGPU device
+   */
   private async _createDevice(): Promise<GPUDevice> {
     // Make sure the required extensions are available
     if (!this.getAdapter().extensions.includes("texture-compression-bc"))
@@ -93,6 +102,9 @@ export class Renderer extends AbstractRenderer {
     return device;
   }
 
+  /**
+   * Creates a WGPU context
+   */
   private _createContext(): GPUCanvasContext {
     const context = this.getCanvas().getContext("gpupresent");
     // Make sure the context was created successfully
@@ -101,6 +113,9 @@ export class Renderer extends AbstractRenderer {
     return context;
   }
 
+  /**
+   * Creates a WGPU swapchain
+   */
   private _createSwapchain(): GPUSwapChain {
     const swapchain = this.getContext().configureSwapChain({
       device: this.getDevice(),

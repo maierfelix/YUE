@@ -1,4 +1,3 @@
-import {EventEmitter} from "../utils";
 import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE} from "../constants";
 import {Shader} from "../";
 import {RenderPipelineGenerator, IRenderPipeline, IBindGroupResource} from "./RenderPipelineGenerator";
@@ -64,7 +63,7 @@ const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
   fragmentShader: null
 };
 
-export class Material extends EventEmitter {
+export class Material {
 
   private _name: string = null;
   private _attributes: IMaterialAttributeOptions[] = [];
@@ -80,13 +79,13 @@ export class Material extends EventEmitter {
 
   private _attributeLayoutByteStride: number = 0;
 
+  private _destroyedState: boolean = false;
   private _needsRebuildState: boolean = false;
 
   /**
    * @param options - Create options
    */
   public constructor(options?: IMaterialOptions) {
-    super();
     // Normalize options
     options = Object.assign({}, MATERIAL_DEFAULT_OPTIONS, options);
     options.vertexShader = Object.assign({}, MATERIAL_SHADER_DEFAULT_OPTIONS, options.vertexShader);
@@ -169,6 +168,8 @@ export class Material extends EventEmitter {
    * @param data - The data to update with
    */
   public updateUniform(name: string, data: any): void {
+    // Abort if the material is destroyed
+    if (this.isDestroyed()) return;
     const uniform = this.getUniformByName(name);
     if (uniform === null)
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
@@ -214,10 +215,17 @@ export class Material extends EventEmitter {
   public getAttributeLayoutByteStride(): number { return this._attributeLayoutByteStride; }
 
   /**
+   * Indicates if the material is destroyed
+   */
+  public isDestroyed(): boolean { return this._destroyedState; }
+
+  /**
    * Build and compile the material into a render pipeline
    * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
+    // Abort if the material is destroyed
+    if (this.isDestroyed()) return;
     // Abort if the material pipeline doesn't need a rebuild
     if (!this._needsRebuild()) return;
     // Generate a new pipeline
@@ -229,7 +237,6 @@ export class Material extends EventEmitter {
     this.update(renderer);
     // Disable further rebuilds
     this._resetRebuild();
-    this.emit("build");
   }
 
   /**
@@ -238,6 +245,8 @@ export class Material extends EventEmitter {
    * @param renderer - Renderer instance
    */
   public update(renderer: Renderer) {
+    // Abort if the material is destroyed
+    if (this.isDestroyed()) return;
     renderer.processUniformUpdateQueue(
       this._uniformUpdateQueue,
       this._sharedUniformResources
@@ -248,6 +257,7 @@ export class Material extends EventEmitter {
    * Destroy this Object
    */
   public destroy(): void {
+    this._destroyedState = true;
     this._name = null;
     this._attributes = null;
     this._vertexShader = null;
@@ -256,7 +266,6 @@ export class Material extends EventEmitter {
     this._renderPipeline = null;
     this._uniformUpdateQueue = null;
     this._sharedUniformResources = null;
-    this.emit("destroy");
   }
 
   /**

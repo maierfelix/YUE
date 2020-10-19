@@ -152,7 +152,7 @@ export abstract class AbstractCamera extends EventEmitter {
   public resize(width: number, height: number) {
     this._width = width;
     this._height = height;
-    this.emit("resize");
+    this.emit("resize", width, height);
   }
 
   /**

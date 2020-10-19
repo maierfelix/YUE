@@ -1,4 +1,3 @@
-import {EventEmitter} from "../utils";
 import {SAMPLER_FILTER_MODE, SAMPLER_WRAP_MODE} from "../constants";
 
 export interface ISamplerAdressModeOptions {
@@ -23,7 +22,7 @@ export const SAMPLER_DEFAULT_OPTIONS: ISamplerOptions = {
   filterMode: SAMPLER_FILTER_MODE.LINEAR
 };
 
-export class Sampler extends EventEmitter {
+export class Sampler {
 
   private _name: string = null;
   private _addressMode: ISamplerAdressModeOptions = null;
@@ -33,7 +32,6 @@ export class Sampler extends EventEmitter {
    * @param options - Create options
    */
   public constructor(options?: ISamplerOptions) {
-    super();
     // Normalize options
     options = Object.assign({}, SAMPLER_DEFAULT_OPTIONS, options);
     // Process options
@@ -69,7 +67,6 @@ export class Sampler extends EventEmitter {
   public destroy(): void {
     this._name = null;
     this._addressMode = null;
-    this.emit("destroy");
   }
 
 }

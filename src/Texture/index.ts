@@ -1,4 +1,3 @@
-import {EventEmitter} from "../utils";
 import {TEXTURE_FORMAT} from "../constants";
 
 export interface ITextureOptions {
@@ -21,7 +20,7 @@ export const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
   format: TEXTURE_FORMAT.NONE
 };
 
-export class Texture extends EventEmitter {
+export class Texture {
 
   private _name: string = null;
   private _data: ArrayBufferView = null;
@@ -35,7 +34,6 @@ export class Texture extends EventEmitter {
    * @param options - Create options
    */
   public constructor(options?: ITextureOptions) {
-    super();
     // Normalize options
     options = Object.assign({}, TEXTURE_DEFAULT_OPTIONS, options);
     // Process options
@@ -94,7 +92,6 @@ export class Texture extends EventEmitter {
   public destroy(): void {
     this._name = null;
     this._data = null;
-    this.emit("destroy");
   }
 
 }

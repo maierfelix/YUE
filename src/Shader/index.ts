@@ -1,4 +1,4 @@
-import {CompileGLSL, EventEmitter} from "../utils";
+import {CompileGLSL} from "../utils";
 import {SHADER_STAGE} from "../constants";
 
 type ShaderCodeType = (
@@ -29,7 +29,7 @@ function ToShaderStageString(stage: SHADER_STAGE): string {
   }
 }
 
-export class Shader extends EventEmitter {
+export class Shader {
 
   private _name: string = null;
   private _stage: SHADER_STAGE = SHADER_STAGE.NONE;
@@ -39,7 +39,6 @@ export class Shader extends EventEmitter {
    * @param options - Create options
    */
   public constructor(options?: IShaderOptions) {
-    super();
     // Normalize options
     options = Object.assign({}, SHADER_DEFAULT_OPTIONS, options);
     // Process options
@@ -80,7 +79,6 @@ export class Shader extends EventEmitter {
   public destroy(): void {
     this._name = null;
     this._code = null;
-    this.emit("destroy");
   }
 
 }

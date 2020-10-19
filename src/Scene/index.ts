@@ -101,7 +101,6 @@ export class Scene extends EventEmitter {
     }
     // Flush the renderer (E.g. flushes buffer copy queue)
     await renderer.flush();
-    this.emit("update");
   }
 
   /**
@@ -109,18 +108,12 @@ export class Scene extends EventEmitter {
    */
   public render(renderer: Renderer): void {
     const children = this._children;
-
     const device = renderer.getDevice();
     const camera = this.getAttachedCamera();
     const backBufferView = renderer.getSwapchain().getCurrentTexture().createView();
-
     // No camera attached, abort
     if (!(camera instanceof AbstractCamera)) return;
-
-    this.emit("beforerender");
-
     camera.update();
-
     // Initial clear
     {
       const [r, g, b, a] = this._clearColor;
@@ -142,7 +135,6 @@ export class Scene extends EventEmitter {
       renderPass.endPass();
       device.defaultQueue.submit([commandEncoder.finish()]);
     }
-
     // Render each child
     const commandEncoder = device.createCommandEncoder({});
     for (let ii = 0; ii < children.length; ++ii) {
@@ -164,10 +156,7 @@ export class Scene extends EventEmitter {
       child.render(renderPass);
       renderPass.endPass();
     }
-
     device.defaultQueue.submit([commandEncoder.finish()]);
-
-    this.emit("afterrender");
   }
 
   /**

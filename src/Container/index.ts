@@ -1,6 +1,5 @@
 import {vec3, quat, mat4} from "gl-matrix";
 import {Renderer} from "../Renderer";
-import {Warn} from "../utils";
 
 export interface IContainerOptions {
   name?: string;
@@ -31,6 +30,8 @@ export class Container {
   private _rotationMatrix: mat4 = null;
 
   private _children: Container[] = [];
+
+  private _destroyedState: boolean = false;
 
   /**
    * @param options - Create options
@@ -117,13 +118,13 @@ export class Container {
 
   /**
    * Rotates this container
-   * @param value - A vector to rotate by
+   * @param value - A vector to rotate by (in radians)
    */
   public rotate(value: vec3): void {
     const rotation = this._rotation;
-    quat.rotateX(rotation, rotation, value[0] * Math.PI / 180);
-    quat.rotateY(rotation, rotation, value[1] * Math.PI / 180);
-    quat.rotateZ(rotation, rotation, value[2] * Math.PI / 180);
+    quat.rotateX(rotation, rotation, value[0]);
+    quat.rotateY(rotation, rotation, value[1]);
+    quat.rotateZ(rotation, rotation, value[2]);
   }
 
   /**
@@ -151,6 +152,11 @@ export class Container {
    * The rotation matrix of this container
    */
   public getRotationMatrix(): mat4 { return this._rotationMatrix; }
+
+  /**
+   * Indicates if the container is destroyed
+   */
+  public isDestroyed(): boolean { return this._destroyedState; }
 
   /**
    * Returns the children of this container
@@ -211,9 +217,12 @@ export class Container {
 
   /**
    * Build this container
+   * This is an internal method
    * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
+    // Abort if the container is destroyed
+    if (this.isDestroyed()) return;
     const children = this.getChildren();
     for (let ii = 0; ii < children.length; ++ii) {
       const child = children[ii];
@@ -223,9 +232,12 @@ export class Container {
 
   /**
    * Update this container
+   * This is an internal method
    * @param renderer - Renderer instance
    */
   public update(renderer: Renderer): void {
+    // Abort if the container is destroyed
+    if (this.isDestroyed()) return;
     this.updateTransform();
     const children = this.getChildren();
     for (let ii = 0; ii < children.length; ++ii) {
@@ -236,9 +248,12 @@ export class Container {
 
   /**
    * Render this container
+   * This is an internal method
    * @param encoder - Encoder object to add commands to
    */
   public render(encoder: GPURenderPassEncoder): void {
+    // Abort if the container is destroyed
+    if (this.isDestroyed()) return;
     const children = this.getChildren();
     for (let ii = 0; ii < children.length; ++ii) {
       const child = children[ii];
@@ -250,12 +265,20 @@ export class Container {
    * Destroy this Object
    */
   public destroy(): void {
+    this._destroyedState = true;
     this._name = null;
     this._translation = null;
     this._rotation = null;
     this._scale = null;
     this._modelMatrix = null;
     this._rotationMatrix = null;
+    // Destroy children
+    const children = this.getChildren();
+    for (let ii = 0; ii < children.length; ++ii) {
+      const child = children[ii];
+      child.destroy();
+    }
+    this._children = null;
   }
 
   /**

@@ -1,5 +1,5 @@
 import {Material} from "../Material";
-import {vec3, quat, mat4} from "gl-matrix";
+import {vec3, quat} from "gl-matrix";
 import {Renderer, IUniformUpdateEntry} from "../Renderer";
 import {GetShaderAttributeComponentSize, IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
 import {IRayTriangleIntersection, Ray, TRIANGLE_FACING} from "../Ray";
@@ -87,6 +87,8 @@ export class Mesh extends Container {
    * @param ray - The ray to intersection with
    */
   public intersectRay(ray: Ray): IRayTriangleIntersection {
+    // Abort if the mesh is destroyed
+    if (this.isDestroyed()) return;
     // In case the mesh data gets freed after upload, we no longer can do this
     if (this._freeAfterUpload) return null;
     const indices = this._indices as Uint32Array;
@@ -120,9 +122,11 @@ export class Mesh extends Container {
       v2[0] = attributeView.getFloat32(i2 + (attributeComponentSize * 0), true);
       v2[1] = attributeView.getFloat32(i2 + (attributeComponentSize * 1), true);
       v2[2] = attributeView.getFloat32(i2 + (attributeComponentSize * 2), true);
+      // Turn vertices into world space
       vec3.transformMat4(v0, v0, mModel);
       vec3.transformMat4(v1, v1, mModel);
       vec3.transformMat4(v2, v2, mModel);
+      // Perform ray-triangle intersection (in world-space)
       const intersection = ray.intersectTriangle(v0, v1, v2);
       if (intersection !== null) {
         // We got a backface intersection, but we prefer front face intersections
@@ -136,7 +140,7 @@ export class Mesh extends Container {
         }
       }
     }
-    // In case no intersection or a back-face intersection happened
+    // We return here in case no intersection OR a back-face intersection happened
     return backfaceIntersection;
   }
 
@@ -155,6 +159,8 @@ export class Mesh extends Container {
    * @param data - The data to update with
    */
   public updateUniform(name: string, data: any): void {
+    // Abort if the mesh is destroyed
+    if (this.isDestroyed()) return;
     const uniform = this.getMaterial().getUniformByName(name);
     if (uniform === null)
       throw new ReferenceError(`Failed to resolve material uniform for '${name}'`);
@@ -182,10 +188,13 @@ export class Mesh extends Container {
 
   /**
    * Build everything required to render this mesh
+   * This is an internal method
    * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
     super.build(renderer);
+    // Abort if the mesh is destroyed
+    if (this.isDestroyed()) return;
     // Abort if the mesh doesn't need a rebuild
     if (!this._needsRebuild()) return;
     const material = this.getMaterial();
@@ -219,13 +228,16 @@ export class Mesh extends Container {
 
   /**
    * Update this mesh
+   * This is an internal method
    * Used to e.g. process pending uniform resource updates
    * @param renderer - Renderer instance
    */
   public update(renderer: Renderer): void {
     super.update(renderer);
+    // Abort if the mesh is destroyed
+    if (this.isDestroyed()) return;
     // Update the assigned material
-    this.getMaterial().update(renderer);
+    this.getMaterial()?.update(renderer);
     renderer.processUniformUpdateQueue(
       this._uniformUpdateQueue,
       this._uniformResources
@@ -259,13 +271,16 @@ export class Mesh extends Container {
 
   /**
    * Render this mesh
+   * This is an internal method
    * @param encoder - Encoder object to add commands to
    */
   public render(encoder: GPURenderPassEncoder): void {
     super.render(encoder);
+    // Abort if the mesh is destroyed
+    if (this.isDestroyed()) return;
     const material = this.getMaterial();
     // make sure the material's render pipeline is ready
-    if (material.getRenderPipeline() !== null) {
+    if (material?.getRenderPipeline() !== null) {
       const {pipeline} = material.getRenderPipeline();
       encoder.setPipeline(pipeline);
       encoder.setBindGroup(0, this._uniformBindGroup);
