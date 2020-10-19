@@ -5,6 +5,7 @@ Personal WebGPU based 3D renderer.
 API Example:
 
 ````ts
+import * as YUE from "yue";
 
 (async() => {
 
