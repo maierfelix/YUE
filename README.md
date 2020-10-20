@@ -7,6 +7,12 @@ Personal WebGPU based 3D renderer.
 npm install yue.js
 ````
 
+### Demo:
+
+<a href="https://i.imgur.com/HK85gTQ.mp4">
+  <img src="https://i.imgur.com/HK85gTQ.gif" width="50%">
+</a>
+
 ### API Example:
 
 ````ts
@@ -58,6 +64,11 @@ import * as YUE from "yue";
     attributes: YUE.Plane.Attributes
   });
   stage.addChild(mesh);
+
+  // Simple ray cast from screen center
+  const ray = new YUE.Ray({camera}).fromCameraCenter();
+  // Contains intersection point in world-space
+  const intersection = mesh.intersectRay(ray);
 
   requestAnimationFrame(function drawLoop(time: number) {
     (async function() {
