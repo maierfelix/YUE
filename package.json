@@ -1,6 +1,6 @@
 {
-  "name": "yue",
-  "version": "0.0.1",
+  "name": "yue.js",
+  "version": "0.0.2",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -37,5 +37,24 @@
     "gl-matrix": "^3.3.0",
     "inertial-turntable-camera": "^2.0.4",
     "normalized-interaction-events": "^2.0.1"
-  }
+  },
+  "description": "Personal WebGPU based 3D renderer.",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/maierfelix/yue.git"
+  },
+  "keywords": [
+    "3d",
+    "renderer",
+    "webgpu"
+  ],
+  "author": "Felix Maier",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/maierfelix/yue/issues"
+  },
+  "homepage": "https://github.com/maierfelix/yue#readme"
 }

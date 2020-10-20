@@ -2,7 +2,12 @@
 
 Personal WebGPU based 3D renderer.
 
-API Example:
+### Installation:
+````
+npm install yue.js
+````
+
+### API Example:
 
 ````ts
 import * as YUE from "yue";
