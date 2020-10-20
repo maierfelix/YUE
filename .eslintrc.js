@@ -75,14 +75,14 @@ module.exports = {
     "@typescript-eslint/naming-convention": [
       "error",
       {
-				selector: "enum",
-				format: ["UPPER_CASE"]
+        selector: "enum",
+        format: ["UPPER_CASE"]
       },
       {
-				selector: "enumMember",
-				format: ["UPPER_CASE"],
-				leadingUnderscore: "forbid",
-				trailingUnderscore: "forbid"
+        selector: "enumMember",
+        format: ["UPPER_CASE"],
+        leadingUnderscore: "forbid",
+        trailingUnderscore: "forbid"
       },
       {
         selector: "memberLike",
