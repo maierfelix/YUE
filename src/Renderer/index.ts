@@ -184,8 +184,8 @@ export class Renderer extends AbstractRenderer {
     //const matrix: mat4 = camera.getViewProjectionMatrix();
     // Update the scene
     await scene.update(this);
-    // Render the scene
-    scene.render(this);
+    // Draw the scene
+    scene.draw(this);
     this._setLastFrameTimestamp(now);
     this.emit("afterrender", {time, delta});
   }
@@ -223,12 +223,16 @@ export class Renderer extends AbstractRenderer {
       // Bind sampler
       else if (data instanceof Sampler) {
         const samplerDescriptor = RenderPipelineGenerator.GenerateSamplerDescriptor(data);
-        const instance = device.createSampler(samplerDescriptor);
-        if (!uniformResource.resource) uniformResource.resource = instance;
+        // Reserve GPUSampler in case it doesn't exist yet
+        if (!uniformResource.resource) {
+          const instance = device.createSampler(samplerDescriptor);
+          uniformResource.resource = instance;
+        }
       }
       // Bind texture
       else if (data instanceof Texture) {
         const textureDescriptor = RenderPipelineGenerator.GenerateTextureDescriptor(data);
+        // Reserve GPUTexture in case it doesn't exist yet
         if (!uniformResource.resource) {
           const texture = device.createTexture(textureDescriptor);
           uniformResource.resource = texture.createView();

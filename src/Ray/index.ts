@@ -133,7 +133,7 @@ export class Ray {
   }
 
   /**
-   * Returns a ray-triangle intersection point in world-space
+   * Returns a ray-triangle intersection point
    * @param v0 - Triangle vertex 0
    * @param v1 - Triangle vertex 1
    * @param v2 - Triangle vertex 2

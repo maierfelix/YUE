@@ -5,7 +5,7 @@ export enum SHADER_STAGE {
   NONE = 0,
   VERTEX = 1 << 0,
   FRAGMENT = 1 << 1
-};
+}
 
 /**
  * Supported shader vertex attributes
@@ -42,7 +42,7 @@ export enum SHADER_ATTRIBUTE {
   INT2,
   INT3,
   INT4
-};
+}
 
 /**
  * Supported shader uniforms
@@ -55,7 +55,7 @@ export enum SHADER_UNIFORM {
   SAMPLER,
   TEXTURE,
   STORAGE_TEXTURE
-};
+}
 
 /**
  * Supported culling modes
@@ -64,7 +64,7 @@ export enum MATERIAL_CULL_MODE {
   NONE,
   FRONT,
   BACK
-};
+}
 
 /**
  * Supported blending modes
@@ -72,7 +72,7 @@ export enum MATERIAL_CULL_MODE {
 export enum MATERIAL_BLEND_MODE {
   NONE,
   PREMULTIPLY
-};
+}
 
 /**
  * Supported sampler filtering modes
@@ -81,7 +81,7 @@ export enum SAMPLER_FILTER_MODE {
   NONE,
   NEAREST,
   LINEAR
-};
+}
 
 /**
  * Supported sampler wrapping modes
@@ -91,7 +91,7 @@ export enum SAMPLER_WRAP_MODE {
   CLAMP_TO_EDGE,
   REPEAT,
   MIRROR_REPEAT
-};
+}
 
 /**
  * Supported texture formats
@@ -151,4 +151,4 @@ export enum TEXTURE_FORMAT {
   BC6H_RGB_FLOAT,
   BC7_RGBA_UNORM,
   BC7_RGBA_UNORM_SRGB
-};
+}

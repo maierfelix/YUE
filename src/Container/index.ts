@@ -1,4 +1,5 @@
 import {vec3, quat, mat4} from "gl-matrix";
+import {AABB, IAABBBounding} from "../AABB";
 import {Renderer} from "../Renderer";
 
 export interface IContainerOptions {
@@ -31,6 +32,8 @@ export class Container {
 
   private _children: Container[] = [];
 
+  private _boundings: AABB = null;
+
   private _destroyedState: boolean = false;
 
   /**
@@ -48,6 +51,9 @@ export class Container {
     this._modelMatrix = mat4.create();
     this._modelInverseMatrix = mat4.create();
     this._rotationMatrix = mat4.create();
+    this._boundings = new AABB();
+    // Trigger an initial transform update right after creation
+    this.updateTransform();
   }
 
   /**
@@ -67,10 +73,25 @@ export class Container {
   public getParent(): Container { return this._parent; }
 
   /**
+   * Returns the top-level parent container
+   */
+  public getTopLevelParent(): Container {
+    let current = this.getParent();
+    while (current !== null) {
+      if (current.getParent() === null) break;
+      current = current.getParent();
+    }
+    return current;
+  }
+
+  /**
    * Update the parent container
    * @param parent - The new parent container
    */
-  public setParent(value: Container): void { this._parent = value; }
+  public setParent(value: Container): void {
+    this._parent = value;
+    this.updateTransform();
+  }
 
   /**
    * The container's translation
@@ -81,7 +102,10 @@ export class Container {
    * Update the container's translation
    * @param value - The new container translation
    */
-  public setTranslation(value: vec3): void { this._translation = value; }
+  public setTranslation(value: vec3): void {
+    this._translation = value;
+    this.updateTransform();
+  }
 
   /**
    * The container's rotation
@@ -92,7 +116,10 @@ export class Container {
    * Update the container's rotation
    * @param value - The new container rotation
    */
-  public setRotation(value: quat): void { this._rotation = value; }
+  public setRotation(value: quat): void {
+    this._rotation = value;
+    this.updateTransform();
+  }
 
   /**
    * The container's scale
@@ -103,7 +130,10 @@ export class Container {
    * Update the container's scale
    * @param value - The new container scale
    */
-  public setScale(value: vec3): void { this._scale = value; }
+  public setScale(value: vec3): void {
+    this._scale = value;
+    this.updateTransform();
+  }
 
   /**
    * Translates this container
@@ -114,6 +144,7 @@ export class Container {
     translation[0] += value[0];
     translation[1] += value[1];
     translation[2] += value[2];
+    this.updateTransform();
   }
 
   /**
@@ -125,6 +156,7 @@ export class Container {
     quat.rotateX(rotation, rotation, value[0]);
     quat.rotateY(rotation, rotation, value[1]);
     quat.rotateZ(rotation, rotation, value[2]);
+    this.updateTransform();
   }
 
   /**
@@ -136,6 +168,7 @@ export class Container {
     scale[0] *= value[0];
     scale[1] *= value[1];
     scale[2] *= value[2];
+    this.updateTransform();
   }
 
   /**
@@ -152,6 +185,11 @@ export class Container {
    * The rotation matrix of this container
    */
   public getRotationMatrix(): mat4 { return this._rotationMatrix; }
+
+  /**
+   * The boundings of this container
+   */
+  public getBoundings(): AABB { return this._boundings; }
 
   /**
    * Indicates if the container is destroyed
@@ -195,6 +233,7 @@ export class Container {
     if (childIndex === -1) {
       child.setParent(this);
       this._children.push(child);
+      this.updateBoundings();
       return this._children.length - 1;
     }
     return -1;
@@ -219,6 +258,7 @@ export class Container {
       const child = this._children[childIndex];
       child.setParent(null);
       this._children.splice(childIndex, 1);
+      this.updateBoundings();
       return childIndex;
     }
     return -1;
@@ -276,10 +316,12 @@ export class Container {
   public destroy(): void {
     this._destroyedState = true;
     this._name = null;
+    this._parent = null;
     this._translation = null;
     this._rotation = null;
     this._scale = null;
     this._modelMatrix = null;
+    this._modelInverseMatrix = null;
     this._rotationMatrix = null;
     // Destroy children
     const children = this.getChildren();
@@ -288,6 +330,7 @@ export class Container {
       child.destroy();
     }
     this._children = null;
+    this._boundings = null;
   }
 
   /**
@@ -320,6 +363,55 @@ export class Container {
       mat4.multiply(mModel, mModel, parent.getModelMatrix());
     }
     mat4.invert(mModelInverse, mModel);
+    // Update the boundings of this container
+    this.updateBoundings();
+  }
+
+  /**
+   * Compute the boundings of this container
+   */
+  public computeBoundings(): IAABBBounding {
+    const children = this.getChildren();
+    // Loop through all children and get their boundings
+    const min = vec3.fromValues(Infinity, Infinity, Infinity);
+    const max = vec3.fromValues(-Infinity, -Infinity, -Infinity);
+    for (let ii = 0; ii < children.length; ++ii) {
+      const child = children[ii];
+      const childBoundings = child.getBoundings();
+      // Process min boundings
+      {
+        const [x, y, z] = childBoundings.getMin();
+        if (x < min[0]) min[0] = x;
+        if (y < min[1]) min[1] = y;
+        if (z < min[2]) min[2] = z;
+      }
+      // Process max boundings
+      {
+        const [x, y, z] = childBoundings.getMax();
+        if (x > max[0]) max[0] = x;
+        if (y > max[1]) max[1] = y;
+        if (z > max[2]) max[2] = z;
+      }
+    }
+    return {min, max};
+  }
+
+  /**
+   * Update the AABB of this container
+   */
+  public updateBoundings(): void {
+    // Update the bounding of this container
+    const boundings = this.getBoundings();
+    const {min, max} = this.computeBoundings();
+    // Only execute this when the boundings have actually changed
+    if (!vec3.exactEquals(boundings.getMin(), min) || !vec3.exactEquals(boundings.getMax(), max)) {
+      // Update boundings
+      vec3.copy(boundings.getMin(), min);
+      vec3.copy(boundings.getMax(), max);
+      // Update the boundings of the top-level parent container
+      const topLevel = this.getTopLevelParent();
+      if (topLevel !== null) topLevel.updateBoundings();
+    }
   }
 
 }

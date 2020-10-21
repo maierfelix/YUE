@@ -1,4 +1,3 @@
-import {EventEmitter, Warn} from "../utils";
 import {Container} from "../Container";
 import {Renderer} from "../Renderer";
 import {AbstractCamera} from "../Camera";
@@ -17,20 +16,17 @@ export const SCENE_DEFAULT_OPTIONS: ISceneOptions = {
 
 type ClearColorType = [number, number, number, number];
 
-export class Scene extends EventEmitter {
-
-  private _name: string = null;
+export class Scene extends Container {
 
   private _clearColor: ClearColorType = null;
 
   private _camera: AbstractCamera = null;
-  private _children: Container[] = [];
 
   /**
    * @param options - Create options
    */
   public constructor(options?: ISceneOptions) {
-    super();
+    super(options);
     // Normalize options
     options = Object.assign({}, SCENE_DEFAULT_OPTIONS, options);
     // Process options
@@ -40,59 +36,23 @@ export class Scene extends EventEmitter {
   }
 
   /**
-   * The shader name
-   */
-  public getName(): string { return this._name; }
-
-  /**
-   * Update the shader name
-   * @param value - The new shader name
-   */
-  public setName(value: string): void { this._name = value; }
-
-  /**
    * The scene's attached camera
    */
   public getAttachedCamera(): AbstractCamera { return this._camera; }
 
   /**
    * Attaches a camera which is used to render this scene
-   * @param camera - The camera to use in this scene
+   * @param camera - The camera to attach
    */
   public attachCamera(camera: AbstractCamera): void {
     this._camera = camera;
   }
 
   /**
-   * Add a child to the scene
-   * @param mesh - The mesh to add
-   */
-  public addChild(mesh: Container): void {
-    if (this._children.indexOf(mesh) === -1) {
-      this._children.push(mesh);
-    } else {
-      Warn(`Child`, mesh, `is already registered`);
-    }
-  }
-
-  /**
-   * Remove a child from the scene
-   * @param mesh - The mesh to remove
-   */
-  public removeChild(mesh: Container): void {
-    const childIndex = this._children.indexOf(mesh);
-    if (childIndex !== -1) {
-      this._children.splice(childIndex, 1);
-    } else {
-      Warn(`Child`, mesh, `is already registered`);
-    }
-  }
-
-  /**
    * Update the scenes children
    */
   public async update(renderer: Renderer): Promise<void> {
-    const children = this._children;
+    const children = this.getChildren();
     // First rebuild childs if necessary
     for (let ii = 0; ii < children.length; ++ii) {
       const child = children[ii];
@@ -104,10 +64,10 @@ export class Scene extends EventEmitter {
   }
 
   /**
-   * Render the scenes children
+   * Draw the scene
    */
-  public render(renderer: Renderer): void {
-    const children = this._children;
+  public draw(renderer: Renderer): void {
+    const children = this.getChildren();
     const device = renderer.getDevice();
     const camera = this.getAttachedCamera();
     const backBufferView = renderer.getSwapchain().getCurrentTexture().createView();
@@ -163,10 +123,9 @@ export class Scene extends EventEmitter {
    * Destroy this Object
    */
   public destroy(): void {
-    this._name = null;
+    super.destroy();
     this._camera = null;
-    this._children = null;
-    this.emit("destroy");
+    this._clearColor = null;
   }
 
 }

@@ -4,6 +4,7 @@ import {Renderer, IUniformUpdateEntry} from "../Renderer";
 import {GetShaderAttributeComponentSize, IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
 import {IRayTriangleIntersection, Ray, TRIANGLE_FACING} from "../Ray";
 import {Container} from "../Container";
+import {AABB, IAABBBounding} from "../AABB";
 
 export * from "./StaticMesh";
 
@@ -36,6 +37,8 @@ export class Mesh extends Container {
   private _attributes: ArrayBufferView = null;
   private _indexCount: number = 0;
 
+  private _localBoundings: AABB = null;
+
   private _uniformBindGroup: GPUBindGroup = null;
   private _uniformResources: IBindGroupResource[] = [];
 
@@ -60,6 +63,8 @@ export class Mesh extends Container {
     this._indices = options.indices;
     this._attributes = options.attributes;
     this._freeAfterUpload = options.freeAfterUpload;
+    // Trigger an initial transform update right after creation
+    this.updateTransform();
   }
 
   /**
@@ -83,29 +88,31 @@ export class Mesh extends Container {
   public getIndexCount(): number { return this._indexCount; }
 
   /**
+   * The object-space boundings of the mesh
+   */
+  public getLocalBoundings(): AABB { return this._localBoundings; }
+
+  /**
    * Returns the intersection point in world-space between the mesh and the provided ray
    * @param ray - The ray to intersection with
    */
   public intersectRay(ray: Ray): IRayTriangleIntersection {
-    // Abort if the mesh is destroyed
-    if (this.isDestroyed()) return;
-    // In case the mesh data gets freed after upload, we no longer can do this
-    if (this._freeAfterUpload) return null;
+    // Abort if the mesh is destroyed or the mesh data gets freed
+    if (this.isDestroyed() || this._freeAfterUpload) return null;
     const indices = this._indices as Uint32Array;
     const attributes = this._attributes as Float32Array;
     const material = this.getMaterial();
     const attributeLayout = material.getAttributes();
     const mModel = this.getModelMatrix();
-    //const mModelInverse = this.getModelInverseMatrix();
-    const v0 = vec3.create();
-    const v1 = vec3.create();
-    const v2 = vec3.create();
     const positionLayout = attributeLayout.find(l => l.name === "Position");
     const positionByteOffset = positionLayout.byteOffset;
     const attributeView = new DataView(attributes.buffer, attributes.byteOffset, attributes.byteLength);
     const attributeComponentSize = GetShaderAttributeComponentSize(positionLayout.type);
     const attributeByteStride = material.getAttributeLayoutByteStride();
-    let backfaceIntersection: IRayTriangleIntersection = null;
+    const v0 = vec3.create();
+    const v1 = vec3.create();
+    const v2 = vec3.create();
+    let out: IRayTriangleIntersection = null;
     for (let ii = 0; ii < indices.length / 3; ++ii) {
       const i0 = positionByteOffset + (((indices[(ii * 3) + 0])) * attributeByteStride);
       const i1 = positionByteOffset + (((indices[(ii * 3) + 1])) * attributeByteStride);
@@ -132,7 +139,7 @@ export class Mesh extends Container {
         // We got a backface intersection, but we prefer front face intersections
         // Cache the backface intersection and continue until we get a front-face intersection
         if (intersection.facing === TRIANGLE_FACING.BACK) {
-          backfaceIntersection = intersection;
+          out = intersection;
         }
         // Found a front face intersection, we can abort now
         else {
@@ -141,7 +148,7 @@ export class Mesh extends Container {
       }
     }
     // We return here in case no intersection OR a back-face intersection happened
-    return backfaceIntersection;
+    return out;
   }
 
   /**
@@ -288,6 +295,81 @@ export class Mesh extends Container {
       encoder.setIndexBuffer(this._indexBuffer, "uint32", 0x0, this.getIndexCount() * Uint32Array.BYTES_PER_ELEMENT);
       encoder.drawIndexed(this.getIndexCount(), 1, 0, 0, 0);
     }
+  }
+
+  /**
+   * Compute the vertex boundings of the mesh
+   */
+  public computeVertexBoundings(): IAABBBounding {
+    // Abort if the mesh is destroyed or the mesh data gets freed
+    if (this.isDestroyed() || this._freeAfterUpload) {
+      return {min: vec3.create(), max: vec3.create()};
+    }
+    const indices = this._indices as Uint32Array;
+    const attributes = this._attributes as Float32Array;
+    const material = this.getMaterial();
+    const attributeLayout = material.getAttributes();
+    const positionLayout = attributeLayout.find(l => l.name === "Position");
+    const positionByteOffset = positionLayout.byteOffset;
+    const attributeView = new DataView(attributes.buffer, attributes.byteOffset, attributes.byteLength);
+    const attributeComponentSize = GetShaderAttributeComponentSize(positionLayout.type);
+    const attributeByteStride = material.getAttributeLayoutByteStride();
+    const vertex = vec3.create();
+    const min = vec3.fromValues(Infinity, Infinity, Infinity);
+    const max = vec3.fromValues(-Infinity, -Infinity, -Infinity);
+    // Compute vertex boundings in world-space
+    for (let ii = 0; ii < indices.length; ++ii) {
+      const index = positionByteOffset + (((indices[(ii * 3)])) * attributeByteStride);
+      // Vertex
+      vertex[0] = attributeView.getFloat32(index + (attributeComponentSize * 0), true);
+      vertex[1] = attributeView.getFloat32(index + (attributeComponentSize * 1), true);
+      vertex[2] = attributeView.getFloat32(index + (attributeComponentSize * 2), true);
+      // Min
+      if (vertex[0] < min[0]) min[0] = vertex[0];
+      if (vertex[1] < min[1]) min[1] = vertex[1];
+      if (vertex[2] < min[2]) min[2] = vertex[2];
+      // Max
+      if (vertex[0] > max[0]) max[0] = vertex[0];
+      if (vertex[1] > max[1]) max[1] = vertex[1];
+      if (vertex[2] > max[2]) max[2] = vertex[2];
+    }
+    return {min, max};
+  }
+
+  /**
+   * Compute the boundings of this container
+   */
+  public computeBoundings(): IAABBBounding {
+    // Abort if the mesh is destroyed or the mesh data gets freed
+    if (this.isDestroyed() || this._freeAfterUpload) {
+      return {min: vec3.create(), max: vec3.create()};
+    }
+    if (this.getLocalBoundings() === null) {
+      const localBoundings = new AABB();
+      const {min, max} = this.computeVertexBoundings();
+      // Save local boundings
+      vec3.copy(localBoundings.getMin(), min);
+      vec3.copy(localBoundings.getMax(), max);
+      // Cache local boundings, we want to avoid computing them again
+      this._localBoundings = localBoundings;
+    }
+    // Turn local boundings into world-space
+    const mModel = this.getModelMatrix();
+    const localBoundings = this.getLocalBoundings();
+    const min = vec3.copy(vec3.create(), localBoundings.getMin());
+    const max = vec3.copy(vec3.create(), localBoundings.getMax());
+    vec3.transformMat4(min, min, mModel);
+    vec3.transformMat4(max, max, mModel);
+    return {min, max};
+  }
+
+  /**
+   * Update the transforms of this container
+   */
+  public updateTransform(): void {
+    // Material isn't ready
+    if (!this._material) return;
+    super.updateTransform();
   }
 
   /**
