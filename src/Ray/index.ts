@@ -1,4 +1,5 @@
 import {vec2, vec3, vec4} from "gl-matrix";
+import {AABB} from "../AABB";
 import {AbstractCamera} from "../Camera";
 
 export enum TRIANGLE_FACING {
@@ -9,6 +10,10 @@ export enum TRIANGLE_FACING {
 export interface IRayTriangleIntersection {
   facing: TRIANGLE_FACING;
   intersection: vec3;
+}
+
+export interface IAABBIntersection {
+  t: number;
 }
 
 export interface IRayOptions {
@@ -138,7 +143,7 @@ export class Ray {
    * @param v1 - Triangle vertex 1
    * @param v2 - Triangle vertex 2
    */
-  public intersectTriangle(v0: vec3, v1: vec3, v2: vec3): IRayTriangleIntersection {
+  public intersectsTriangle(v0: vec3, v1: vec3, v2: vec3): IRayTriangleIntersection {
     const origin = this.getOrigin();
     const direction = this.getDirection();
 
@@ -178,6 +183,27 @@ export class Ray {
     );
 
     return {facing, intersection};
+  }
+
+  /**
+   * Returns T of a ray-aabb intersection
+   * @param aabb - The AABB to check the intersection with
+   */
+  public intersectsAABB(aabb: AABB): IAABBIntersection {
+    const min = aabb.getMin();
+    const max = aabb.getMax();
+    const origin = this.getOrigin();
+    const direction = this.getDirection();
+    const t1 = (min[0] - origin[0]) / direction[0];
+    const t2 = (max[0] - origin[0]) / direction[0];
+    const t3 = (min[1] - origin[1]) / direction[1];
+    const t4 = (max[1] - origin[1]) / direction[1];
+    const t5 = (min[2] - origin[2]) / direction[2];
+    const t6 = (max[2] - origin[2]) / direction[2];
+    const t7 = Math.max(Math.max(Math.min(t1, t2), Math.min(t3, t4)), Math.min(t5, t6));
+    const t8 = Math.min(Math.min(Math.max(t1, t2), Math.max(t3, t4)), Math.max(t5, t6));
+    if (t8 < 0 || t7 > t8) return null;
+    return {t: t7};
   }
 
 }

@@ -134,7 +134,7 @@ export class Mesh extends Container {
       vec3.transformMat4(v1, v1, mModel);
       vec3.transformMat4(v2, v2, mModel);
       // Perform ray-triangle intersection (in world-space)
-      const intersection = ray.intersectTriangle(v0, v1, v2);
+      const intersection = ray.intersectsTriangle(v0, v1, v2);
       if (intersection !== null) {
         // We got a backface intersection, but we prefer front face intersections
         // Cache the backface intersection and continue until we get a front-face intersection
