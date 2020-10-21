@@ -240,6 +240,22 @@ export class Container {
   }
 
   /**
+   * Add new children to the container
+   * @param children - The children to add
+   */
+  public addChildren(children: Container[]): void {
+    for (let ii = 0; ii < children.length; ++ii) {
+      const child = children[ii];
+      const childIndex = this._children.indexOf(child);
+      if (childIndex === -1) {
+        child.setParent(this);
+        this._children.push(child);
+      }
+    }
+    this.updateBoundings();
+  }
+
+  /**
    * Check if the container contains a child
    * @param child - The child to check
    */

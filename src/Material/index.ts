@@ -1,4 +1,4 @@
-import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE} from "../constants";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE, MATERIAL_COLOR_WRITE} from "../constants";
 import {Shader} from "../";
 import {RenderPipelineGenerator, IRenderPipeline, IBindGroupResource} from "./RenderPipelineGenerator";
 import {Renderer, IUniformUpdateEntry} from "../Renderer";
@@ -50,6 +50,7 @@ export interface IMaterialOptions {
   attributes?: IMaterialAttributeOptions[];
   cullMode?: MATERIAL_CULL_MODE;
   blendMode?: MATERIAL_BLEND_MODE;
+  colorWrite?: MATERIAL_COLOR_WRITE;
   vertexShader: IMaterialShaderOptions;
   fragmentShader: IMaterialShaderOptions;
 }
@@ -57,8 +58,9 @@ export interface IMaterialOptions {
 const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
   name: null,
   attributes: null,
-  cullMode: MATERIAL_CULL_MODE.NONE,
+  cullMode: MATERIAL_CULL_MODE.BACK,
   blendMode: MATERIAL_BLEND_MODE.NONE,
+  colorWrite: MATERIAL_COLOR_WRITE.ALL,
   vertexShader: null,
   fragmentShader: null
 };
@@ -67,8 +69,11 @@ export class Material {
 
   private _name: string = null;
   private _attributes: IMaterialAttributeOptions[] = [];
+
   private _cullMode: MATERIAL_CULL_MODE = MATERIAL_CULL_MODE.NONE;
   private _blendMode: MATERIAL_BLEND_MODE = MATERIAL_BLEND_MODE.NONE;
+  private _colorWrite: MATERIAL_COLOR_WRITE = MATERIAL_COLOR_WRITE.ALL;
+
   private _vertexShader: Shader = null;
   private _fragmentShader: Shader = null;
 
@@ -97,6 +102,7 @@ export class Material {
     );
     this._cullMode = options.cullMode;
     this._blendMode = options.blendMode;
+    this._colorWrite = options.colorWrite;
     this._vertexShader = options.vertexShader.shader;
     this._fragmentShader = options.fragmentShader.shader;
     this._uniforms = this._generateUniforms(options);
@@ -193,6 +199,11 @@ export class Material {
    * The material blending mode
    */
   public getBlendMode(): MATERIAL_BLEND_MODE { return this._blendMode; }
+
+  /**
+   * The material color write
+   */
+  public getColorWrite(): MATERIAL_COLOR_WRITE { return this._colorWrite; }
 
   /**
    * The material vertex shader

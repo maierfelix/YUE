@@ -2,8 +2,8 @@
  * Supported shader stages
  */
 export enum SHADER_STAGE {
-  NONE = 0,
-  VERTEX = 1 << 0,
+  NONE     = 0 << 0,
+  VERTEX   = 1 << 0,
   FRAGMENT = 1 << 1
 }
 
@@ -72,6 +72,18 @@ export enum MATERIAL_CULL_MODE {
 export enum MATERIAL_BLEND_MODE {
   NONE,
   PREMULTIPLY
+}
+
+/**
+ * Supported color writes
+ */
+export enum MATERIAL_COLOR_WRITE {
+  NONE  = 0 << 0,
+  RED   = 1 << 0,
+  GREEN = 1 << 1,
+  BLUE  = 1 << 2,
+  ALPHA = 1 << 3,
+  ALL   = 1 << 4
 }
 
 /**

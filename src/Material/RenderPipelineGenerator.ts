@@ -1,6 +1,6 @@
 import {Material} from ".";
 
-import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT} from "../constants";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, MATERIAL_COLOR_WRITE} from "../constants";
 import {Unreachable} from "../utils";
 import {Sampler} from "../Sampler";
 import {Texture} from "../Texture";
@@ -12,6 +12,27 @@ export function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   }
   if (stages & SHADER_STAGE.FRAGMENT) {
     flags |= GPUShaderStage.FRAGMENT;
+  }
+  return flags;
+}
+
+export function ToWGPUColorWrite(colorWrite: MATERIAL_COLOR_WRITE): GPUColorWriteFlags {
+  let flags: GPUColorWriteFlags = 0;
+  if (colorWrite & MATERIAL_COLOR_WRITE.RED) {
+    flags |= GPUColorWrite.RED;
+    return flags;
+  }
+  if (colorWrite & MATERIAL_COLOR_WRITE.GREEN) {
+    flags |= GPUColorWrite.GREEN;
+  }
+  if (colorWrite & MATERIAL_COLOR_WRITE.BLUE) {
+    flags |= GPUColorWrite.BLUE;
+  }
+  if (colorWrite & MATERIAL_COLOR_WRITE.ALPHA) {
+    flags |= GPUColorWrite.ALPHA;
+  }
+  if (colorWrite & MATERIAL_COLOR_WRITE.ALL) {
+    flags |= GPUColorWrite.ALL;
   }
   return flags;
 }
@@ -126,6 +147,18 @@ export function ToWGPUFilterMode(filterMode: SAMPLER_FILTER_MODE): GPUFilterMode
       return "nearest";
     case SAMPLER_FILTER_MODE.LINEAR:
       return "linear";
+  }
+  Unreachable();
+}
+
+export function ToWGPUCullMode(cullMode: MATERIAL_CULL_MODE): GPUCullMode {
+  switch (cullMode) {
+    case MATERIAL_CULL_MODE.NONE:
+      return "none";
+    case MATERIAL_CULL_MODE.FRONT:
+      return "front";
+    case MATERIAL_CULL_MODE.BACK:
+      return "back";
   }
   Unreachable();
 }
@@ -345,6 +378,31 @@ export class RenderPipelineGenerator {
   }
 
   /**
+   * Generates a GPUColorStateDescriptor based on the provided blend mode
+   * @param material - Material object
+   */
+  public static GenerateColorStateDescriptor(material: Material): GPUColorStateDescriptor[] {
+    const blendMode = material.getBlendMode();
+    const colorWrite = material.getColorWrite();
+    const out: GPUColorStateDescriptor = {
+      format: "bgra8unorm",
+      colorBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
+      alphaBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
+      writeMask: ToWGPUColorWrite(colorWrite)
+    };
+    switch (blendMode) {
+      case MATERIAL_BLEND_MODE.NONE: {
+        // Nothing to do
+      } break;
+      case MATERIAL_BLEND_MODE.PREMULTIPLY: {
+        out.colorBlend = {srcFactor: "src-alpha", dstFactor: "one-minus-src-alpha", operation: "add"};
+        out.alphaBlend = {srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add"};
+      } break;
+    }
+    return [out];
+  }
+
+  /**
    * Generates the descriptor to constructor a new GPUTexture
    * @param texture - Texture object
    */
@@ -529,12 +587,12 @@ export class RenderPipelineGenerator {
       format: "depth32float"
     };
     const rasterizationStateDescriptor: GPURasterizationStateDescriptor = {
-      cullMode: "none"
+      cullMode: ToWGPUCullMode(material.getCullMode())
     };
     // TODO: allow to render into FBOs
-    const colorStatesDescriptor: GPUColorStateDescriptor[] = [{
-      format: "bgra8unorm"
-    }];
+    const colorStatesDescriptor: GPUColorStateDescriptor[] = (
+      RenderPipelineGenerator.GenerateColorStateDescriptor(material)
+    );
     const bindGroupLayout = device.createBindGroupLayout(
       RenderPipelineGenerator.generateBindGroupLayoutDescriptor(material)
     );
