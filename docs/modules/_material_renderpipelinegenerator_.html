@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>&quot;Material/RenderPipelineGenerator&quot; | yue</title>
-	<meta name="description" content="Documentation for yue">
+	<title>&quot;Material/RenderPipelineGenerator&quot; | yue.js</title>
+	<meta name="description" content="Documentation for yue.js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">yue</a>
+					<a href="../index.html" class="title">yue.js</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -90,6 +90,8 @@
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#getshaderattributecomponentsize" class="tsd-kind-icon">Get<wbr>Shader<wbr>Attribute<wbr>Component<wbr>Size</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgpuaddressmode" class="tsd-kind-icon">ToWGPUAddress<wbr>Mode</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgpubindingtype" class="tsd-kind-icon">ToWGPUBinding<wbr>Type</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgpucolorwrite" class="tsd-kind-icon">ToWGPUColor<wbr>Write</a></li>
+								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgpucullmode" class="tsd-kind-icon">ToWGPUCull<wbr>Mode</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgpufiltermode" class="tsd-kind-icon">ToWGPUFilter<wbr>Mode</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgpushaderstage" class="tsd-kind-icon">ToWGPUShader<wbr>Stage</a></li>
 								<li class="tsd-kind-function tsd-parent-kind-module"><a href="_material_renderpipelinegenerator_.html#towgputextureformat" class="tsd-kind-icon">ToWGPUTexture<wbr>Format</a></li>
@@ -111,7 +113,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L235">src/Material/RenderPipelineGenerator.ts:235</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L268">src/Material/RenderPipelineGenerator.ts:268</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -134,7 +136,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L277">src/Material/RenderPipelineGenerator.ts:277</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L310">src/Material/RenderPipelineGenerator.ts:310</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -157,7 +159,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L107">src/Material/RenderPipelineGenerator.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L128">src/Material/RenderPipelineGenerator.ts:128</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -180,7 +182,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L19">src/Material/RenderPipelineGenerator.ts:19</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L40">src/Material/RenderPipelineGenerator.ts:40</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -194,6 +196,52 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="towgpucolorwrite" class="tsd-anchor"></a>
+					<h3>ToWGPUColor<wbr>Write</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">ToWGPUColor<wbr>Write<span class="tsd-signature-symbol">(</span>colorWrite<span class="tsd-signature-symbol">: </span><a href="../enums/_constants_.material_color_write.html" class="tsd-signature-type">MATERIAL_COLOR_WRITE</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GPUColorWriteFlags</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L19">src/Material/RenderPipelineGenerator.ts:19</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>colorWrite: <a href="../enums/_constants_.material_color_write.html" class="tsd-signature-type">MATERIAL_COLOR_WRITE</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">GPUColorWriteFlags</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
+					<a name="towgpucullmode" class="tsd-anchor"></a>
+					<h3>ToWGPUCull<wbr>Mode</h3>
+					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
+						<li class="tsd-signature tsd-kind-icon">ToWGPUCull<wbr>Mode<span class="tsd-signature-symbol">(</span>cullMode<span class="tsd-signature-symbol">: </span><a href="../enums/_constants_.material_cull_mode.html" class="tsd-signature-type">MATERIAL_CULL_MODE</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">GPUCullMode</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L154">src/Material/RenderPipelineGenerator.ts:154</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>cullMode: <a href="../enums/_constants_.material_cull_mode.html" class="tsd-signature-type">MATERIAL_CULL_MODE</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">GPUCullMode</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-function tsd-parent-kind-module">
 					<a name="towgpufiltermode" class="tsd-anchor"></a>
 					<h3>ToWGPUFilter<wbr>Mode</h3>
 					<ul class="tsd-signatures tsd-kind-function tsd-parent-kind-module">
@@ -203,7 +251,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L121">src/Material/RenderPipelineGenerator.ts:121</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L142">src/Material/RenderPipelineGenerator.ts:142</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -226,7 +274,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L8">src/Material/RenderPipelineGenerator.ts:8</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L8">src/Material/RenderPipelineGenerator.ts:8</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -249,7 +297,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L133">src/Material/RenderPipelineGenerator.ts:133</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L166">src/Material/RenderPipelineGenerator.ts:166</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -272,7 +320,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Material/RenderPipelineGenerator.ts#L39">src/Material/RenderPipelineGenerator.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Material/RenderPipelineGenerator.ts#L60">src/Material/RenderPipelineGenerator.ts:60</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -292,6 +340,9 @@
 				<ul>
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="_aabb_index_.html">&quot;AABB/index&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
 						<a href="_camera_abstractcamera_.html">&quot;<wbr>Camera/<wbr>Abstract<wbr>Camera&quot;</a>
@@ -380,6 +431,12 @@
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_material_renderpipelinegenerator_.html#towgpubindingtype" class="tsd-kind-icon">ToWGPUBinding<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_material_renderpipelinegenerator_.html#towgpucolorwrite" class="tsd-kind-icon">ToWGPUColor<wbr>Write</a>
+					</li>
+					<li class=" tsd-kind-function tsd-parent-kind-module">
+						<a href="_material_renderpipelinegenerator_.html#towgpucullmode" class="tsd-kind-icon">ToWGPUCull<wbr>Mode</a>
 					</li>
 					<li class=" tsd-kind-function tsd-parent-kind-module">
 						<a href="_material_renderpipelinegenerator_.html#towgpufiltermode" class="tsd-kind-icon">ToWGPUFilter<wbr>Mode</a>

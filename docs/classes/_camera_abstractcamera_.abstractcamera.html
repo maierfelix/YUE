@@ -3,8 +3,8 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>AbstractCamera | yue</title>
-	<meta name="description" content="Documentation for yue">
+	<title>AbstractCamera | yue.js</title>
+	<meta name="description" content="Documentation for yue.js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
 </head>
@@ -22,7 +22,7 @@
 						<li class="state loading">Preparing search index...</li>
 						<li class="state failure">The search index is not available</li>
 					</ul>
-					<a href="../index.html" class="title">yue</a>
+					<a href="../index.html" class="title">yue.js</a>
 				</div>
 				<div class="table-cell" id="tsd-widgets">
 					<div id="tsd-filter">
@@ -102,6 +102,7 @@
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static"><a href="_camera_abstractcamera_.abstractcamera.html#argumentmap" class="tsd-kind-icon">Argument<wbr>Map</a></li>
+								<li class="tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static"><a href="_camera_abstractcamera_.abstractcamera.html#arguments" class="tsd-kind-icon">Arguments</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static"><a href="_camera_abstractcamera_.abstractcamera.html#eventargs" class="tsd-kind-icon">Event<wbr>Args</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static"><a href="_camera_abstractcamera_.abstractcamera.html#eventlistener" class="tsd-kind-icon">Event<wbr>Listener</a></li>
 								<li class="tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static"><a href="_camera_abstractcamera_.abstractcamera.html#eventnames" class="tsd-kind-icon">Event<wbr>Names</a></li>
@@ -175,7 +176,7 @@
 					<div class="tsd-signature tsd-kind-icon">Argument<wbr>Map&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in node_modules/eventemitter3/index.d.ts:109</li>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:100</li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -191,12 +192,31 @@
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
+					<a name="arguments" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagStatic">Static</span> Arguments</h3>
+					<div class="tsd-signature tsd-kind-icon">Arguments&lt;T, K&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">K</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">ArgumentMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:108</li>
+						</ul>
+					</aside>
+					<h4 class="tsd-type-parameters-title">Type parameters</h4>
+					<ul class="tsd-type-parameters">
+						<li>
+							<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">object</span></h4>
+						</li>
+						<li>
+							<h4>K<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
 					<a name="eventargs" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> Event<wbr>Args</h3>
 					<div class="tsd-signature tsd-kind-icon">Event<wbr>Args&lt;T, K&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Parameters</span><span class="tsd-signature-symbol">&lt;</span><a href="_camera_abstractcamera_.abstractcamera.html#eventlistener" class="tsd-signature-type">EventListener</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in node_modules/eventemitter3/index.d.ts:126</li>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:120</li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -212,10 +232,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
 					<a name="eventlistener" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> Event<wbr>Listener</h3>
-					<div class="tsd-signature tsd-kind-icon">Event<wbr>Listener&lt;T, K&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArgumentMap</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Exclude</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">Extract</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
+					<div class="tsd-signature tsd-kind-icon">Event<wbr>Listener&lt;T, K&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><a href="_camera_abstractcamera_.abstractcamera.html#arguments" class="tsd-signature-type">Arguments</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">Exclude</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">K</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in node_modules/eventemitter3/index.d.ts:117</li>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:113</li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -234,7 +254,7 @@
 					<div class="tsd-signature tsd-kind-icon">Event<wbr>Names&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> extends </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol"> ? </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol"> : </span><span class="tsd-signature-symbol">keyof </span><span class="tsd-signature-type">T</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in node_modules/eventemitter3/index.d.ts:105</li>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:96</li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -250,18 +270,9 @@
 					<div class="tsd-signature tsd-kind-icon">Valid<wbr>Event<wbr>Types<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">symbol</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in node_modules/eventemitter3/index.d.ts:103</li>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:94</li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p><code>object</code> should be in either of the following forms:</p>
-							<pre><code><span class="hljs-keyword">interface</span> EventTypes {
-  <span class="hljs-string">&#x27;event-with-parameters&#x27;</span>: <span class="hljs-built_in">any</span>[]
-  <span class="hljs-string">&#x27;event-with-example-handler&#x27;</span>: <span class="hljs-function">(<span class="hljs-params">...args: <span class="hljs-built_in">any</span>[]</span>) =&gt;</span> <span class="hljs-built_in">void</span>
-}</code></pre>
-						</div>
-					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
@@ -276,7 +287,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -305,7 +316,7 @@
 					<div class="tsd-signature tsd-kind-icon">_height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L18">src/Camera/AbstractCamera.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L18">src/Camera/AbstractCamera.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -315,7 +326,7 @@
 					<div class="tsd-signature tsd-kind-icon">_projection<wbr>Inverse<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L25">src/Camera/AbstractCamera.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L25">src/Camera/AbstractCamera.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -325,7 +336,7 @@
 					<div class="tsd-signature tsd-kind-icon">_projection<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L23">src/Camera/AbstractCamera.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L23">src/Camera/AbstractCamera.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -335,7 +346,7 @@
 					<div class="tsd-signature tsd-kind-icon">_translation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">vec3</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L20">src/Camera/AbstractCamera.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L20">src/Camera/AbstractCamera.ts:20</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -345,7 +356,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Inverse<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L24">src/Camera/AbstractCamera.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L24">src/Camera/AbstractCamera.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -355,7 +366,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L22">src/Camera/AbstractCamera.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L22">src/Camera/AbstractCamera.ts:22</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -365,7 +376,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Projection<wbr>Inverse<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -375,7 +386,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Projection<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L26">src/Camera/AbstractCamera.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L26">src/Camera/AbstractCamera.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -385,7 +396,7 @@
 					<div class="tsd-signature tsd-kind-icon">_width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L17">src/Camera/AbstractCamera.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L17">src/Camera/AbstractCamera.ts:17</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -395,7 +406,7 @@
 					<div class="tsd-signature tsd-kind-icon">Event<wbr>Emitter<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_camera_abstractcamera_.abstractcamera.eventemitterstatic.html" class="tsd-signature-type">EventEmitterStatic</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in node_modules/eventemitter3/index.d.ts:131</li>
+							<li>Defined in node_modules/eventemitter3/index.d.ts:125</li>
 						</ul>
 					</aside>
 				</section>
@@ -459,7 +470,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L139">src/Camera/AbstractCamera.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L139">src/Camera/AbstractCamera.ts:139</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -543,7 +554,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L72">src/Camera/AbstractCamera.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L72">src/Camera/AbstractCamera.ts:72</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -565,7 +576,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L189">src/Camera/AbstractCamera.ts:189</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L189">src/Camera/AbstractCamera.ts:189</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -596,7 +607,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L61">src/Camera/AbstractCamera.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L61">src/Camera/AbstractCamera.ts:61</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -618,7 +629,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L97">src/Camera/AbstractCamera.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L97">src/Camera/AbstractCamera.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -640,7 +651,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L87">src/Camera/AbstractCamera.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L87">src/Camera/AbstractCamera.ts:87</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -662,7 +673,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L77">src/Camera/AbstractCamera.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L77">src/Camera/AbstractCamera.ts:77</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -684,7 +695,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L92">src/Camera/AbstractCamera.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L92">src/Camera/AbstractCamera.ts:92</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -706,7 +717,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L82">src/Camera/AbstractCamera.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L82">src/Camera/AbstractCamera.ts:82</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -728,7 +739,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L107">src/Camera/AbstractCamera.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L107">src/Camera/AbstractCamera.ts:107</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -750,7 +761,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L102">src/Camera/AbstractCamera.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L102">src/Camera/AbstractCamera.ts:102</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -772,7 +783,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L51">src/Camera/AbstractCamera.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L51">src/Camera/AbstractCamera.ts:51</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1052,7 +1063,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L152">src/Camera/AbstractCamera.ts:152</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L152">src/Camera/AbstractCamera.ts:152</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1089,7 +1100,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L162">src/Camera/AbstractCamera.ts:162</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L162">src/Camera/AbstractCamera.ts:162</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1120,7 +1131,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L67">src/Camera/AbstractCamera.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L67">src/Camera/AbstractCamera.ts:67</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1151,7 +1162,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L56">src/Camera/AbstractCamera.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L56">src/Camera/AbstractCamera.ts:56</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1182,7 +1193,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L112">src/Camera/AbstractCamera.ts:112</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L112">src/Camera/AbstractCamera.ts:112</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1204,7 +1215,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L119">src/Camera/AbstractCamera.ts:119</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L119">src/Camera/AbstractCamera.ts:119</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1241,7 +1252,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/11f468f/src/Camera/AbstractCamera.ts#L176">src/Camera/AbstractCamera.ts:176</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/7af0fdc/src/Camera/AbstractCamera.ts#L176">src/Camera/AbstractCamera.ts:176</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1269,6 +1280,9 @@
 				<ul>
 					<li class="globals  ">
 						<a href="../globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-module">
+						<a href="../modules/_aabb_index_.html">&quot;AABB/index&quot;</a>
 					</li>
 					<li class="current tsd-kind-module">
 						<a href="../modules/_camera_abstractcamera_.html">&quot;<wbr>Camera/<wbr>Abstract<wbr>Camera&quot;</a>
@@ -1350,6 +1364,9 @@
 							</li>
 							<li class=" tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
 								<a href="_camera_abstractcamera_.abstractcamera.html#argumentmap" class="tsd-kind-icon">Argument<wbr>Map</a>
+							</li>
+							<li class=" tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
+								<a href="_camera_abstractcamera_.abstractcamera.html#arguments" class="tsd-kind-icon">Arguments</a>
 							</li>
 							<li class=" tsd-kind-type-alias tsd-parent-kind-class tsd-has-type-parameter tsd-is-static">
 								<a href="_camera_abstractcamera_.abstractcamera.html#eventargs" class="tsd-kind-icon">Event<wbr>Args</a>
