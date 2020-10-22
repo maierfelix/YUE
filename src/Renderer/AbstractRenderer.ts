@@ -1,5 +1,5 @@
 import {EventEmitter} from "../utils";
-import {Scene, ISceneOptions} from "../Scene";
+import {Frame} from "../Frame";
 
 export interface IRendererOptions {
   canvas?: HTMLCanvasElement;
@@ -61,17 +61,10 @@ export abstract class AbstractRenderer extends EventEmitter {
   }
 
   /**
-   * Render a scene, must be overridden
+   * Render a frame
+   * @param frame - The frame to render
    */
-  public abstract render(scene: Scene): void;
-
-  /**
-   * Create a new scene
-   */
-  public createScene(options?: ISceneOptions): Scene {
-    options = Object.assign({renderer: this}, options);
-    return new Scene(options);
-  }
+  public abstract async render(frame: Frame): Promise<void>;
 
   /**
    * Destroy this Object

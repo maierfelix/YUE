@@ -1,5 +1,6 @@
 import {vec3, quat, mat4} from "gl-matrix";
 import {AABB, IAABBBounding} from "../AABB";
+import {Mesh} from "../Mesh";
 import {Renderer} from "../Renderer";
 
 export interface IContainerOptions {
@@ -78,7 +79,6 @@ export class Container {
   public getTopLevelParent(): Container {
     let current = this.getParent();
     while (current !== null) {
-      if (current.getParent() === null) break;
       current = current.getParent();
     }
     return current;
@@ -105,6 +105,7 @@ export class Container {
   public setTranslation(value: vec3): void {
     this._translation = value;
     this.updateTransform();
+    this.updateBoundings();
   }
 
   /**
@@ -119,6 +120,7 @@ export class Container {
   public setRotation(value: quat): void {
     this._rotation = value;
     this.updateTransform();
+    this.updateBoundings();
   }
 
   /**
@@ -133,6 +135,7 @@ export class Container {
   public setScale(value: vec3): void {
     this._scale = value;
     this.updateTransform();
+    this.updateBoundings();
   }
 
   /**
@@ -145,6 +148,7 @@ export class Container {
     translation[1] += value[1];
     translation[2] += value[2];
     this.updateTransform();
+    this.updateBoundings();
   }
 
   /**
@@ -157,6 +161,7 @@ export class Container {
     quat.rotateY(rotation, rotation, value[1]);
     quat.rotateZ(rotation, rotation, value[2]);
     this.updateTransform();
+    this.updateBoundings();
   }
 
   /**
@@ -169,6 +174,7 @@ export class Container {
     scale[1] *= value[1];
     scale[2] *= value[2];
     this.updateTransform();
+    this.updateBoundings();
   }
 
   /**
@@ -309,6 +315,7 @@ export class Container {
       const child = children[ii];
       child.update(renderer);
     }
+    this.updateBoundings();
   }
 
   /**
@@ -379,8 +386,6 @@ export class Container {
       mat4.multiply(mModel, mModel, parent.getModelMatrix());
     }
     mat4.invert(mModelInverse, mModel);
-    // Update the boundings of this container
-    this.updateBoundings();
   }
 
   /**
@@ -413,20 +418,26 @@ export class Container {
   }
 
   /**
-   * Update the AABB of this container
+   * Update the boundings of this container
    */
   public updateBoundings(): void {
-    // Update the bounding of this container
+    // Update the boundings of this container
     const boundings = this.getBoundings();
     const {min, max} = this.computeBoundings();
-    // Only execute this when the boundings have actually changed
     if (!vec3.exactEquals(boundings.getMin(), min) || !vec3.exactEquals(boundings.getMax(), max)) {
       // Update boundings
       vec3.copy(boundings.getMin(), min);
       vec3.copy(boundings.getMax(), max);
-      // Update the boundings of the top-level parent container
-      const topLevel = this.getTopLevelParent();
-      if (topLevel !== null) topLevel.updateBoundings();
+      // Turn boundings into world-space
+      const mModel = this.getModelMatrix();
+      vec3.transformMat4(boundings.getMin(), min, mModel);
+      vec3.transformMat4(boundings.getMax(), max, mModel);
+      // Update the boundings of the parent containers
+      let current = this.getParent();
+      while (current !== null) {
+        current.updateBoundings();
+        current = current.getParent();
+      }
     }
   }
 

@@ -9,6 +9,6 @@ export * from "./Mesh";
 export * from "./Ray";
 export * from "./Renderer";
 export * from "./Sampler";
-export * from "./Scene";
+export * from "./Frame";
 export * from "./Shader";
 export * from "./Texture";

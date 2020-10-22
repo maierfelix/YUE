@@ -1,6 +1,6 @@
 import {AbstractRenderer, IRendererOptions} from "./AbstractRenderer";
 
-import {Scene} from "../Scene";
+import {Frame} from "../Frame";
 import {AbstractCamera} from "../Camera";
 import {IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
 import {Sampler} from "../Sampler";
@@ -156,23 +156,23 @@ export class Renderer extends AbstractRenderer {
   }
 
   /**
-   * Render the scene
-   * @param camera - The camera to be used to render the scene
+   * Render a frame
+   * @param frame - The frame to render
    */
-  public async render(scene: Scene): Promise<void> {
+  public async render(frame: Frame): Promise<void> {
     const now = GetTimeStamp();
     const delta = (now - this._getLastFrameTimestamp()) / 1e3;
     const begin = this._getBeginFrameTimestamp();
     const time = (now - begin) / 1e3;
     this.emit("beforerender", {time, delta});
-    // Make sure a scene object is provided
-    if (!(scene instanceof Scene))
-      throw TypeError(`Unexpected type for argument 1 in 'render', expected instance of 'AbstractCamera'`);
-    // The scene's camera determines the rendering surface size
-    const camera = scene.getAttachedCamera();
-    // Make sure the scene has a valid camera attached
+    // Make sure a frame object is provided
+    if (!(frame instanceof Frame))
+      throw TypeError(`Unexpected type for argument 1 in 'render', expected instance of 'Frame'`);
+    // The frame's camera determines the rendering surface size
+    const camera = frame.getAttachedCamera();
+    // Make sure the frame has a valid camera attached
     if (!(camera instanceof AbstractCamera))
-      throw ReferenceError(`Scene requires an attached camera`);
+      throw ReferenceError(`Frame requires an attached camera`);
     if (
       (this.getWidth() !== camera.getWidth()) ||
       (this.getHeight() !== camera.getHeight()
@@ -180,12 +180,10 @@ export class Renderer extends AbstractRenderer {
     // Make sure the renderer got created successfully
     if (!this.getAdapter() || !this.getDevice())
       throw new ReferenceError(`Method 'create' must be called on 'Renderer' before usage`);
-    // Take the scene's combined camera matrix
-    //const matrix: mat4 = camera.getViewProjectionMatrix();
-    // Update the scene
-    await scene.update(this);
-    // Draw the scene
-    scene.draw(this);
+    // Update the frame
+    await frame.update(this);
+    // Draw the frame
+    frame.draw(this);
     this._setLastFrameTimestamp(now);
     this.emit("afterrender", {time, delta});
   }

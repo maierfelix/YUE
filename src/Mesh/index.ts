@@ -37,7 +37,7 @@ export class Mesh extends Container {
   private _attributes: ArrayBufferView = null;
   private _indexCount: number = 0;
 
-  private _localBoundings: AABB = null;
+  private _vertexBoundings: AABB = null;
 
   private _uniformBindGroup: GPUBindGroup = null;
   private _uniformResources: IBindGroupResource[] = [];
@@ -88,9 +88,9 @@ export class Mesh extends Container {
   public getIndexCount(): number { return this._indexCount; }
 
   /**
-   * The object-space boundings of the mesh
+   * The object-space vertex boundings of the mesh
    */
-  public getLocalBoundings(): AABB { return this._localBoundings; }
+  public getVertexBoundings(): AABB { return this._vertexBoundings; }
 
   /**
    * Returns the intersection point in world-space between the mesh and the provided ray
@@ -344,23 +344,55 @@ export class Mesh extends Container {
     if (this.isDestroyed() || this._freeAfterUpload) {
       return {min: vec3.create(), max: vec3.create()};
     }
-    if (this.getLocalBoundings() === null) {
-      const localBoundings = new AABB();
+    // Calculate and cache the vertex boundings if necessary
+    if (this.getVertexBoundings() === null) {
+      const vertexBoundings = new AABB();
       const {min, max} = this.computeVertexBoundings();
       // Save local boundings
-      vec3.copy(localBoundings.getMin(), min);
-      vec3.copy(localBoundings.getMax(), max);
-      // Cache local boundings, we want to avoid computing them again
-      this._localBoundings = localBoundings;
+      vec3.copy(vertexBoundings.getMin(), min);
+      vec3.copy(vertexBoundings.getMax(), max);
+      // Cache vertex boundings, we want to avoid computing them again
+      this._vertexBoundings = vertexBoundings;
     }
-    // Turn local boundings into world-space
+    const vertexBoundings = this.getVertexBoundings();
+    const min = vec3.copy(vec3.create(), vertexBoundings.getMin());
+    const max = vec3.copy(vec3.create(), vertexBoundings.getMax());
+    return {min, max};
+  }
+
+  /**
+   * Update the boundings of this container
+   */
+  public updateBoundings(): void {
+    // Update the boundings of this container
+    const boundings = this.getBoundings();
+    const vertexBoundings = this.computeBoundings();
+    // Update boundings
+    const min = boundings.getMin();
+    const max = boundings.getMax();
+    vec3.copy(min, vertexBoundings.min);
+    vec3.copy(max, vertexBoundings.max);
+    // Turn boundings into world-space
     const mModel = this.getModelMatrix();
-    const localBoundings = this.getLocalBoundings();
-    const min = vec3.copy(vec3.create(), localBoundings.getMin());
-    const max = vec3.copy(vec3.create(), localBoundings.getMax());
     vec3.transformMat4(min, min, mModel);
     vec3.transformMat4(max, max, mModel);
-    return {min, max};
+    // We now have the world-space boundings of this mesh
+    // In the final step, we have to add the boundings of our children
+    {
+      // First take the boundings of the attached children
+      // Next we min/max between our mesh boundings and the child boundings
+      const childBoundings = super.computeBoundings();
+      const childMin = childBoundings.min;
+      const childMax = childBoundings.max;
+      // Min
+      if (childMin[0] < min[0]) min[0] = childMin[0];
+      if (childMin[1] < min[1]) min[1] = childMin[1];
+      if (childMin[2] < min[2]) min[2] = childMin[2];
+      // Max
+      if (childMax[0] > max[0]) max[0] = childMax[0];
+      if (childMax[1] > max[1]) max[1] = childMax[1];
+      if (childMax[2] > max[2]) max[2] = childMax[2];
+    }
   }
 
   /**

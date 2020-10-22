@@ -50,6 +50,15 @@ export class AABB {
   }
 
   /**
+   * The size of the AABB
+   */
+  public getSize(): vec3 {
+    const out = vec3.create();
+    vec3.subtract(out, this.getMax(), this.getMin());
+    return out;
+  }
+
+  /**
    * Indicates if this and the provided AABB are intersecting
    * @param aabb - The AABB to check
    */
