@@ -1,4 +1,5 @@
-import {mat4, vec2, vec3} from "gl-matrix";
+import {mat4, vec2, vec3, vec4} from "gl-matrix";
+import {AABB} from "../AABB";
 
 import {EventEmitter} from "../utils";
 
@@ -26,6 +27,8 @@ export abstract class AbstractCamera extends EventEmitter {
   private _viewProjectionMatrix: mat4 = null;
   private _viewProjectionInverseMatrix: mat4 = null;
 
+  private _frustumPlanes: vec4[] = null;
+
   /**
    * @param options - Create options
    */
@@ -43,6 +46,14 @@ export abstract class AbstractCamera extends EventEmitter {
     this._projectionInverseMatrix = mat4.create();
     this._viewProjectionMatrix = mat4.create();
     this._viewProjectionInverseMatrix = mat4.create();
+    this._frustumPlanes = [
+      vec4.create(),
+      vec4.create(),
+      vec4.create(),
+      vec4.create(),
+      vec4.create(),
+      vec4.create()
+    ];
   }
 
   /**
@@ -180,6 +191,74 @@ export abstract class AbstractCamera extends EventEmitter {
     out[0] = Math.round(((v[0] + 1.0) * 0.5) * this.getWidth());
     out[1] = Math.round(((1.0 - v[1]) * 0.5) * this.getHeight());
     return out;
+  }
+
+  /**
+   * Indicates if the camera's frustum intersects with the provided AABB
+   * @param aabb - The AABB to check intersection with
+   */
+  public intersectsAABB(aabb: AABB): boolean {
+    const frustumPlanes = this._frustumPlanes;
+    for (let ii = 0; ii < 6; ++ii) {
+      const plane = frustumPlanes[ii];
+      const min = aabb.getMin();
+      const max = aabb.getMax();
+      const px = plane[0] > 0 ? max[0] : min[0];
+      const py = plane[1] > 0 ? max[1] : min[1];
+      const pz = plane[2] > 0 ? max[2] : min[2];
+      if ((plane[0] * px) + (plane[1] * py) + (plane[2] * pz) + (plane[3]) < 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Update the frustum of the camera
+   */
+  public updateFrustum(): void {
+    const frustumPlanes = this._frustumPlanes;
+    const [
+      m0,  m1,  m2,  m3,
+      m4,  m5,  m6,  m7,
+      m8,  m9,  m10, m11,
+      m12, m13, m14, m15
+    ] = this.getViewProjectionMatrix();
+    // Right
+    frustumPlanes[0][0] = (m3  - m0) / 6;
+    frustumPlanes[0][1] = (m7  - m4) / 6;
+    frustumPlanes[0][2] = (m11 - m8) / 6;
+    frustumPlanes[0][3] = (m15 - m12) / 6;
+    // Left
+    frustumPlanes[1][0] = (m3  + m0) / 6;
+    frustumPlanes[1][1] = (m7  + m4) / 6;
+    frustumPlanes[1][2] = (m11 + m8) / 6;
+    frustumPlanes[1][3] = (m15 + m12) / 6;
+    // Bottom
+    frustumPlanes[2][0] = (m3  + m1) / 6;
+    frustumPlanes[2][1] = (m7  + m5) / 6;
+    frustumPlanes[2][2] = (m11 + m9) / 6;
+    frustumPlanes[2][3] = (m15 + m13) / 6;
+    // Top
+    frustumPlanes[3][0] = (m3  - m1) / 6;
+    frustumPlanes[3][1] = (m7  - m5) / 6;
+    frustumPlanes[3][2] = (m11 - m9) / 6;
+    frustumPlanes[3][3] = (m15 - m13) / 6;
+    // Top
+    frustumPlanes[4][0] = (m3  - m2) / 6;
+    frustumPlanes[4][1] = (m7  - m6) / 6;
+    frustumPlanes[4][2] = (m11 - m1) / 6;
+    frustumPlanes[4][3] = (m15 - m14) / 6;
+    // Z-Far
+    frustumPlanes[4][0] = (m3  - m2) / 6;
+    frustumPlanes[4][1] = (m7  - m6) / 6;
+    frustumPlanes[4][2] = (m11 - m10) / 6;
+    frustumPlanes[4][3] = (m15 - m14) / 6;
+    // Z-Near
+    frustumPlanes[5][0] = (m3  + m2) / 6;
+    frustumPlanes[5][1] = (m7  + m6) / 6;
+    frustumPlanes[5][2] = (m11 + m10) / 6;
+    frustumPlanes[5][3] = (m15 + m14) / 6;
   }
 
   /**

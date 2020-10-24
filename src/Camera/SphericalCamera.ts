@@ -101,6 +101,7 @@ export class SphericalCamera extends AbstractCamera {
     const mView = this._instance.state.view;
     const mProjection = this._instance.state.projection;
     this.updateTransforms(mView, mProjection);
+    this.updateFrustum();
     this.emit("update");
   }
 
