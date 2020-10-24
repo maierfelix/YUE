@@ -118,6 +118,7 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_camera_abstractcamera_.abstractcamera.html#_frustumplanes" class="tsd-kind-icon">_frustum<wbr>Planes</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_camera_abstractcamera_.abstractcamera.html#_height" class="tsd-kind-icon">_height</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_camera_abstractcamera_.abstractcamera.html#_projectioninversematrix" class="tsd-kind-icon">_projection<wbr>Inverse<wbr>Matrix</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_camera_abstractcamera_.abstractcamera.html#_projectionmatrix" class="tsd-kind-icon">_projection<wbr>Matrix</a></li>
@@ -149,6 +150,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#getviewprojectioninversematrix" class="tsd-kind-icon">get<wbr>View<wbr>Projection<wbr>Inverse<wbr>Matrix</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#getviewprojectionmatrix" class="tsd-kind-icon">get<wbr>View<wbr>Projection<wbr>Matrix</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#getwidth" class="tsd-kind-icon">get<wbr>Width</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#intersectsaabb" class="tsd-kind-icon">intersectsAABB</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="_camera_abstractcamera_.abstractcamera.html#listenercount" class="tsd-kind-icon">listener<wbr>Count</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited"><a href="_camera_abstractcamera_.abstractcamera.html#listeners" class="tsd-kind-icon">listeners</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-inherited"><a href="_camera_abstractcamera_.abstractcamera.html#off" class="tsd-kind-icon">off</a></li>
@@ -161,6 +163,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#setheight" class="tsd-kind-icon">set<wbr>Height</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#setwidth" class="tsd-kind-icon">set<wbr>Width</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#update" class="tsd-kind-icon">update</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#updatefrustum" class="tsd-kind-icon">update<wbr>Frustum</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#updatetransforms" class="tsd-kind-icon">update<wbr>Transforms</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_camera_abstractcamera_.abstractcamera.html#worldtoscreenpoint" class="tsd-kind-icon">world<wbr>ToScreen<wbr>Point</a></li>
 							</ul>
@@ -287,7 +290,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L30">src/Camera/AbstractCamera.ts:30</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -311,12 +314,22 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_frustumplanes" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _frustum<wbr>Planes</h3>
+					<div class="tsd-signature tsd-kind-icon">_frustum<wbr>Planes<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">vec4</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L30">src/Camera/AbstractCamera.ts:30</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
 					<a name="_height" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _height</h3>
 					<div class="tsd-signature tsd-kind-icon">_height<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L18">src/Camera/AbstractCamera.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L19">src/Camera/AbstractCamera.ts:19</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -326,7 +339,7 @@
 					<div class="tsd-signature tsd-kind-icon">_projection<wbr>Inverse<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L25">src/Camera/AbstractCamera.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L26">src/Camera/AbstractCamera.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -336,7 +349,7 @@
 					<div class="tsd-signature tsd-kind-icon">_projection<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L23">src/Camera/AbstractCamera.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L24">src/Camera/AbstractCamera.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -346,7 +359,7 @@
 					<div class="tsd-signature tsd-kind-icon">_translation<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">vec3</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L20">src/Camera/AbstractCamera.ts:20</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L21">src/Camera/AbstractCamera.ts:21</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -356,7 +369,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Inverse<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L24">src/Camera/AbstractCamera.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L25">src/Camera/AbstractCamera.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -366,7 +379,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L22">src/Camera/AbstractCamera.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L23">src/Camera/AbstractCamera.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -376,7 +389,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Projection<wbr>Inverse<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L28">src/Camera/AbstractCamera.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -386,7 +399,7 @@
 					<div class="tsd-signature tsd-kind-icon">_view<wbr>Projection<wbr>Matrix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">mat4</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L26">src/Camera/AbstractCamera.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L27">src/Camera/AbstractCamera.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -396,7 +409,7 @@
 					<div class="tsd-signature tsd-kind-icon">_width<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L17">src/Camera/AbstractCamera.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L18">src/Camera/AbstractCamera.ts:18</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -470,7 +483,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L139">src/Camera/AbstractCamera.ts:139</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L150">src/Camera/AbstractCamera.ts:150</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -554,7 +567,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L72">src/Camera/AbstractCamera.ts:72</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L83">src/Camera/AbstractCamera.ts:83</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -576,7 +589,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L189">src/Camera/AbstractCamera.ts:189</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L268">src/Camera/AbstractCamera.ts:268</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -607,7 +620,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L61">src/Camera/AbstractCamera.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L72">src/Camera/AbstractCamera.ts:72</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -629,7 +642,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L97">src/Camera/AbstractCamera.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L108">src/Camera/AbstractCamera.ts:108</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -651,7 +664,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L87">src/Camera/AbstractCamera.ts:87</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L98">src/Camera/AbstractCamera.ts:98</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -673,7 +686,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L77">src/Camera/AbstractCamera.ts:77</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L88">src/Camera/AbstractCamera.ts:88</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -695,7 +708,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L92">src/Camera/AbstractCamera.ts:92</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L103">src/Camera/AbstractCamera.ts:103</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -717,7 +730,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L82">src/Camera/AbstractCamera.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L93">src/Camera/AbstractCamera.ts:93</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -739,7 +752,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L107">src/Camera/AbstractCamera.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L118">src/Camera/AbstractCamera.ts:118</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -761,7 +774,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L102">src/Camera/AbstractCamera.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L113">src/Camera/AbstractCamera.ts:113</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -783,7 +796,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L51">src/Camera/AbstractCamera.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L62">src/Camera/AbstractCamera.ts:62</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -792,6 +805,37 @@
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">number</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="intersectsaabb" class="tsd-anchor"></a>
+					<h3>intersectsAABB</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">intersectsAABB<span class="tsd-signature-symbol">(</span>aabb<span class="tsd-signature-symbol">: </span><a href="_aabb_index_.aabb.html" class="tsd-signature-type">AABB</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">boolean</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L200">src/Camera/AbstractCamera.ts:200</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Indicates if the camera&#39;s frustum intersects with the provided AABB</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>aabb: <a href="_aabb_index_.aabb.html" class="tsd-signature-type">AABB</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>The AABB to check intersection with</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -1063,7 +1107,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L152">src/Camera/AbstractCamera.ts:152</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L163">src/Camera/AbstractCamera.ts:163</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1100,7 +1144,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L162">src/Camera/AbstractCamera.ts:162</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L173">src/Camera/AbstractCamera.ts:173</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1131,7 +1175,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L67">src/Camera/AbstractCamera.ts:67</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L78">src/Camera/AbstractCamera.ts:78</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1162,7 +1206,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L56">src/Camera/AbstractCamera.ts:56</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L67">src/Camera/AbstractCamera.ts:67</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1193,12 +1237,34 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L112">src/Camera/AbstractCamera.ts:112</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L123">src/Camera/AbstractCamera.ts:123</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Should be called every frame, must be overridden</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="updatefrustum" class="tsd-anchor"></a>
+					<h3>update<wbr>Frustum</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">update<wbr>Frustum<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L219">src/Camera/AbstractCamera.ts:219</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Update the frustum of the camera</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -1215,7 +1281,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L119">src/Camera/AbstractCamera.ts:119</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L130">src/Camera/AbstractCamera.ts:130</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1252,7 +1318,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/c507188/src/Camera/AbstractCamera.ts#L176">src/Camera/AbstractCamera.ts:176</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/ad55c4d/src/Camera/AbstractCamera.ts#L187">src/Camera/AbstractCamera.ts:187</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -1384,6 +1450,9 @@
 								<a href="_camera_abstractcamera_.abstractcamera.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_camera_abstractcamera_.abstractcamera.html#_frustumplanes" class="tsd-kind-icon">_frustum<wbr>Planes</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_camera_abstractcamera_.abstractcamera.html#_height" class="tsd-kind-icon">_height</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
@@ -1461,6 +1530,9 @@
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_camera_abstractcamera_.abstractcamera.html#getwidth" class="tsd-kind-icon">get<wbr>Width</a>
 							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_camera_abstractcamera_.abstractcamera.html#intersectsaabb" class="tsd-kind-icon">intersectsAABB</a>
+							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 								<a href="_camera_abstractcamera_.abstractcamera.html#listenercount" class="tsd-kind-icon">listener<wbr>Count</a>
 							</li>
@@ -1496,6 +1568,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_camera_abstractcamera_.abstractcamera.html#update" class="tsd-kind-icon">update</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_camera_abstractcamera_.abstractcamera.html#updatefrustum" class="tsd-kind-icon">update<wbr>Frustum</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_camera_abstractcamera_.abstractcamera.html#updatetransforms" class="tsd-kind-icon">update<wbr>Transforms</a>
