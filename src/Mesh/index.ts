@@ -63,8 +63,11 @@ export class Mesh extends Container {
     this._indices = options.indices;
     this._attributes = options.attributes;
     this._freeAfterUpload = options.freeAfterUpload;
-    // Trigger an initial transform update right after creation
-    this.updateTransform();
+    // Trigger an initial transform and boundings update right after creation
+    if (this.doTransformAutoUpdate()) {
+      this.updateTransform();
+      this.updateBoundings();
+    }
   }
 
   /**
@@ -283,8 +286,8 @@ export class Mesh extends Container {
    */
   public render(encoder: GPURenderPassEncoder): void {
     super.render(encoder);
-    // Abort if the mesh is destroyed
-    if (this.isDestroyed()) return;
+    // Abort if the mesh is destroyed or hidden
+    if (this.isDestroyed() || !this.isVisible()) return;
     const material = this.getMaterial();
     // make sure the material's render pipeline is ready
     if (material?.getRenderPipeline() !== null) {
@@ -319,7 +322,7 @@ export class Mesh extends Container {
     const max = vec3.fromValues(-Infinity, -Infinity, -Infinity);
     // Compute vertex boundings in world-space
     for (let ii = 0; ii < indices.length; ++ii) {
-      const index = positionByteOffset + (((indices[(ii * 3)])) * attributeByteStride);
+      const index = positionByteOffset + (indices[(ii * 3)] * attributeByteStride);
       // Vertex
       vertex[0] = attributeView.getFloat32(index + (attributeComponentSize * 0), true);
       vertex[1] = attributeView.getFloat32(index + (attributeComponentSize * 1), true);
@@ -357,6 +360,10 @@ export class Mesh extends Container {
     const vertexBoundings = this.getVertexBoundings();
     const min = vec3.copy(vec3.create(), vertexBoundings.getMin());
     const max = vec3.copy(vec3.create(), vertexBoundings.getMax());
+    // Turn vertex boundings from object-space into world-space
+    const mModel = this.getModelMatrix();
+    vec3.transformMat4(min, min, mModel);
+    vec3.transformMat4(max, max, mModel);
     return {min, max};
   }
 
@@ -372,14 +379,10 @@ export class Mesh extends Container {
     const max = boundings.getMax();
     vec3.copy(min, vertexBoundings.min);
     vec3.copy(max, vertexBoundings.max);
-    // Turn boundings into world-space
-    const mModel = this.getModelMatrix();
-    vec3.transformMat4(min, min, mModel);
-    vec3.transformMat4(max, max, mModel);
     // We now have the world-space boundings of this mesh
     // In the final step, we have to add the boundings of our children
     {
-      // First take the boundings of the attached children
+      // First calculate the boundings of the attached children
       // Next we min/max between our mesh boundings and the child boundings
       const childBoundings = super.computeBoundings();
       const childMin = childBoundings.min;
@@ -417,6 +420,7 @@ export class Mesh extends Container {
     this._uniformUpdateQueue = null;
     this._indexBuffer = null;
     this._attributeBuffer = null;
+    this._vertexBoundings = null;
   }
 
   /**

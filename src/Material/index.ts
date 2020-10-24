@@ -58,7 +58,7 @@ export interface IMaterialOptions {
 const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
   name: null,
   attributes: null,
-  cullMode: MATERIAL_CULL_MODE.BACK,
+  cullMode: MATERIAL_CULL_MODE.NONE,
   blendMode: MATERIAL_BLEND_MODE.NONE,
   colorWrite: MATERIAL_COLOR_WRITE.ALL,
   vertexShader: null,

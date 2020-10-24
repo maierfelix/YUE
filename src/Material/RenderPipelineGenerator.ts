@@ -261,6 +261,10 @@ export function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFo
       return "bc7-rgba-unorm";
     case TEXTURE_FORMAT.BC7_RGBA_UNORM_SRGB:
       return "bc7-rgba-unorm-srgb";
+    case TEXTURE_FORMAT.DEPTH24_PLUS:
+      return "depth24plus";
+    case TEXTURE_FORMAT.DEPTH32_FLOAT:
+      return "depth32float";
   }
   Unreachable();
 }

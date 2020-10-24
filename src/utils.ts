@@ -23,6 +23,14 @@ export function CompileGLSL(glsl: string, type: string): Uint32Array {
   return glslangModule.compileGLSL(glsl, type);
 }
 
+let uid: number = 0;
+/**
+ * Returns a unique id
+ */
+export function getUniqueId(): number {
+  return uid++;
+}
+
 /**
  * Fetches a text from the provided path
  * @param path - The path to fetch the text from
