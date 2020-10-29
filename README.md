@@ -25,13 +25,13 @@ import * as YUE from "yue";
   const camera = new YUE.SphericalCamera();
   camera.attachControl(renderer.getCanvas());
 
-  const scene = new YUE.Scene({
+  const frame = new YUE.Frame({
     clearColor: [0.925, 0.925, 0.925, 1.0]
   });
-  scene.attachCamera(camera);
+  frame.attachCamera(camera);
 
-  const stage = new YUE.Container();
-  scene.addChild(stage);
+  const scene = new YUE.Container();
+  frame.addChild(scene);
 
   const vertexShaderCode = await fetchText("./shaders/grid.vert");
   const fragmentShaderCode = await fetchText("./shaders/grid.frag");
@@ -63,12 +63,15 @@ import * as YUE from "yue";
     translation: new Float32Array([0, 0, 0]),
     attributes: YUE.Plane.Attributes
   });
-  stage.addChild(mesh);
+  scene.addChild(mesh);
 
   // Simple ray cast from screen center
   const ray = new YUE.Ray({camera}).fromCameraCenter();
   // Contains intersection point in world-space
-  const intersection = mesh.intersectRay(ray);
+  const doesIntersect = ray.intersectsAABB(mesh.getBoundings()) && mesh.intersectRay(ray);
+
+  // Check if the scene is inside the camera's frustum
+  const isInsideFrustum = camera.intersectsAABB(scene.getBoundings());
 
   requestAnimationFrame(function drawLoop(time: number) {
     (async function() {

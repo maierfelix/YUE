@@ -3,12 +3,12 @@ import {vec3, quat} from "gl-matrix";
 import {Renderer, IUniformUpdateEntry} from "../Renderer";
 import {GetShaderAttributeComponentSize, IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
 import {IRayTriangleIntersection, Ray, TRIANGLE_FACING} from "../Ray";
-import {Container} from "../Container";
+import {Container, IContainerOptions} from "../Container";
 import {AABB, IAABBBounding} from "../AABB";
 
 export * from "./StaticMesh";
 
-export interface IMeshOptions {
+export interface IMeshOptions extends IContainerOptions {
   name?: string;
   material: Material;
   translation?: vec3;
@@ -109,29 +109,32 @@ export class Mesh extends Container {
     const mModel = this.getModelMatrix();
     const positionLayout = attributeLayout.find(l => l.name === "Position");
     const positionByteOffset = positionLayout.byteOffset;
+    const positionAttributeSize = GetShaderAttributeComponentSize(positionLayout.type);
+    const normalLayout = attributeLayout.find(l => l.name === "Normal");
+    const normalByteOffset = normalLayout.byteOffset;
+    const normalAttributeSize = GetShaderAttributeComponentSize(normalLayout.type);
     const attributeView = new DataView(attributes.buffer, attributes.byteOffset, attributes.byteLength);
-    const attributeComponentSize = GetShaderAttributeComponentSize(positionLayout.type);
     const attributeByteStride = material.getAttributeLayoutByteStride();
     const v0 = vec3.create();
     const v1 = vec3.create();
     const v2 = vec3.create();
     let out: IRayTriangleIntersection = null;
     for (let ii = 0; ii < indices.length / 3; ++ii) {
-      const i0 = positionByteOffset + (((indices[(ii * 3) + 0])) * attributeByteStride);
-      const i1 = positionByteOffset + (((indices[(ii * 3) + 1])) * attributeByteStride);
-      const i2 = positionByteOffset + (((indices[(ii * 3) + 2])) * attributeByteStride);
+      const i0 = ((indices[(ii * 3) + 0])) * attributeByteStride;
+      const i1 = ((indices[(ii * 3) + 1])) * attributeByteStride;
+      const i2 = ((indices[(ii * 3) + 2])) * attributeByteStride;
       // Vertex 0
-      v0[0] = attributeView.getFloat32(i0 + (attributeComponentSize * 0), true);
-      v0[1] = attributeView.getFloat32(i0 + (attributeComponentSize * 1), true);
-      v0[2] = attributeView.getFloat32(i0 + (attributeComponentSize * 2), true);
+      v0[0] = attributeView.getFloat32(positionByteOffset + i0 + (positionAttributeSize * 0), true);
+      v0[1] = attributeView.getFloat32(positionByteOffset + i0 + (positionAttributeSize * 1), true);
+      v0[2] = attributeView.getFloat32(positionByteOffset + i0 + (positionAttributeSize * 2), true);
       // Vertex 1
-      v1[0] = attributeView.getFloat32(i1 + (attributeComponentSize * 0), true);
-      v1[1] = attributeView.getFloat32(i1 + (attributeComponentSize * 1), true);
-      v1[2] = attributeView.getFloat32(i1 + (attributeComponentSize * 2), true);
+      v1[0] = attributeView.getFloat32(positionByteOffset + i1 + (positionAttributeSize * 0), true);
+      v1[1] = attributeView.getFloat32(positionByteOffset + i1 + (positionAttributeSize * 1), true);
+      v1[2] = attributeView.getFloat32(positionByteOffset + i1 + (positionAttributeSize * 2), true);
       // Vertex 2
-      v2[0] = attributeView.getFloat32(i2 + (attributeComponentSize * 0), true);
-      v2[1] = attributeView.getFloat32(i2 + (attributeComponentSize * 1), true);
-      v2[2] = attributeView.getFloat32(i2 + (attributeComponentSize * 2), true);
+      v2[0] = attributeView.getFloat32(positionByteOffset + i2 + (positionAttributeSize * 0), true);
+      v2[1] = attributeView.getFloat32(positionByteOffset + i2 + (positionAttributeSize * 1), true);
+      v2[2] = attributeView.getFloat32(positionByteOffset + i2 + (positionAttributeSize * 2), true);
       // Turn vertices into world space
       vec3.transformMat4(v0, v0, mModel);
       vec3.transformMat4(v1, v1, mModel);
@@ -139,14 +142,19 @@ export class Mesh extends Container {
       // Perform ray-triangle intersection (in world-space)
       const intersection = ray.intersectsTriangle(v0, v1, v2);
       if (intersection !== null) {
-        // We got a backface intersection, but we prefer front face intersections
-        // Cache the backface intersection and continue until we get a front-face intersection
-        if (intersection.facing === TRIANGLE_FACING.BACK) {
+        // Normal 0
+        const normal = vec3.create();
+        normal[0] = attributeView.getFloat32(normalByteOffset + i0 + (normalAttributeSize * 0), true);
+        normal[1] = attributeView.getFloat32(normalByteOffset + i0 + (normalAttributeSize * 1), true);
+        normal[2] = attributeView.getFloat32(normalByteOffset + i0 + (normalAttributeSize * 2), true);
+        intersection.normal = normal;
+        // Return the closest intersection
+        if (out !== null) {
+          if (intersection.t < out.t) {
+            out = intersection;
+          }
+        } else {
           out = intersection;
-        }
-        // Found a front face intersection, we can abort now
-        else {
-          return intersection;
         }
       }
     }

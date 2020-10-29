@@ -10,6 +10,8 @@ export enum TRIANGLE_FACING {
 export interface IRayTriangleIntersection {
   facing: TRIANGLE_FACING;
   intersection: vec3;
+  normal: vec3;
+  t: number;
 }
 
 export interface IAABBIntersection {
@@ -181,8 +183,9 @@ export class Ray {
       TRIANGLE_FACING.FRONT :
       TRIANGLE_FACING.BACK
     );
+    const dist = vec3.distance(origin, intersection);
 
-    return {facing, intersection};
+    return {facing, intersection, t: dist, normal: null};
   }
 
   /**

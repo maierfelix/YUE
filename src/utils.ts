@@ -8,7 +8,6 @@ let glslangModule: any = null;
  */
 export async function LoadGLSLang() {
   if (glslangModule !== null) return glslangModule;
-  // Evil hack because webpack is a son of a bitch
   const module = await (window["eval"])(`import("https://unpkg.com/@webgpu/glslang@0.0.15/dist/web-devel/glslang.js")`);
   glslangModule = await module.default();
   return glslangModule;
