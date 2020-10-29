@@ -90,50 +90,53 @@
   <span class="hljs-keyword">const</span> camera = <span class="hljs-keyword">new</span> YUE.SphericalCamera();
   camera.attachControl(renderer.getCanvas());
 
-  <span class="hljs-keyword">const</span> scene = <span class="hljs-keyword">new</span> YUE.Scene({
-    clearColor: [<span class="hljs-number">0.925</span>, <span class="hljs-number">0.925</span>, <span class="hljs-number">0.925</span>, <span class="hljs-number">1.0</span>]
+  <span class="hljs-keyword">const</span> frame = <span class="hljs-keyword">new</span> YUE.Frame({
+    <span class="hljs-attr">clearColor</span>: [<span class="hljs-number">0.925</span>, <span class="hljs-number">0.925</span>, <span class="hljs-number">0.925</span>, <span class="hljs-number">1.0</span>]
   });
-  scene.attachCamera(camera);
+  frame.attachCamera(camera);
 
-  <span class="hljs-keyword">const</span> stage = <span class="hljs-keyword">new</span> YUE.Container();
-  scene.addChild(stage);
+  <span class="hljs-keyword">const</span> scene = <span class="hljs-keyword">new</span> YUE.Container();
+  frame.addChild(scene);
 
   <span class="hljs-keyword">const</span> vertexShaderCode = <span class="hljs-keyword">await</span> fetchText(<span class="hljs-string">&quot;./shaders/grid.vert&quot;</span>);
   <span class="hljs-keyword">const</span> fragmentShaderCode = <span class="hljs-keyword">await</span> fetchText(<span class="hljs-string">&quot;./shaders/grid.frag&quot;</span>);
 
-  <span class="hljs-keyword">const</span> vertexShader = <span class="hljs-keyword">new</span> YUE.Shader({stage: YUE.SHADER_STAGE.VERTEX, code: vertexShaderCode});
-  <span class="hljs-keyword">const</span> fragmentShader = <span class="hljs-keyword">new</span> YUE.Shader({stage: YUE.SHADER_STAGE.FRAGMENT, code: fragmentShaderCode});
+  <span class="hljs-keyword">const</span> vertexShader = <span class="hljs-keyword">new</span> YUE.Shader({<span class="hljs-attr">stage</span>: YUE.SHADER_STAGE.VERTEX, <span class="hljs-attr">code</span>: vertexShaderCode});
+  <span class="hljs-keyword">const</span> fragmentShader = <span class="hljs-keyword">new</span> YUE.Shader({<span class="hljs-attr">stage</span>: YUE.SHADER_STAGE.FRAGMENT, <span class="hljs-attr">code</span>: fragmentShaderCode});
 
   <span class="hljs-keyword">const</span> material = <span class="hljs-keyword">new</span> YUE.Material({
-    attributes: YUE.Plane.AttributeLayout,
-    vertexShader: {
-      shader: vertexShader,
-      uniforms: [
-        {name: <span class="hljs-string">&quot;Camera&quot;</span>, id: <span class="hljs-number">0</span>, <span class="hljs-keyword">type</span>: YUE.SHADER_UNIFORM.UNIFORM_BUFFER, isShared: <span class="hljs-literal">true</span>, byteLength: <span class="hljs-number">64</span>},
-        {name: <span class="hljs-string">&quot;Object&quot;</span>, id: <span class="hljs-number">1</span>, <span class="hljs-keyword">type</span>: YUE.SHADER_UNIFORM.UNIFORM_BUFFER, byteLength: <span class="hljs-number">64</span>}
+    <span class="hljs-attr">attributes</span>: YUE.Plane.AttributeLayout,
+    <span class="hljs-attr">vertexShader</span>: {
+      <span class="hljs-attr">shader</span>: vertexShader,
+      <span class="hljs-attr">uniforms</span>: [
+        {<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;Camera&quot;</span>, <span class="hljs-attr">id</span>: <span class="hljs-number">0</span>, <span class="hljs-attr">type</span>: YUE.SHADER_UNIFORM.UNIFORM_BUFFER, <span class="hljs-attr">isShared</span>: <span class="hljs-literal">true</span>, <span class="hljs-attr">byteLength</span>: <span class="hljs-number">64</span>},
+        {<span class="hljs-attr">name</span>: <span class="hljs-string">&quot;Object&quot;</span>, <span class="hljs-attr">id</span>: <span class="hljs-number">1</span>, <span class="hljs-attr">type</span>: YUE.SHADER_UNIFORM.UNIFORM_BUFFER, <span class="hljs-attr">byteLength</span>: <span class="hljs-number">64</span>}
       ]
     },
-    fragmentShader: {
-      shader: fragmentShader,
-      uniforms: []
+    <span class="hljs-attr">fragmentShader</span>: {
+      <span class="hljs-attr">shader</span>: fragmentShader,
+      <span class="hljs-attr">uniforms</span>: []
     },
-    cullMode: YUE.MATERIAL_CULL_MODE.NONE,
-    blendMode: YUE.MATERIAL_BLEND_MODE.NONE
+    <span class="hljs-attr">cullMode</span>: YUE.MATERIAL_CULL_MODE.NONE,
+    <span class="hljs-attr">blendMode</span>: YUE.MATERIAL_BLEND_MODE.NONE
   });
 
   <span class="hljs-keyword">const</span> mesh = <span class="hljs-keyword">new</span> YUE.Mesh({
-    material: material,
-    indices: YUE.Plane.Indices,
-    scale: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>([<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]),
-    translation: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]),
-    attributes: YUE.Plane.Attributes
+    <span class="hljs-attr">material</span>: material,
+    <span class="hljs-attr">indices</span>: YUE.Plane.Indices,
+    <span class="hljs-attr">scale</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>([<span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>]),
+    <span class="hljs-attr">translation</span>: <span class="hljs-keyword">new</span> <span class="hljs-built_in">Float32Array</span>([<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>]),
+    <span class="hljs-attr">attributes</span>: YUE.Plane.Attributes
   });
-  stage.addChild(mesh);
+  scene.addChild(mesh);
 
   <span class="hljs-comment">// Simple ray cast from screen center</span>
   <span class="hljs-keyword">const</span> ray = <span class="hljs-keyword">new</span> YUE.Ray({camera}).fromCameraCenter();
   <span class="hljs-comment">// Contains intersection point in world-space</span>
-  <span class="hljs-keyword">const</span> intersection = mesh.intersectRay(ray);
+  <span class="hljs-keyword">const</span> doesIntersect = ray.intersectsAABB(mesh.getBoundings()) &amp;&amp; mesh.intersectRay(ray);
+
+  <span class="hljs-comment">// Check if the scene is inside the camera&#x27;s frustum</span>
+  <span class="hljs-keyword">const</span> isInsideFrustum = camera.intersectsAABB(scene.getBoundings());
 
   requestAnimationFrame(<span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">drawLoop</span>(<span class="hljs-params">time: <span class="hljs-built_in">number</span></span>) </span>{
     (<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span>(<span class="hljs-params"></span>) </span>{
