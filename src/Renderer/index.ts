@@ -80,8 +80,8 @@ export class Renderer extends AbstractRenderer {
     this._adapter = await this._createAdapter();
     this._device = await this._createDevice();
     this._context = this._createContext();
-    this._swapchain = this._createSwapchain();
     this._swapchainFormat = await this._resolveSwapchainFormat();
+    this._swapchain = this._createSwapchain();
     this._swapchainTexture = new Texture({
       width: this.getWidth(),
       height: this.getHeight(),
@@ -276,7 +276,7 @@ export class Renderer extends AbstractRenderer {
   private _createSwapchain(): GPUSwapChain {
     const swapchain = this.getContext().configureSwapChain({
       device: this.getDevice(),
-      format: "bgra8unorm",
+      format: ToWGPUTextureFormat(this.getSwapchainFormat()),
       usage: GPUTextureUsage.OUTPUT_ATTACHMENT
     });
     // Make sure the swapchain was configured successfully
