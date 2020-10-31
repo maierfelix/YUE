@@ -19,14 +19,35 @@ npm install yue.js
 import * as YUE from "yue";
 
 (async() => {
-
   const renderer = await new YUE.Renderer({canvas}).create();
 
   const camera = new YUE.SphericalCamera();
   camera.attachControl(renderer.getCanvas());
+  // Do an initial resize to fit the screen
+  camera.resize(window.innerWidth, window.innerHeight);
+
+  const depthAttachment = new YUE.Texture({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    isRenderable: true,
+    format: YUE.TEXTURE_FORMAT.DEPTH32_FLOAT
+  });
 
   const frame = new YUE.Frame({
-    clearColor: [0.925, 0.925, 0.925, 1.0]
+    depthAttachment: {
+      attachment: depthAttachment,
+      readCommand: YUE.FRAME_COMMAND.CLEAR,
+      writeCommand: YUE.FRAME_COMMAND.WRITE
+    },
+    colorAttachments: [
+      {
+        // Render into swapchain texture
+        attachment: renderer.getSwapchainTexture(),
+        clearColor: [1, 1, 1, 1],
+        readCommand: YUE.FRAME_COMMAND.CLEAR,
+        writeCommand: YUE.FRAME_COMMAND.WRITE
+      }
+    ]
   });
   frame.attachCamera(camera);
 
@@ -52,8 +73,13 @@ import * as YUE from "yue";
       shader: fragmentShader,
       uniforms: []
     },
-    cullMode: YUE.MATERIAL_CULL_MODE.NONE,
-    blendMode: YUE.MATERIAL_BLEND_MODE.NONE
+    depthOutput: {
+      format: YUE.TEXTURE_FORMAT.DEPTH32_FLOAT
+    },
+    colorOutputs: [
+      {format: renderer.getSwapchainFormat()},
+    ],
+    cullMode: YUE.MATERIAL_CULL_MODE.NONE
   });
 
   const mesh = new YUE.Mesh({
@@ -69,20 +95,27 @@ import * as YUE from "yue";
   const ray = new YUE.Ray({camera}).fromCameraCenter();
   // Contains intersection point in world-space
   const doesIntersect = ray.intersectsAABB(mesh.getBoundings()) && mesh.intersectRay(ray);
-
-  // Check if the scene is inside the camera's frustum
+  // Indicates if the scene is inside the camera's frustum
   const isInsideFrustum = camera.intersectsAABB(scene.getBoundings());
 
-  requestAnimationFrame(function drawLoop(time: number) {
+  // Update loop
+  setTimeout(function updateLoop() {
     (async function() {
-      await renderer.render(scene);
-      requestAnimationFrame(drawLoop);
-      // Update model matrix
-      mesh.updateUniform("Object", mesh.getModelMatrix());
-      // Update camera matrix for material
-      // This update affects all objects using this material since 'Camera' is shared
-      material.updateUniform("Camera", camera.getViewProjectionMatrix());
+      await frame.update(renderer);
+      setTimeout(updateLoop);
     })();
+  });
+
+  // Draw loop
+  requestAnimationFrame(function drawLoop(time: number) {
+    requestAnimationFrame(drawLoop);
+    // Render frames
+    renderer.render(frame);
+    // Update model matrix of the mesh
+    mesh.updateUniform("Object", mesh.getModelMatrix());
+    // Update camera matrix of the material
+    // This update affects all objects using this material since the uniform 'Camera' is shared
+    material.updateUniform("Camera", camera.getViewProjectionMatrix());
   });
 
 })();
