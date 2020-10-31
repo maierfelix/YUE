@@ -26,7 +26,7 @@ let uid: number = 0;
 /**
  * Returns a unique id
  */
-export function getUniqueId(): number {
+export function GetUniqueId(): number {
   return uid++;
 }
 

@@ -2,12 +2,13 @@ import {AbstractRenderer, IRendererOptions} from "./AbstractRenderer";
 
 import {Frame} from "../Frame";
 import {AbstractCamera} from "../Camera";
-import {IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
+import {IBindGroupResource, RenderPipelineGenerator, ToWGPUTextureFormat} from "../Material/RenderPipelineGenerator";
 import {Sampler} from "../Sampler";
 import {Texture} from "../Texture";
 import {QueueCommander} from "../QueueCommander";
 
 import {LoadGLSLang, GetTimeStamp} from "../utils";
+import {TEXTURE_FORMAT} from "../constants";
 
 export interface IUniformUpdateEntry {
   id: number;
@@ -20,12 +21,14 @@ export class Renderer extends AbstractRenderer {
   private _adapter: GPUAdapter = null;
   private _context: GPUCanvasContext = null;
   private _swapchain: GPUSwapChain = null;
-  private _depthAttachment: GPUTextureView = null;
 
   private _beginFrameTimestamp: number = 0;
   private _lastFrameTimestamp: number = 0;
 
   private _queueCommander: QueueCommander = null;
+
+  private _swapchainTexture: Texture = null;
+  private _swapchainFormat: TEXTURE_FORMAT = null;
 
   /**
    * @param options - Create options
@@ -34,18 +37,40 @@ export class Renderer extends AbstractRenderer {
     super(options);
   }
 
+  /**
+   * The WGPU device
+   */
   public getDevice(): GPUDevice { return this._device; }
+
+  /**
+   * The WGPU adapter
+   */
   public getAdapter(): GPUAdapter { return this._adapter; }
+
+  /**
+   * The WGPU canvas context
+   */
   public getContext(): GPUCanvasContext { return this._context; }
+
+  /**
+   * The WGPU swapchain
+   */
   public getSwapchain(): GPUSwapChain { return this._swapchain; }
-  public getDepthAttachment(): GPUTextureView { return this._depthAttachment; }
+
+  /**
+   * The queue commander
+   */
   public getQueueCommander(): QueueCommander { return this._queueCommander; }
 
-  private _getBeginFrameTimestamp(): number { return this._beginFrameTimestamp; }
-  private _setBeginFrameTimestamp(value: number): void { this._beginFrameTimestamp = value; }
+  /**
+   * The swapchain texture
+   */
+  public getSwapchainTexture(): Texture { return this._swapchainTexture; }
 
-  private _getLastFrameTimestamp(): number { return this._lastFrameTimestamp; }
-  private _setLastFrameTimestamp(value: number): void { this._lastFrameTimestamp = value; }
+  /**
+   * The texture format of the swapchain
+   */
+  public getSwapchainFormat(): TEXTURE_FORMAT { return this._swapchainFormat; }
 
   /**
    * Create the renderer
@@ -56,12 +81,144 @@ export class Renderer extends AbstractRenderer {
     this._device = await this._createDevice();
     this._context = this._createContext();
     this._swapchain = this._createSwapchain();
+    this._swapchainFormat = await this._resolveSwapchainFormat();
+    this._swapchainTexture = new Texture({
+      width: this.getWidth(),
+      height: this.getHeight(),
+      format: this.getSwapchainFormat()
+    });
     this._queueCommander = new QueueCommander(this.getDevice());
-    this._setBeginFrameTimestamp(GetTimeStamp());
-    this._setLastFrameTimestamp(GetTimeStamp());
+    this._beginFrameTimestamp = GetTimeStamp();
+    this._lastFrameTimestamp = GetTimeStamp();
     // Perform an initial resize
     this.resize(this.getCanvas().width, this.getCanvas().height);
+    this._updateSwapchainTexture();
     return this;
+  }
+
+  /**
+   * Resize the renderer
+   * @param width - The destination width after resize
+   * @param height - The destination height after resize
+   */
+  public resize(width: number, height: number) {
+    // Make sure the render surface is at least 1x1
+    width = Math.max(1, width);
+    height = Math.max(1, height);
+    super.resize(width, height);
+  }
+
+  /**
+   * Render a frame
+   * @param frame - The frame to render
+   */
+  public render(frame: Frame): void {
+    const now = GetTimeStamp();
+    const delta = (now - this._lastFrameTimestamp) / 1e3;
+    const begin = this._beginFrameTimestamp;
+    const time = (now - begin) / 1e3;
+    this.emit("beforerender", {time, delta});
+    // Make sure a frame object is provided
+    if (!(frame instanceof Frame))
+      throw new TypeError(`Unexpected type for argument 1 in 'render', expected instance of 'Frame'`);
+    // The frame's camera determines the rendering surface size
+    const camera = frame.getAttachedCamera();
+    // If there is a camera attached then resize the renderer to match the camera size
+    if (camera instanceof AbstractCamera) {
+      if (
+        (this.getWidth() !== camera.getWidth()) ||
+        (this.getHeight() !== camera.getHeight()
+      )) this.resize(camera.getWidth(), camera.getHeight());
+    }
+    // Make sure the renderer got created successfully
+    if (!this.getAdapter() || !this.getDevice())
+      throw new ReferenceError(`Method 'create' must be called on 'Renderer' before usage`);
+    // Update the frame
+    //await frame.update(this);
+    // Draw the frame
+    frame.draw(this);
+    this._lastFrameTimestamp = now;
+    this.emit("afterrender", {time, delta});
+  }
+
+  /**
+   * Flushes all pending operations such as buffer copies
+   */
+  public async flush(): Promise<void> {
+    await this.getQueueCommander().flush();
+  }
+
+  /**
+   * Process the uniform update queue
+   * @param queue - The uniform queue to process
+   * @param resources - The bound uniform resources
+   */
+  public processUniformUpdateQueue(queue: IUniformUpdateEntry[], uniformResources: IBindGroupResource[]): void {
+    const queueCommander = this.getQueueCommander();
+    // Samplers and Texture updates can trigger a rebuild
+    // Process and dequeue the entries from the uniform update queue
+    for (let ii = 0; ii < queue.length; ++ii) {
+      const {id, data} = queue[ii];
+      const uniformResource = uniformResources.find(
+        resource => resource ? resource.id === id : false
+      );
+      if (uniformResource === null) {
+        throw new ReferenceError(`Failed to resolve uniform resource for uniform '${id}'`);
+      }
+      const {resource} = uniformResource;
+      // Enqueue buffer copy operation
+      if (resource instanceof GPUBuffer) {
+        queueCommander.transferDataToBuffer(resource, data, 0x0, null);
+      }
+      // Bind sampler
+      else if (data instanceof Sampler) {
+        if (!data.getResource()) {
+          const descriptor = RenderPipelineGenerator.GenerateSamplerDescriptor(data);
+          data.create(this, descriptor);
+        }
+        uniformResource.resource = data.getResource();
+      }
+      // Bind texture
+      else if (data instanceof Texture) {
+        if (!data.getResource()) {
+          const descriptor = RenderPipelineGenerator.GenerateTextureDescriptor(data);
+          data.create(this, descriptor);
+        }
+        uniformResource.resource = data.getResourceView();
+      }
+      else {
+        throw new TypeError(`Unexpected type '${typeof data}'`);
+      }
+      // Remove queue item
+      queue.splice(ii--, 1);
+    }
+  }
+
+  /**
+   * Destroy this Object
+   */
+  public destroy(): void {
+    this._device = null;
+    this._adapter = null;
+    this._context = null;
+    this._swapchain = null;
+    super.destroy();
+  }
+
+  /**
+   * Resolves the texture format of the swapchain
+   */
+  private async _resolveSwapchainFormat(): Promise<TEXTURE_FORMAT> {
+    const device = this.getDevice();
+    const context = this.getContext();
+    const swapchainFormat = await context.getSwapChainPreferredFormat(device);
+    const start = TEXTURE_FORMAT.NONE + 1;
+    const end = Object.keys(TEXTURE_FORMAT).length;
+    for (let ii = start; ii < end; ++ii) {
+      const format = ToWGPUTextureFormat(ii);
+      if (format === swapchainFormat) return ii;
+    }
+    return TEXTURE_FORMAT.NONE;
   }
 
   /**
@@ -129,25 +286,6 @@ export class Renderer extends AbstractRenderer {
   }
 
   /**
-   * Resize the rendering surface and depth texture
-   * @param width - The destination width after resize
-   * @param height - The destination height after resize
-   */
-  public resize(width: number, height: number) {
-    // Make sure render surface is at least 1x1
-    if (width === 0) width = 1;
-    if (height === 0) height = 1;
-    super.resize(width, height);
-    // resize depth attachment
-    const depthAttachment = this.getDevice().createTexture({
-      size: {width: width, height: height, depth: 1},
-      format: "depth32float",
-      usage: GPUTextureUsage.OUTPUT_ATTACHMENT
-    }).createView();
-    this._depthAttachment = depthAttachment;
-  }
-
-  /**
    * Called in case of an device error
    * @param error - The error message
    */
@@ -156,114 +294,19 @@ export class Renderer extends AbstractRenderer {
   }
 
   /**
-   * Render a frame
-   * @param frame - The frame to render
+   * Update the swapchain texture
    */
-  public async render(frame: Frame): Promise<void> {
-    const now = GetTimeStamp();
-    const delta = (now - this._getLastFrameTimestamp()) / 1e3;
-    const begin = this._getBeginFrameTimestamp();
-    const time = (now - begin) / 1e3;
-    this.emit("beforerender", {time, delta});
-    // Make sure a frame object is provided
-    if (!(frame instanceof Frame))
-      throw TypeError(`Unexpected type for argument 1 in 'render', expected instance of 'Frame'`);
-    // The frame's camera determines the rendering surface size
-    const camera = frame.getAttachedCamera();
-    // Make sure the frame has a valid camera attached
-    if (!(camera instanceof AbstractCamera))
-      throw ReferenceError(`Frame requires an attached camera`);
-    if (
-      (this.getWidth() !== camera.getWidth()) ||
-      (this.getHeight() !== camera.getHeight()
-    )) this.resize(camera.getWidth(), camera.getHeight());
-    // Make sure the renderer got created successfully
-    if (!this.getAdapter() || !this.getDevice())
-      throw new ReferenceError(`Method 'create' must be called on 'Renderer' before usage`);
-    // Update the frame
-    await frame.update(this);
-    // Draw the frame
-    frame.draw(this);
-    this._setLastFrameTimestamp(now);
-    this.emit("afterrender", {time, delta});
-  }
-
-  /**
-   * Flushes all pending operations such as buffer copies
-   */
-  public async flush(): Promise<void> {
-    await this.getQueueCommander().flush();
-  }
-
-  /**
-   * 
-   * @param queue - The uniform queue to process
-   * @param resources - The bound uniform resources
-   */
-  public processUniformUpdateQueue(queue: IUniformUpdateEntry[], uniformResources: IBindGroupResource[]): void {
-    const device = this.getDevice();
-    // Samplers and Texture updates can trigger a rebuild
-    // Process and dequeue the entries from the uniform update queue
-    for (let ii = 0; ii < queue.length; ++ii) {
-      const {id, data} = queue[ii];
-      const uniformResource = uniformResources.find(
-        resource => resource ? resource.id === id : false
-      );
-      if (uniformResource === null)
-        throw new ReferenceError(`Failed to resolve uniform resource for uniform '${id}'`);
-      const {resource} = uniformResource;
-      // Enqueue buffer copy operation
-      if (resource instanceof GPUBuffer) {
-        this.getQueueCommander().transferDataToBuffer(
-          resource, data, 0x0, null
-        );
-      }
-      // Bind sampler
-      else if (data instanceof Sampler) {
-        const samplerDescriptor = RenderPipelineGenerator.GenerateSamplerDescriptor(data);
-        // Reserve GPUSampler in case it doesn't exist yet
-        if (!uniformResource.resource) {
-          const instance = device.createSampler(samplerDescriptor);
-          uniformResource.resource = instance;
-        }
-      }
-      // Bind texture
-      else if (data instanceof Texture) {
-        const textureDescriptor = RenderPipelineGenerator.GenerateTextureDescriptor(data);
-        // Reserve GPUTexture in case it doesn't exist yet
-        if (!uniformResource.resource) {
-          const texture = device.createTexture(textureDescriptor);
-          uniformResource.resource = texture.createView();
-          // Hack to save reference to texture, beautify this
-          (uniformResource.resource as any).texture = texture;
-        }
-        const width = data.getWidth();
-        const height = data.getHeight();
-        const depth = data.getDepth();
-        const imageData = data.getData() as Uint8Array;
-        const bytesPerRow = data.getBytesPerRow();
-        this.getQueueCommander().transferDataToTexture(
-          (uniformResource.resource as any).texture, imageData, width, height, depth, bytesPerRow, null
-        );
-      }
-      else {
-        throw new TypeError(`Unexpected type '${typeof data}'`);
-      }
-      // Remove queue item
-      queue.splice(ii--, 1);
-    }
-  }
-
-  /**
-   * Destroy this Object
-   */
-  public destroy(): void {
-    this._device = null;
-    this._adapter = null;
-    this._context = null;
-    this._swapchain = null;
-    this._depthAttachment = null;
-    super.destroy();
+  private _updateSwapchainTexture(): void {
+    const canvas = this.getCanvas();
+    const swapchain = this.getSwapchain();
+    const swapchainTexture = swapchain.getCurrentTexture();
+    const swapchainTextureView = swapchainTexture.createView();
+    // Update texture resources with new swapchain resources
+    (this._swapchainTexture as any)._resource = swapchainTexture;
+    (this._swapchainTexture as any)._resourceView = swapchainTextureView;
+    // Update swapchain texture dimension
+    (this._swapchainTexture as any)._width = canvas.clientWidth;
+    (this._swapchainTexture as any)._height = canvas.clientHeight;
   }
 
 }

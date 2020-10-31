@@ -1,4 +1,4 @@
-import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE, MATERIAL_COLOR_WRITE} from "../constants";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE, MATERIAL_DEPTH_COMPARISON_MODE, TEXTURE_FORMAT, MATERIAL_COLOR_MASK} from "../constants";
 import {Shader} from "../";
 import {RenderPipelineGenerator, IRenderPipeline, IBindGroupResource} from "./RenderPipelineGenerator";
 import {Renderer, IUniformUpdateEntry} from "../Renderer";
@@ -28,7 +28,7 @@ export interface IMaterialAttributeOptions {
   byteOffset?: number;
 }
 
-const MATERIAL_ATTRIBUTE_DEFAULT_OPTIONS: IMaterialAttributeOptions = {
+export const MATERIAL_ATTRIBUTE_DEFAULT_OPTIONS: IMaterialAttributeOptions = {
   id: 0,
   name: null,
   type: SHADER_ATTRIBUTE.NONE,
@@ -40,29 +40,51 @@ export interface IMaterialShaderOptions {
   uniforms?: IMaterialUniformOptions[];
 }
 
-const MATERIAL_SHADER_DEFAULT_OPTIONS: IMaterialShaderOptions = {
+export const MATERIAL_SHADER_DEFAULT_OPTIONS: IMaterialShaderOptions = {
   shader: null,
   uniforms: []
+};
+
+export interface IMaterialOutputDepthOptions {
+  format: TEXTURE_FORMAT;
+  comparisonMode?: MATERIAL_DEPTH_COMPARISON_MODE;
+}
+
+export const MATERIAL_OUTPUT_DEPTH_DEFAULT_OPTIONS: IMaterialOutputDepthOptions = {
+  format: TEXTURE_FORMAT.NONE,
+  comparisonMode: MATERIAL_DEPTH_COMPARISON_MODE.LESS,
+};
+
+export interface IMaterialOutputColorOptions {
+  format: TEXTURE_FORMAT;
+  mask?: MATERIAL_COLOR_MASK;
+  blendMode?: MATERIAL_BLEND_MODE;
+}
+
+export const MATERIAL_OUTPUT_COLOR_DEFAULT_OPTIONS: IMaterialOutputColorOptions = {
+  format: TEXTURE_FORMAT.NONE,
+  mask: MATERIAL_COLOR_MASK.ALL,
+  blendMode: MATERIAL_BLEND_MODE.NONE,
 };
 
 export interface IMaterialOptions {
   name?: string;
   attributes?: IMaterialAttributeOptions[];
   cullMode?: MATERIAL_CULL_MODE;
-  blendMode?: MATERIAL_BLEND_MODE;
-  colorWrite?: MATERIAL_COLOR_WRITE;
   vertexShader: IMaterialShaderOptions;
   fragmentShader: IMaterialShaderOptions;
+  depthOutput?: IMaterialOutputDepthOptions;
+  colorOutputs: IMaterialOutputColorOptions[];
 }
 
-const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
+export const MATERIAL_DEFAULT_OPTIONS: IMaterialOptions = {
   name: null,
   attributes: null,
   cullMode: MATERIAL_CULL_MODE.NONE,
-  blendMode: MATERIAL_BLEND_MODE.NONE,
-  colorWrite: MATERIAL_COLOR_WRITE.ALL,
   vertexShader: null,
-  fragmentShader: null
+  fragmentShader: null,
+  depthOutput: null,
+  colorOutputs: null,
 };
 
 export class Material {
@@ -71,8 +93,6 @@ export class Material {
   private _attributes: IMaterialAttributeOptions[] = [];
 
   private _cullMode: MATERIAL_CULL_MODE = MATERIAL_CULL_MODE.NONE;
-  private _blendMode: MATERIAL_BLEND_MODE = MATERIAL_BLEND_MODE.NONE;
-  private _colorWrite: MATERIAL_COLOR_WRITE = MATERIAL_COLOR_WRITE.ALL;
 
   private _vertexShader: Shader = null;
   private _fragmentShader: Shader = null;
@@ -86,6 +106,9 @@ export class Material {
 
   private _destroyedState: boolean = false;
   private _needsRebuildState: boolean = false;
+
+  private _depthOutput: IMaterialOutputDepthOptions = null;
+  private _colorOutputs: IMaterialOutputColorOptions[] = [];
 
   /**
    * @param options - Create options
@@ -101,10 +124,10 @@ export class Material {
       Object.assign({}, MATERIAL_ATTRIBUTE_DEFAULT_OPTIONS, attr)
     );
     this._cullMode = options.cullMode;
-    this._blendMode = options.blendMode;
-    this._colorWrite = options.colorWrite;
     this._vertexShader = options.vertexShader.shader;
     this._fragmentShader = options.fragmentShader.shader;
+    this._depthOutput = options.depthOutput ? Object.assign({}, MATERIAL_OUTPUT_DEPTH_DEFAULT_OPTIONS, options.depthOutput) : null;
+    this._colorOutputs = options.colorOutputs.map(c => Object.assign({}, MATERIAL_OUTPUT_COLOR_DEFAULT_OPTIONS, c));
     this._uniforms = this._generateUniforms(options);
     // Save the attribute layout bytestride
     this._attributeLayoutByteStride = (
@@ -196,16 +219,6 @@ export class Material {
   public getCullMode(): MATERIAL_CULL_MODE { return this._cullMode; }
 
   /**
-   * The material blending mode
-   */
-  public getBlendMode(): MATERIAL_BLEND_MODE { return this._blendMode; }
-
-  /**
-   * The material color write
-   */
-  public getColorWrite(): MATERIAL_COLOR_WRITE { return this._colorWrite; }
-
-  /**
    * The material vertex shader
    */
   public getVertexShader(): Shader { return this._vertexShader; }
@@ -214,6 +227,16 @@ export class Material {
    * The material fragment shader
    */
   public getFragmentShader(): Shader { return this._fragmentShader; }
+
+  /**
+   * The material depth output
+   */
+  public getDepthOutput(): IMaterialOutputDepthOptions { return this._depthOutput; }
+
+  /**
+   * The material color outputs
+   */
+  public getColorOutputs(): IMaterialOutputColorOptions[] { return this._colorOutputs; }
 
   /**
    * The material render pipeline
@@ -239,6 +262,16 @@ export class Material {
     if (this.isDestroyed()) return;
     // Abort if the material pipeline doesn't need a rebuild
     if (!this._needsRebuild()) return;
+    const vertexShader = this.getVertexShader();
+    const fragmentShader = this.getFragmentShader();
+    // Create vertex shader if necessary
+    if (vertexShader !== null && !vertexShader.getResource()) {
+      vertexShader.create(renderer, RenderPipelineGenerator.generateShaderModuleDescriptor(vertexShader));
+    }
+    // Create fragment shader if necessary
+    if (fragmentShader !== null && !fragmentShader.getResource()) {
+      fragmentShader.create(renderer, RenderPipelineGenerator.generateShaderModuleDescriptor(fragmentShader));
+    }
     // Generate a new pipeline
     this._renderPipeline = RenderPipelineGenerator.generate(this, renderer.getDevice());
     // Build bind group resources

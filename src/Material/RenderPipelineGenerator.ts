@@ -1,9 +1,11 @@
 import {Material} from ".";
 
-import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, MATERIAL_COLOR_WRITE} from "../constants";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, FRAME_COMMAND, MATERIAL_COLOR_MASK, MATERIAL_DEPTH_COMPARISON_MODE} from "../constants";
 import {Unreachable} from "../utils";
 import {Sampler} from "../Sampler";
 import {Texture} from "../Texture";
+import {Shader} from "../Shader";
+import {IFrameAttachment} from "../Frame";
 
 export function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   let flags: GPUShaderStageFlags = 0;
@@ -16,25 +18,49 @@ export function ToWGPUShaderStage(stages: SHADER_STAGE): GPUShaderStageFlags {
   return flags;
 }
 
-export function ToWGPUColorWrite(colorWrite: MATERIAL_COLOR_WRITE): GPUColorWriteFlags {
+export function ToWGPUColorWrite(colorMask: MATERIAL_COLOR_MASK): GPUColorWriteFlags {
   let flags: GPUColorWriteFlags = 0;
-  if (colorWrite & MATERIAL_COLOR_WRITE.RED) {
+  if (colorMask & MATERIAL_COLOR_MASK.RED) {
     flags |= GPUColorWrite.RED;
     return flags;
   }
-  if (colorWrite & MATERIAL_COLOR_WRITE.GREEN) {
+  if (colorMask & MATERIAL_COLOR_MASK.GREEN) {
     flags |= GPUColorWrite.GREEN;
   }
-  if (colorWrite & MATERIAL_COLOR_WRITE.BLUE) {
+  if (colorMask & MATERIAL_COLOR_MASK.BLUE) {
     flags |= GPUColorWrite.BLUE;
   }
-  if (colorWrite & MATERIAL_COLOR_WRITE.ALPHA) {
+  if (colorMask & MATERIAL_COLOR_MASK.ALPHA) {
     flags |= GPUColorWrite.ALPHA;
   }
-  if (colorWrite & MATERIAL_COLOR_WRITE.ALL) {
+  if (colorMask & MATERIAL_COLOR_MASK.ALL) {
     flags |= GPUColorWrite.ALL;
   }
   return flags;
+}
+
+export function ToWGPULoadOp(frameCommand: FRAME_COMMAND): GPULoadOp {
+  switch (frameCommand) {
+    case FRAME_COMMAND.NONE:
+      throw new Error(`'FRAME_COMMAND.NONE' is not a valid load op`);
+    case FRAME_COMMAND.READ:
+      return "load";
+    case FRAME_COMMAND.CLEAR:
+      return null;
+  }
+  Unreachable();
+}
+
+export function ToWGPUStoreOp(frameCommand: FRAME_COMMAND): GPUStoreOp {
+  switch (frameCommand) {
+    case FRAME_COMMAND.NONE:
+      throw new Error(`'FRAME_COMMAND.NONE' is not a valid store op`);
+    case FRAME_COMMAND.WRITE:
+      return "store";
+    case FRAME_COMMAND.CLEAR:
+      return "clear";
+  }
+  Unreachable();
 }
 
 export function ToWGPUBindingType(uniformType: SHADER_UNIFORM): GPUBindingType {
@@ -159,6 +185,30 @@ export function ToWGPUCullMode(cullMode: MATERIAL_CULL_MODE): GPUCullMode {
       return "front";
     case MATERIAL_CULL_MODE.BACK:
       return "back";
+  }
+  Unreachable();
+}
+
+export function ToWGPUCompareFunction(comparisonMode: MATERIAL_DEPTH_COMPARISON_MODE): GPUCompareFunction {
+  switch (comparisonMode) {
+    case MATERIAL_DEPTH_COMPARISON_MODE.NONE:
+      throw new Error(`'MATERIAL_DEPTH_COMPARISON_MODE.NONE' is not a valid depth comparison mode`);
+    case MATERIAL_DEPTH_COMPARISON_MODE.NEVER:
+      return "never";
+    case MATERIAL_DEPTH_COMPARISON_MODE.LESS:
+      return "less";
+    case MATERIAL_DEPTH_COMPARISON_MODE.GREATER:
+      return "greater";
+    case MATERIAL_DEPTH_COMPARISON_MODE.EQUAL:
+      return "equal";
+    case MATERIAL_DEPTH_COMPARISON_MODE.NOT_EQUAL:
+      return "not-equal";
+    case MATERIAL_DEPTH_COMPARISON_MODE.LESS_EQUAL:
+      return "less-equal";
+    case MATERIAL_DEPTH_COMPARISON_MODE.GREATER_EQUAL:
+      return "greater-equal";
+    case MATERIAL_DEPTH_COMPARISON_MODE.ALWAYS:
+      return "always";
   }
   Unreachable();
 }
@@ -382,28 +432,46 @@ export class RenderPipelineGenerator {
   }
 
   /**
-   * Generates a GPUColorStateDescriptor based on the provided blend mode
+   * Generates a GPUColorStateDescriptor based on the provided material
    * @param material - Material object
    */
   public static GenerateColorStateDescriptor(material: Material): GPUColorStateDescriptor[] {
-    const blendMode = material.getBlendMode();
-    const colorWrite = material.getColorWrite();
-    const out: GPUColorStateDescriptor = {
-      format: "bgra8unorm",
-      colorBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
-      alphaBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
-      writeMask: ToWGPUColorWrite(colorWrite)
-    };
-    switch (blendMode) {
-      case MATERIAL_BLEND_MODE.NONE: {
-        // Nothing to do
-      } break;
-      case MATERIAL_BLEND_MODE.PREMULTIPLY: {
-        out.colorBlend = {srcFactor: "src-alpha", dstFactor: "one-minus-src-alpha", operation: "add"};
-        out.alphaBlend = {srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add"};
-      } break;
+    const colorOutputs = material.getColorOutputs();
+    const out: GPUColorStateDescriptor[] = [];
+    for (const {format, mask, blendMode} of colorOutputs) {
+      const colorState: GPUColorStateDescriptor = {
+        format: ToWGPUTextureFormat(format),
+        colorBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
+        alphaBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
+        writeMask: ToWGPUColorWrite(mask)
+      };
+      switch (blendMode) {
+        case MATERIAL_BLEND_MODE.NONE: {
+          // Nothing to do
+        } break;
+        // TODO: Refactor blending stuff?
+        case MATERIAL_BLEND_MODE.PREMULTIPLY: {
+          colorState.colorBlend = {srcFactor: "src-alpha", dstFactor: "one-minus-src-alpha", operation: "add"};
+          colorState.alphaBlend = {srcFactor: "one", dstFactor: "one-minus-src-alpha", operation: "add"};
+        } break;
+      }
+      out.push(colorState);
     }
-    return [out];
+    return out;
+  }
+
+  /**
+   * Generates a GPUDepthStencilStateDescriptor based on the provided material
+   * @param material - Material object
+   */
+  public static GenerateDepthStencilStateDescriptor(material: Material): GPUDepthStencilStateDescriptor {
+    const {format, comparisonMode} = material.getDepthOutput();
+    const out: GPUDepthStencilStateDescriptor = {
+      depthWriteEnabled: true,
+      depthCompare: ToWGPUCompareFunction(comparisonMode),
+      format: ToWGPUTextureFormat(format)
+    };
+    return out;
   }
 
   /**
@@ -422,8 +490,14 @@ export class RenderPipelineGenerator {
       sampleCount: 1,
       dimension: "2d",
       format: ToWGPUTextureFormat(texture.getFormat()),
-      usage: GPUTextureUsage.COPY_DST | GPUTextureUsage.SAMPLED
+      usage: GPUTextureUsage.SAMPLED
     };
+    if (texture.getData() !== null) {
+      out.usage = out.usage | GPUTextureUsage.COPY_DST;
+    }
+    if (texture.isRenderable()) {
+      out.usage = out.usage | GPUTextureUsage.OUTPUT_ATTACHMENT;
+    }
     return out;
   }
 
@@ -480,6 +554,49 @@ export class RenderPipelineGenerator {
     const out: GPUBindGroupLayoutDescriptor = {
       entries: bindGroupEntries
     };
+    return out;
+  }
+
+  public static generateRenderPassDescriptor(depthFrameAttachment: IFrameAttachment, colorFrameAttachments: IFrameAttachment[]): GPURenderPassDescriptor {
+    const out: GPURenderPassDescriptor = {
+      colorAttachments: null
+    };
+    if (depthFrameAttachment !== null) {
+      const depthAttachment = depthFrameAttachment.attachment;
+      const attachment: GPURenderPassDepthStencilAttachmentDescriptor = {
+        attachment: depthAttachment.getResourceView(),
+        depthLoadValue: ToWGPULoadOp(depthFrameAttachment.readCommand),
+        depthStoreOp: ToWGPUStoreOp(depthFrameAttachment.writeCommand),
+        stencilLoadValue: 0,
+        stencilStoreOp: "store"
+      };
+      out.depthStencilAttachment = attachment;
+      // TODO: Can this be better?
+      if (depthFrameAttachment.readCommand === FRAME_COMMAND.CLEAR) {
+        out.depthStencilAttachment.depthLoadValue = 1.0;
+      }
+    }
+    if (colorFrameAttachments !== null) {
+      const attachments: GPURenderPassColorAttachmentDescriptor[] = [];
+      for (const colorFrameAttachment of colorFrameAttachments) {
+        const colorAttachment = colorFrameAttachment.attachment;
+        const attachment: GPURenderPassColorAttachmentDescriptor = {
+          attachment: colorAttachment.getResourceView(),
+          loadValue: ToWGPULoadOp(colorFrameAttachment.readCommand),
+          storeOp: ToWGPUStoreOp(colorFrameAttachment.writeCommand),
+        };
+        // TODO: Can this be better?
+        if (colorFrameAttachment.readCommand === FRAME_COMMAND.CLEAR) {
+          if (colorFrameAttachment.clearColor !== null) {
+            attachment.loadValue = colorFrameAttachment.clearColor;
+          } else {
+            throw new ReferenceError(`Clear frame command in color attachment requires a clear color`);
+          }
+        }
+        attachments.push(attachment);
+      }
+      out.colorAttachments = attachments;
+    }
     return out;
   }
 
@@ -569,31 +686,29 @@ export class RenderPipelineGenerator {
     return out;
   }
 
+  public static generateShaderModuleDescriptor(shader: Shader): GPUShaderModuleDescriptor {
+    const out: GPUShaderModuleDescriptor = {
+      code: shader.getCode()
+    };
+    return out;
+  }
+
   public static generate(material: Material, device: GPUDevice): IRenderPipeline {
     const vertexStateDescriptor = RenderPipelineGenerator.generateVertexStateDescriptor(material);
     const vertexStageDescriptor: GPUProgrammableStageDescriptor = {
-      module: device.createShaderModule({
-        code: material.getVertexShader().getCode()
-      }),
+      module: material.getVertexShader().getResource(),
       entryPoint: "main"
     };
-    const fragmentShaderModule = device.createShaderModule({
-      code: material.getFragmentShader().getCode()
-    });
     const fragmentStageDescriptor: GPUProgrammableStageDescriptor = {
-      module: fragmentShaderModule,
+      module: material.getFragmentShader().getResource(),
       entryPoint: "main"
     };
-    // TODO: allow non-depth writing
-    const depthStencilStateDescriptor: GPUDepthStencilStateDescriptor = {
-      depthWriteEnabled: true,
-      depthCompare: "less",
-      format: "depth32float"
-    };
+    const depthStencilStateDescriptor: GPUDepthStencilStateDescriptor = (
+      RenderPipelineGenerator.GenerateDepthStencilStateDescriptor(material)
+    );
     const rasterizationStateDescriptor: GPURasterizationStateDescriptor = {
       cullMode: ToWGPUCullMode(material.getCullMode())
     };
-    // TODO: allow to render into FBOs
     const colorStatesDescriptor: GPUColorStateDescriptor[] = (
       RenderPipelineGenerator.GenerateColorStateDescriptor(material)
     );
@@ -608,11 +723,14 @@ export class RenderPipelineGenerator {
       vertexStage: vertexStageDescriptor,
       fragmentStage: fragmentStageDescriptor,
       primitiveTopology: "triangle-list",
-      depthStencilState: depthStencilStateDescriptor,
       vertexState: vertexStateDescriptor,
       rasterizationState: rasterizationStateDescriptor,
       colorStates: colorStatesDescriptor
     };
+    // Depth output is optional
+    if (material.getDepthOutput() !== null) {
+      renderPipelineDescriptor.depthStencilState = depthStencilStateDescriptor;
+    }
     const pipeline = device.createRenderPipeline(renderPipelineDescriptor);
     return {pipeline, bindGroupLayout};
   }

@@ -1,7 +1,7 @@
 import {vec3, quat, mat4} from "gl-matrix";
 import {AABB, IAABBBounding} from "../AABB";
 import {Renderer} from "../Renderer";
-import {getUniqueId} from "../utils";
+import {GetUniqueId} from "../utils";
 
 export interface IContainerOptions {
   name?: string;
@@ -56,7 +56,7 @@ export class Container {
     // Normalize options
     options = Object.assign({}, CONTAINER_DEFAULT_OPTIONS, options);
     // Process options
-    this._id = getUniqueId();
+    this._id = GetUniqueId();
     this.setName(options.name);
     this._parent = options.parent;
     this._translation = options.translation ? options.translation : vec3.create();
@@ -405,7 +405,6 @@ export class Container {
     if (childIndex === -1) {
       child.setParent(this);
       this._children.push(child);
-      this.updateBoundings();
       return this._children.length - 1;
     }
     return -1;
@@ -424,7 +423,6 @@ export class Container {
         this._children.push(child);
       }
     }
-    this.updateBoundings();
   }
 
   /**
@@ -446,7 +444,6 @@ export class Container {
       const child = this._children[childIndex];
       child.setParent(null);
       this._children.splice(childIndex, 1);
-      this.updateBoundings();
       return childIndex;
     }
     return -1;

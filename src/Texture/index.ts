@@ -1,4 +1,5 @@
 import {TEXTURE_FORMAT} from "../constants";
+import {Renderer} from "../Renderer";
 
 export interface ITextureOptions {
   name?: string;
@@ -6,7 +7,8 @@ export interface ITextureOptions {
   width: number;
   height: number;
   depth?: number;
-  bytesPerRow: number;
+  bytesPerRow?: number;
+  isRenderable?: boolean;
   format: TEXTURE_FORMAT;
 }
 
@@ -17,6 +19,7 @@ export const TEXTURE_DEFAULT_OPTIONS: ITextureOptions = {
   height: 0,
   depth: 1,
   bytesPerRow: 0,
+  isRenderable: false,
   format: TEXTURE_FORMAT.NONE
 };
 
@@ -29,6 +32,10 @@ export class Texture {
   private _depth: number = 0;
   private _bytesPerRow: number = 0;
   private _format: TEXTURE_FORMAT = TEXTURE_FORMAT.NONE;
+  private _isRenderable: boolean = false;
+
+  private _resource: GPUTexture = null;
+  private _resourceView: GPUTextureView = null;
 
   /**
    * @param options - Create options
@@ -44,6 +51,7 @@ export class Texture {
     this._depth = options.depth;
     this._bytesPerRow = options.bytesPerRow;
     this._format = options.format;
+    this._isRenderable = options.isRenderable;
   }
 
   /**
@@ -77,14 +85,54 @@ export class Texture {
   public getDepth(): number { return this._depth; }
 
   /**
+   * The texture bytes per row
+   */
+  public getBytesPerRow(): TEXTURE_FORMAT { return this._bytesPerRow; }
+
+  /**
    * The texture format
    */
   public getFormat(): TEXTURE_FORMAT { return this._format; }
 
   /**
-   * The texture bytes per row
+   * Indicates if this texture is renderable
    */
-  public getBytesPerRow(): TEXTURE_FORMAT { return this._bytesPerRow; }
+  public isRenderable(): boolean { return this._isRenderable; }
+
+  /**
+   * The GPU texture resource
+   */
+  public getResource(): GPUTexture { return this._resource; }
+
+  /**
+   * The GPU texture view resource
+   */
+  public getResourceView(): GPUTextureView { return this._resourceView; }
+
+  /**
+   * Create the GPU resource of the sampler
+   * @param renderer - Renderer instance
+   * @param descriptor - The descriptor used to create the texture
+   */
+  public create(renderer: Renderer, descriptor: GPUTextureDescriptor): void {
+    const device = renderer.getDevice();
+    // Reserve GPUTexture in case it doesn't exist yet
+    if (this._resource === null) {
+      const texture = device.createTexture(descriptor);
+      this._resource = texture;
+      this._resourceView = texture.createView();
+      // Data was provided for the texture that needs to be copied
+      if (this.getData() !== null) {
+        const imageData = this.getData();
+        const width = this.getWidth();
+        const height = this.getHeight();
+        const depth = this.getDepth();
+        const bytesPerRow = this.getBytesPerRow();
+        const resource = this.getResource();
+        renderer.getQueueCommander().transferDataToTexture(resource, imageData, width, height, depth, bytesPerRow, null);
+      }
+    }
+  }
 
   /**
    * Destroy this Object

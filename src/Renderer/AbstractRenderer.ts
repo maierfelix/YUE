@@ -64,7 +64,7 @@ export abstract class AbstractRenderer extends EventEmitter {
    * Render a frame
    * @param frame - The frame to render
    */
-  public abstract async render(frame: Frame): Promise<void>;
+  public abstract render(frame: Frame): void;
 
   /**
    * Destroy this Object

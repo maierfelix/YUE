@@ -75,9 +75,24 @@ export enum MATERIAL_BLEND_MODE {
 }
 
 /**
- * Supported color writes
+ * Supported depth comparison modes
  */
-export enum MATERIAL_COLOR_WRITE {
+export enum MATERIAL_DEPTH_COMPARISON_MODE {
+  NONE,
+  NEVER,
+  LESS,
+  GREATER,
+  EQUAL,
+  NOT_EQUAL,
+  LESS_EQUAL,
+  GREATER_EQUAL,
+  ALWAYS
+}
+
+/**
+ * Supported color masks
+ */
+export enum MATERIAL_COLOR_MASK {
   NONE  = 0 << 0,
   RED   = 1 << 0,
   GREEN = 1 << 1,
@@ -103,6 +118,16 @@ export enum SAMPLER_WRAP_MODE {
   CLAMP_TO_EDGE,
   REPEAT,
   MIRROR_REPEAT
+}
+
+/**
+ * Supported frame commands for attachments
+ */
+export enum FRAME_COMMAND {
+  NONE,
+  READ,
+  WRITE,
+  CLEAR
 }
 
 /**

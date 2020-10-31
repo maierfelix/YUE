@@ -1,5 +1,6 @@
 import {CompileGLSL} from "../utils";
 import {SHADER_STAGE} from "../constants";
+import {Renderer} from "../Renderer";
 
 type ShaderCodeType = (
   Uint32Array | // SPIRV
@@ -34,6 +35,8 @@ export class Shader {
   private _name: string = null;
   private _stage: SHADER_STAGE = SHADER_STAGE.NONE;
   private _code: ShaderCodeType = null;
+
+  private _resource: GPUShaderModule = null;
 
   /**
    * @param options - Create options
@@ -72,6 +75,24 @@ export class Shader {
    * Returns the shader's stage
    */
   public getStage(): SHADER_STAGE { return this._stage; }
+
+  /**
+   * The GPU shader resource
+   */
+  public getResource(): GPUShaderModule { return this._resource; }
+
+  /**
+   * Create the GPU resource of the shader
+   * @param renderer - Renderer instance
+   * @param descriptor - The descriptor used to create the shader
+   */
+  public create(renderer: Renderer, descriptor: GPUShaderModuleDescriptor): void {
+    if (this._resource === null) {
+      const device = renderer.getDevice();
+      const instance = device.createShaderModule(descriptor);
+      this._resource = instance;
+    }
+  }
 
   /**
    * Destroy this Object
