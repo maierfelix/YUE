@@ -13,13 +13,13 @@ export default {
       format: "esm",
       plugins: []
     },
-    /*{
+    {
       name: "yue",
       file: "dist/index.js",
       format: "cjs",
       plugins: []
     },
-    {
+    /*{
       name: "yue",
       file: "dist/index.min.js",
       format: "cjs",
