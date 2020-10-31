@@ -92,9 +92,9 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_attributelayoutbytestride" class="tsd-kind-icon">_attribute<wbr>Layout<wbr>Byte<wbr>Stride</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_attributes" class="tsd-kind-icon">_attributes</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_blendmode" class="tsd-kind-icon">_blend<wbr>Mode</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_colorwrite" class="tsd-kind-icon">_color<wbr>Write</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_coloroutputs" class="tsd-kind-icon">_color<wbr>Outputs</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_cullmode" class="tsd-kind-icon">_cull<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_depthoutput" class="tsd-kind-icon">_depth<wbr>Output</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_destroyedstate" class="tsd-kind-icon">_destroyed<wbr>State</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_fragmentshader" class="tsd-kind-icon">_fragment<wbr>Shader</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="_material_index_.material.html#_name" class="tsd-kind-icon">_name</a></li>
@@ -118,9 +118,9 @@
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#enqueueuniformupdate" class="tsd-kind-icon">enqueue<wbr>Uniform<wbr>Update</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getattributelayoutbytestride" class="tsd-kind-icon">get<wbr>Attribute<wbr>Layout<wbr>Byte<wbr>Stride</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getattributes" class="tsd-kind-icon">get<wbr>Attributes</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getblendmode" class="tsd-kind-icon">get<wbr>Blend<wbr>Mode</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getcolorwrite" class="tsd-kind-icon">get<wbr>Color<wbr>Write</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getcoloroutputs" class="tsd-kind-icon">get<wbr>Color<wbr>Outputs</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getcullmode" class="tsd-kind-icon">get<wbr>Cull<wbr>Mode</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getdepthoutput" class="tsd-kind-icon">get<wbr>Depth<wbr>Output</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getfragmentshader" class="tsd-kind-icon">get<wbr>Fragment<wbr>Shader</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getname" class="tsd-kind-icon">get<wbr>Name</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class"><a href="_material_index_.material.html#getrenderpipeline" class="tsd-kind-icon">get<wbr>Render<wbr>Pipeline</a></li>
@@ -149,7 +149,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L88">src/Material/index.ts:88</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L111">src/Material/index.ts:111</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -178,7 +178,7 @@
 					<div class="tsd-signature tsd-kind-icon">_attribute<wbr>Layout<wbr>Byte<wbr>Stride<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L85">src/Material/index.ts:85</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L105">src/Material/index.ts:105</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -188,27 +188,17 @@
 					<div class="tsd-signature tsd-kind-icon">_attributes<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_material_index_.imaterialattributeoptions.html" class="tsd-signature-type">IMaterialAttributeOptions</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L71">src/Material/index.ts:71</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L93">src/Material/index.ts:93</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_blendmode" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _blend<wbr>Mode</h3>
-					<div class="tsd-signature tsd-kind-icon">_blend<wbr>Mode<span class="tsd-signature-symbol">:</span> <a href="../enums/_constants_.material_blend_mode.html" class="tsd-signature-type">MATERIAL_BLEND_MODE</a><span class="tsd-signature-symbol"> = MATERIAL_BLEND_MODE.NONE</span></div>
+					<a name="_coloroutputs" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _color<wbr>Outputs</h3>
+					<div class="tsd-signature tsd-kind-icon">_color<wbr>Outputs<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_material_index_.imaterialoutputcoloroptions.html" class="tsd-signature-type">IMaterialOutputColorOptions</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L74">src/Material/index.ts:74</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
-					<a name="_colorwrite" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _color<wbr>Write</h3>
-					<div class="tsd-signature tsd-kind-icon">_color<wbr>Write<span class="tsd-signature-symbol">:</span> <a href="../enums/_constants_.material_color_write.html" class="tsd-signature-type">MATERIAL_COLOR_WRITE</a><span class="tsd-signature-symbol"> = MATERIAL_COLOR_WRITE.ALL</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L75">src/Material/index.ts:75</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L111">src/Material/index.ts:111</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -218,7 +208,17 @@
 					<div class="tsd-signature tsd-kind-icon">_cull<wbr>Mode<span class="tsd-signature-symbol">:</span> <a href="../enums/_constants_.material_cull_mode.html" class="tsd-signature-type">MATERIAL_CULL_MODE</a><span class="tsd-signature-symbol"> = MATERIAL_CULL_MODE.NONE</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L73">src/Material/index.ts:73</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L95">src/Material/index.ts:95</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_depthoutput" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _depth<wbr>Output</h3>
+					<div class="tsd-signature tsd-kind-icon">_depth<wbr>Output<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_material_index_.imaterialoutputdepthoptions.html" class="tsd-signature-type">IMaterialOutputDepthOptions</a><span class="tsd-signature-symbol"> = null</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L110">src/Material/index.ts:110</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -228,7 +228,7 @@
 					<div class="tsd-signature tsd-kind-icon">_destroyed<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L87">src/Material/index.ts:87</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L107">src/Material/index.ts:107</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -238,7 +238,7 @@
 					<div class="tsd-signature tsd-kind-icon">_fragment<wbr>Shader<span class="tsd-signature-symbol">:</span> <a href="_shader_index_.shader.html" class="tsd-signature-type">Shader</a><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L78">src/Material/index.ts:78</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L98">src/Material/index.ts:98</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -248,7 +248,7 @@
 					<div class="tsd-signature tsd-kind-icon">_name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L70">src/Material/index.ts:70</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L92">src/Material/index.ts:92</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -258,7 +258,7 @@
 					<div class="tsd-signature tsd-kind-icon">_needs<wbr>Rebuild<wbr>State<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">boolean</span><span class="tsd-signature-symbol"> = false</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L88">src/Material/index.ts:88</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L108">src/Material/index.ts:108</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -268,7 +268,7 @@
 					<div class="tsd-signature tsd-kind-icon">_render<wbr>Pipeline<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_material_renderpipelinegenerator_.irenderpipeline.html" class="tsd-signature-type">IRenderPipeline</a><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L81">src/Material/index.ts:81</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L101">src/Material/index.ts:101</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -278,7 +278,7 @@
 					<div class="tsd-signature tsd-kind-icon">_shared<wbr>Uniform<wbr>Resources<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_material_renderpipelinegenerator_.ibindgroupresource.html" class="tsd-signature-type">IBindGroupResource</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L83">src/Material/index.ts:83</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L103">src/Material/index.ts:103</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -288,7 +288,7 @@
 					<div class="tsd-signature tsd-kind-icon">_uniform<wbr>Update<wbr>Queue<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_renderer_index_.iuniformupdateentry.html" class="tsd-signature-type">IUniformUpdateEntry</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L82">src/Material/index.ts:82</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L102">src/Material/index.ts:102</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -298,7 +298,7 @@
 					<div class="tsd-signature tsd-kind-icon">_uniforms<span class="tsd-signature-symbol">:</span> <a href="../interfaces/_material_index_.imaterialuniformoptions.html" class="tsd-signature-type">IMaterialUniformOptions</a><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L80">src/Material/index.ts:80</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L100">src/Material/index.ts:100</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -308,7 +308,7 @@
 					<div class="tsd-signature tsd-kind-icon">_vertex<wbr>Shader<span class="tsd-signature-symbol">:</span> <a href="_shader_index_.shader.html" class="tsd-signature-type">Shader</a><span class="tsd-signature-symbol"> = null</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L77">src/Material/index.ts:77</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L97">src/Material/index.ts:97</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -325,7 +325,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L286">src/Material/index.ts:286</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L319">src/Material/index.ts:319</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -356,7 +356,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L360">src/Material/index.ts:360</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L393">src/Material/index.ts:393</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -378,7 +378,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L372">src/Material/index.ts:372</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L405">src/Material/index.ts:405</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -400,7 +400,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L366">src/Material/index.ts:366</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L399">src/Material/index.ts:399</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -422,7 +422,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L237">src/Material/index.ts:237</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L260">src/Material/index.ts:260</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -453,7 +453,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L270">src/Material/index.ts:270</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L303">src/Material/index.ts:303</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -475,7 +475,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L167">src/Material/index.ts:167</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L190">src/Material/index.ts:190</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -512,7 +512,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L226">src/Material/index.ts:226</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L249">src/Material/index.ts:249</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -534,7 +534,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L191">src/Material/index.ts:191</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L214">src/Material/index.ts:214</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -547,46 +547,24 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getblendmode" class="tsd-anchor"></a>
-					<h3>get<wbr>Blend<wbr>Mode</h3>
+					<a name="getcoloroutputs" class="tsd-anchor"></a>
+					<h3>get<wbr>Color<wbr>Outputs</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Blend<wbr>Mode<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../enums/_constants_.material_blend_mode.html" class="tsd-signature-type">MATERIAL_BLEND_MODE</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Color<wbr>Outputs<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_material_index_.imaterialoutputcoloroptions.html" class="tsd-signature-type">IMaterialOutputColorOptions</a><span class="tsd-signature-symbol">[]</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L201">src/Material/index.ts:201</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L239">src/Material/index.ts:239</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>The material blending mode</p>
+									<p>The material color outputs</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="../enums/_constants_.material_blend_mode.html" class="tsd-signature-type">MATERIAL_BLEND_MODE</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
-					<a name="getcolorwrite" class="tsd-anchor"></a>
-					<h3>get<wbr>Color<wbr>Write</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Color<wbr>Write<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../enums/_constants_.material_color_write.html" class="tsd-signature-type">MATERIAL_COLOR_WRITE</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L206">src/Material/index.ts:206</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>The material color write</p>
-								</div>
-							</div>
-							<h4 class="tsd-returns-title">Returns <a href="../enums/_constants_.material_color_write.html" class="tsd-signature-type">MATERIAL_COLOR_WRITE</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_material_index_.imaterialoutputcoloroptions.html" class="tsd-signature-type">IMaterialOutputColorOptions</a><span class="tsd-signature-symbol">[]</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -600,7 +578,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L196">src/Material/index.ts:196</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L219">src/Material/index.ts:219</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -609,6 +587,28 @@
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="../enums/_constants_.material_cull_mode.html" class="tsd-signature-type">MATERIAL_CULL_MODE</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="getdepthoutput" class="tsd-anchor"></a>
+					<h3>get<wbr>Depth<wbr>Output</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Depth<wbr>Output<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/_material_index_.imaterialoutputdepthoptions.html" class="tsd-signature-type">IMaterialOutputDepthOptions</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L234">src/Material/index.ts:234</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>The material depth output</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/_material_index_.imaterialoutputdepthoptions.html" class="tsd-signature-type">IMaterialOutputDepthOptions</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -622,7 +622,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L216">src/Material/index.ts:216</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L229">src/Material/index.ts:229</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -644,7 +644,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L124">src/Material/index.ts:124</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L147">src/Material/index.ts:147</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -666,7 +666,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L221">src/Material/index.ts:221</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L244">src/Material/index.ts:244</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -688,7 +688,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L153">src/Material/index.ts:153</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L176">src/Material/index.ts:176</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -719,7 +719,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L140">src/Material/index.ts:140</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L163">src/Material/index.ts:163</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -750,7 +750,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L134">src/Material/index.ts:134</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L157">src/Material/index.ts:157</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -772,7 +772,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L211">src/Material/index.ts:211</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L224">src/Material/index.ts:224</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -794,7 +794,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L231">src/Material/index.ts:231</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L254">src/Material/index.ts:254</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -816,7 +816,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L129">src/Material/index.ts:129</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L152">src/Material/index.ts:152</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -847,7 +847,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L258">src/Material/index.ts:258</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L291">src/Material/index.ts:291</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -879,7 +879,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/27f2abd/src/Material/index.ts#L176">src/Material/index.ts:176</a></li>
+									<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L199">src/Material/index.ts:199</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -999,13 +999,13 @@
 								<a href="_material_index_.material.html#_attributes" class="tsd-kind-icon">_attributes</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_material_index_.material.html#_blendmode" class="tsd-kind-icon">_blend<wbr>Mode</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
-								<a href="_material_index_.material.html#_colorwrite" class="tsd-kind-icon">_color<wbr>Write</a>
+								<a href="_material_index_.material.html#_coloroutputs" class="tsd-kind-icon">_color<wbr>Outputs</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_material_index_.material.html#_cullmode" class="tsd-kind-icon">_cull<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="_material_index_.material.html#_depthoutput" class="tsd-kind-icon">_depth<wbr>Output</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
 								<a href="_material_index_.material.html#_destroyedstate" class="tsd-kind-icon">_destroyed<wbr>State</a>
@@ -1062,13 +1062,13 @@
 								<a href="_material_index_.material.html#getattributes" class="tsd-kind-icon">get<wbr>Attributes</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_material_index_.material.html#getblendmode" class="tsd-kind-icon">get<wbr>Blend<wbr>Mode</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class">
-								<a href="_material_index_.material.html#getcolorwrite" class="tsd-kind-icon">get<wbr>Color<wbr>Write</a>
+								<a href="_material_index_.material.html#getcoloroutputs" class="tsd-kind-icon">get<wbr>Color<wbr>Outputs</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_material_index_.material.html#getcullmode" class="tsd-kind-icon">get<wbr>Cull<wbr>Mode</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="_material_index_.material.html#getdepthoutput" class="tsd-kind-icon">get<wbr>Depth<wbr>Output</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class">
 								<a href="_material_index_.material.html#getfragmentshader" class="tsd-kind-icon">get<wbr>Fragment<wbr>Shader</a>
@@ -1114,18 +1114,30 @@
 						<a href="../interfaces/_material_index_.imaterialoptions.html" class="tsd-kind-icon">IMaterial<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_material_index_.imaterialoutputcoloroptions.html" class="tsd-kind-icon">IMaterial<wbr>Output<wbr>Color<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="../interfaces/_material_index_.imaterialoutputdepthoptions.html" class="tsd-kind-icon">IMaterial<wbr>Output<wbr>Depth<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_material_index_.imaterialshaderoptions.html" class="tsd-kind-icon">IMaterial<wbr>Shader<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-parent-kind-module">
 						<a href="../interfaces/_material_index_.imaterialuniformoptions.html" class="tsd-kind-icon">IMaterial<wbr>Uniform<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-parent-kind-module tsd-is-not-exported">
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
 						<a href="../modules/_material_index_.html#material_attribute_default_options" class="tsd-kind-icon">MATERIAL_<wbr>ATTRIBUTE_<wbr>DEFAULT_<wbr>OPTIONS</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-parent-kind-module tsd-is-not-exported">
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
 						<a href="../modules/_material_index_.html#material_default_options" class="tsd-kind-icon">MATERIAL_<wbr>DEFAULT_<wbr>OPTIONS</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-parent-kind-module tsd-is-not-exported">
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_output_color_default_options" class="tsd-kind-icon">MATERIAL_<wbr>OUTPUT_<wbr>COLOR_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_output_depth_default_options" class="tsd-kind-icon">MATERIAL_<wbr>OUTPUT_<wbr>DEPTH_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
 						<a href="../modules/_material_index_.html#material_shader_default_options" class="tsd-kind-icon">MATERIAL_<wbr>SHADER_<wbr>DEFAULT_<wbr>OPTIONS</a>
 					</li>
 					<li class=" tsd-kind-object-literal tsd-parent-kind-module">

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SHADER_STAGE | yue.js</title>
+	<title>IMaterialOutputColorOptions | yue.js</title>
 	<meta name="description" content="Documentation for yue.js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,70 +56,71 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="../modules/_constants_.html">&quot;constants&quot;</a>
+					<a href="../modules/_material_index_.html">&quot;Material/index&quot;</a>
 				</li>
 				<li>
-					<a href="_constants_.shader_stage.html">SHADER_STAGE</a>
+					<a href="_material_index_.imaterialoutputcoloroptions.html">IMaterialOutputColorOptions</a>
 				</li>
 			</ul>
-			<h1>Enumeration SHADER_STAGE</h1>
+			<h1>Interface IMaterialOutputColorOptions</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Supported shader stages</p>
-					</div>
-				</div>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">IMaterialOutputColorOptions</span>
+					</li>
+				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section ">
-							<h3>Enumeration members</h3>
+							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#fragment" class="tsd-kind-icon">FRAGMENT</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#none" class="tsd-kind-icon">NONE</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#vertex" class="tsd-kind-icon">VERTEX</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_material_index_.imaterialoutputcoloroptions.html#blendmode" class="tsd-kind-icon">blend<wbr>Mode</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_material_index_.imaterialoutputcoloroptions.html#format" class="tsd-kind-icon">format</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="_material_index_.imaterialoutputcoloroptions.html#mask" class="tsd-kind-icon">mask</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Enumeration members</h2>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="fragment" class="tsd-anchor"></a>
-					<h3>FRAGMENT</h3>
-					<div class="tsd-signature tsd-kind-icon">FRAGMENT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1 &lt;&lt; 1</span></div>
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="blendmode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> blend<wbr>Mode</h3>
+					<div class="tsd-signature tsd-kind-icon">blend<wbr>Mode<span class="tsd-signature-symbol">:</span> <a href="../enums/_constants_.material_blend_mode.html" class="tsd-signature-type">MATERIAL_BLEND_MODE</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L7">src/constants.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L61">src/Material/index.ts:61</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="none" class="tsd-anchor"></a>
-					<h3>NONE</h3>
-					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0 &lt;&lt; 0</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="format" class="tsd-anchor"></a>
+					<h3>format</h3>
+					<div class="tsd-signature tsd-kind-icon">format<span class="tsd-signature-symbol">:</span> <a href="../enums/_constants_.texture_format.html" class="tsd-signature-type">TEXTURE_FORMAT</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L5">src/constants.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L59">src/Material/index.ts:59</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="vertex" class="tsd-anchor"></a>
-					<h3>VERTEX</h3>
-					<div class="tsd-signature tsd-kind-icon">VERTEX<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1 &lt;&lt; 0</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="mask" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> mask</h3>
+					<div class="tsd-signature tsd-kind-icon">mask<span class="tsd-signature-symbol">:</span> <a href="../enums/_constants_.material_color_mask.html" class="tsd-signature-type">MATERIAL_COLOR_MASK</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L6">src/constants.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/Material/index.ts#L60">src/Material/index.ts:60</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -152,7 +153,7 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/_material_renderpipelinegenerator_.html">&quot;<wbr>Material/<wbr>Render<wbr>Pipeline<wbr>Generator&quot;</a>
 					</li>
-					<li class=" tsd-kind-module">
+					<li class="current tsd-kind-module">
 						<a href="../modules/_material_index_.html">&quot;<wbr>Material/index&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -188,7 +189,7 @@
 					<li class=" tsd-kind-module">
 						<a href="../modules/_texture_index_.html">&quot;<wbr>Texture/index&quot;</a>
 					</li>
-					<li class="current tsd-kind-module">
+					<li class=" tsd-kind-module">
 						<a href="../modules/_constants_.html">&quot;constants&quot;</a>
 					</li>
 					<li class=" tsd-kind-module">
@@ -201,53 +202,59 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.frame_command.html" class="tsd-kind-icon">FRAME_<wbr>COMMAND</a>
+					<li class=" tsd-kind-class tsd-parent-kind-module">
+						<a href="../classes/_material_index_.material.html" class="tsd-kind-icon">Material</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.material_blend_mode.html" class="tsd-kind-icon">MATERIAL_<wbr>BLEND_<wbr>MODE</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_material_index_.imaterialattributeoptions.html" class="tsd-kind-icon">IMaterial<wbr>Attribute<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.material_color_mask.html" class="tsd-kind-icon">MATERIAL_<wbr>COLOR_<wbr>MASK</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.material_cull_mode.html" class="tsd-kind-icon">MATERIAL_<wbr>CULL_<wbr>MODE</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.material_depth_comparison_mode.html" class="tsd-kind-icon">MATERIAL_<wbr>DEPTH_<wbr>COMPARISON_<wbr>MODE</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.sampler_filter_mode.html" class="tsd-kind-icon">SAMPLER_<wbr>FILTER_<wbr>MODE</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.sampler_wrap_mode.html" class="tsd-kind-icon">SAMPLER_<wbr>WRAP_<wbr>MODE</a>
-					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.shader_attribute.html" class="tsd-kind-icon">SHADER_<wbr>ATTRIBUTE</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_material_index_.imaterialoptions.html" class="tsd-kind-icon">IMaterial<wbr>Options</a>
 					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.shader_stage.html" class="tsd-kind-icon">SHADER_<wbr>STAGE</a>
+					<li class="current tsd-kind-interface tsd-parent-kind-module">
+						<a href="_material_index_.imaterialoutputcoloroptions.html" class="tsd-kind-icon">IMaterial<wbr>Output<wbr>Color<wbr>Options</a>
 						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#fragment" class="tsd-kind-icon">FRAGMENT</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_material_index_.imaterialoutputcoloroptions.html#blendmode" class="tsd-kind-icon">blend<wbr>Mode</a>
 							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#none" class="tsd-kind-icon">NONE</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_material_index_.imaterialoutputcoloroptions.html#format" class="tsd-kind-icon">format</a>
 							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#vertex" class="tsd-kind-icon">VERTEX</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="_material_index_.imaterialoutputcoloroptions.html#mask" class="tsd-kind-icon">mask</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.shader_uniform.html" class="tsd-kind-icon">SHADER_<wbr>UNIFORM</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_material_index_.imaterialoutputdepthoptions.html" class="tsd-kind-icon">IMaterial<wbr>Output<wbr>Depth<wbr>Options</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
-						<a href="_constants_.texture_format.html" class="tsd-kind-icon">TEXTURE_<wbr>FORMAT</a>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_material_index_.imaterialshaderoptions.html" class="tsd-kind-icon">IMaterial<wbr>Shader<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-parent-kind-module">
+						<a href="_material_index_.imaterialuniformoptions.html" class="tsd-kind-icon">IMaterial<wbr>Uniform<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_attribute_default_options" class="tsd-kind-icon">MATERIAL_<wbr>ATTRIBUTE_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_default_options" class="tsd-kind-icon">MATERIAL_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_output_color_default_options" class="tsd-kind-icon">MATERIAL_<wbr>OUTPUT_<wbr>COLOR_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_output_depth_default_options" class="tsd-kind-icon">MATERIAL_<wbr>OUTPUT_<wbr>DEPTH_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_shader_default_options" class="tsd-kind-icon">MATERIAL_<wbr>SHADER_<wbr>DEFAULT_<wbr>OPTIONS</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-parent-kind-module">
+						<a href="../modules/_material_index_.html#material_uniform_default_options" class="tsd-kind-icon">MATERIAL_<wbr>UNIFORM_<wbr>DEFAULT_<wbr>OPTIONS</a>
 					</li>
 				</ul>
 			</nav>
@@ -265,10 +272,11 @@
 				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>

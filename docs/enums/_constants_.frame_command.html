@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SHADER_STAGE | yue.js</title>
+	<title>FRAME_COMMAND | yue.js</title>
 	<meta name="description" content="Documentation for yue.js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -59,10 +59,10 @@
 					<a href="../modules/_constants_.html">&quot;constants&quot;</a>
 				</li>
 				<li>
-					<a href="_constants_.shader_stage.html">SHADER_STAGE</a>
+					<a href="_constants_.frame_command.html">FRAME_COMMAND</a>
 				</li>
 			</ul>
-			<h1>Enumeration SHADER_STAGE</h1>
+			<h1>Enumeration FRAME_COMMAND</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Supported shader stages</p>
+						<p>Supported frame commands for attachments</p>
 					</div>
 				</div>
 			</section>
@@ -83,9 +83,10 @@
 						<section class="tsd-index-section ">
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#fragment" class="tsd-kind-icon">FRAGMENT</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#none" class="tsd-kind-icon">NONE</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#vertex" class="tsd-kind-icon">VERTEX</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.frame_command.html#clear" class="tsd-kind-icon">CLEAR</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.frame_command.html#none" class="tsd-kind-icon">NONE</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.frame_command.html#read" class="tsd-kind-icon">READ</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.frame_command.html#write" class="tsd-kind-icon">WRITE</a></li>
 							</ul>
 						</section>
 					</div>
@@ -94,32 +95,42 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Enumeration members</h2>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="fragment" class="tsd-anchor"></a>
-					<h3>FRAGMENT</h3>
-					<div class="tsd-signature tsd-kind-icon">FRAGMENT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1 &lt;&lt; 1</span></div>
+					<a name="clear" class="tsd-anchor"></a>
+					<h3>CLEAR</h3>
+					<div class="tsd-signature tsd-kind-icon">CLEAR<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L7">src/constants.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L130">src/constants.ts:130</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="none" class="tsd-anchor"></a>
 					<h3>NONE</h3>
-					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0 &lt;&lt; 0</span></div>
+					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L5">src/constants.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L127">src/constants.ts:127</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="vertex" class="tsd-anchor"></a>
-					<h3>VERTEX</h3>
-					<div class="tsd-signature tsd-kind-icon">VERTEX<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1 &lt;&lt; 0</span></div>
+					<a name="read" class="tsd-anchor"></a>
+					<h3>READ</h3>
+					<div class="tsd-signature tsd-kind-icon">READ<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L6">src/constants.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L128">src/constants.ts:128</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="write" class="tsd-anchor"></a>
+					<h3>WRITE</h3>
+					<div class="tsd-signature tsd-kind-icon">WRITE<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L129">src/constants.ts:129</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -201,9 +212,27 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.frame_command.html" class="tsd-kind-icon">FRAME_<wbr>COMMAND</a>
+						<ul>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.frame_command.html#clear" class="tsd-kind-icon">CLEAR</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.frame_command.html#none" class="tsd-kind-icon">NONE</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.frame_command.html#read" class="tsd-kind-icon">READ</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.frame_command.html#write" class="tsd-kind-icon">WRITE</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.material_blend_mode.html" class="tsd-kind-icon">MATERIAL_<wbr>BLEND_<wbr>MODE</a>
 					</li>
@@ -225,24 +254,9 @@
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.shader_attribute.html" class="tsd-kind-icon">SHADER_<wbr>ATTRIBUTE</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-enum tsd-parent-kind-module">
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.shader_stage.html" class="tsd-kind-icon">SHADER_<wbr>STAGE</a>
-						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#fragment" class="tsd-kind-icon">FRAGMENT</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#none" class="tsd-kind-icon">NONE</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#vertex" class="tsd-kind-icon">VERTEX</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.shader_uniform.html" class="tsd-kind-icon">SHADER_<wbr>UNIFORM</a>
 					</li>

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SHADER_STAGE | yue.js</title>
+	<title>MATERIAL_DEPTH_COMPARISON_MODE | yue.js</title>
 	<meta name="description" content="Documentation for yue.js">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -59,10 +59,10 @@
 					<a href="../modules/_constants_.html">&quot;constants&quot;</a>
 				</li>
 				<li>
-					<a href="_constants_.shader_stage.html">SHADER_STAGE</a>
+					<a href="_constants_.material_depth_comparison_mode.html">MATERIAL_DEPTH_COMPARISON_MODE</a>
 				</li>
 			</ul>
-			<h1>Enumeration SHADER_STAGE</h1>
+			<h1>Enumeration MATERIAL_DEPTH_COMPARISON_MODE</h1>
 		</div>
 	</div>
 </header>
@@ -72,7 +72,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Supported shader stages</p>
+						<p>Supported depth comparison modes</p>
 					</div>
 				</div>
 			</section>
@@ -83,9 +83,15 @@
 						<section class="tsd-index-section ">
 							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#fragment" class="tsd-kind-icon">FRAGMENT</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#none" class="tsd-kind-icon">NONE</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.shader_stage.html#vertex" class="tsd-kind-icon">VERTEX</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#always" class="tsd-kind-icon">ALWAYS</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#equal" class="tsd-kind-icon">EQUAL</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#greater" class="tsd-kind-icon">GREATER</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#greater_equal" class="tsd-kind-icon">GREATER_<wbr>EQUAL</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#less" class="tsd-kind-icon">LESS</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#less_equal" class="tsd-kind-icon">LESS_<wbr>EQUAL</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#never" class="tsd-kind-icon">NEVER</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#none" class="tsd-kind-icon">NONE</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum"><a href="_constants_.material_depth_comparison_mode.html#not_equal" class="tsd-kind-icon">NOT_<wbr>EQUAL</a></li>
 							</ul>
 						</section>
 					</div>
@@ -94,32 +100,92 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Enumeration members</h2>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="fragment" class="tsd-anchor"></a>
-					<h3>FRAGMENT</h3>
-					<div class="tsd-signature tsd-kind-icon">FRAGMENT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1 &lt;&lt; 1</span></div>
+					<a name="always" class="tsd-anchor"></a>
+					<h3>ALWAYS</h3>
+					<div class="tsd-signature tsd-kind-icon">ALWAYS<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L7">src/constants.ts:7</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L89">src/constants.ts:89</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="equal" class="tsd-anchor"></a>
+					<h3>EQUAL</h3>
+					<div class="tsd-signature tsd-kind-icon">EQUAL<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L85">src/constants.ts:85</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="greater" class="tsd-anchor"></a>
+					<h3>GREATER</h3>
+					<div class="tsd-signature tsd-kind-icon">GREATER<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L84">src/constants.ts:84</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="greater_equal" class="tsd-anchor"></a>
+					<h3>GREATER_<wbr>EQUAL</h3>
+					<div class="tsd-signature tsd-kind-icon">GREATER_<wbr>EQUAL<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L88">src/constants.ts:88</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="less" class="tsd-anchor"></a>
+					<h3>LESS</h3>
+					<div class="tsd-signature tsd-kind-icon">LESS<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L83">src/constants.ts:83</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="less_equal" class="tsd-anchor"></a>
+					<h3>LESS_<wbr>EQUAL</h3>
+					<div class="tsd-signature tsd-kind-icon">LESS_<wbr>EQUAL<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L87">src/constants.ts:87</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
+					<a name="never" class="tsd-anchor"></a>
+					<h3>NEVER</h3>
+					<div class="tsd-signature tsd-kind-icon">NEVER<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L82">src/constants.ts:82</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
 					<a name="none" class="tsd-anchor"></a>
 					<h3>NONE</h3>
-					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 0 &lt;&lt; 0</span></div>
+					<div class="tsd-signature tsd-kind-icon">NONE<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L5">src/constants.ts:5</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L81">src/constants.ts:81</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum">
-					<a name="vertex" class="tsd-anchor"></a>
-					<h3>VERTEX</h3>
-					<div class="tsd-signature tsd-kind-icon">VERTEX<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol"> = 1 &lt;&lt; 0</span></div>
+					<a name="not_equal" class="tsd-anchor"></a>
+					<h3>NOT_<wbr>EQUAL</h3>
+					<div class="tsd-signature tsd-kind-icon">NOT_<wbr>EQUAL<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L6">src/constants.ts:6</a></li>
+							<li>Defined in <a href="https://github.com/maierfelix/yue/blob/83d9424/src/constants.ts#L86">src/constants.ts:86</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -213,9 +279,42 @@
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.material_cull_mode.html" class="tsd-kind-icon">MATERIAL_<wbr>CULL_<wbr>MODE</a>
 					</li>
-					<li class=" tsd-kind-enum tsd-parent-kind-module">
+				</ul>
+				<ul class="current">
+					<li class="current tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.material_depth_comparison_mode.html" class="tsd-kind-icon">MATERIAL_<wbr>DEPTH_<wbr>COMPARISON_<wbr>MODE</a>
+						<ul>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#always" class="tsd-kind-icon">ALWAYS</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#equal" class="tsd-kind-icon">EQUAL</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#greater" class="tsd-kind-icon">GREATER</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#greater_equal" class="tsd-kind-icon">GREATER_<wbr>EQUAL</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#less" class="tsd-kind-icon">LESS</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#less_equal" class="tsd-kind-icon">LESS_<wbr>EQUAL</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#never" class="tsd-kind-icon">NEVER</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#none" class="tsd-kind-icon">NONE</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
+								<a href="_constants_.material_depth_comparison_mode.html#not_equal" class="tsd-kind-icon">NOT_<wbr>EQUAL</a>
+							</li>
+						</ul>
 					</li>
+				</ul>
+				<ul class="after-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.sampler_filter_mode.html" class="tsd-kind-icon">SAMPLER_<wbr>FILTER_<wbr>MODE</a>
 					</li>
@@ -225,24 +324,9 @@
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.shader_attribute.html" class="tsd-kind-icon">SHADER_<wbr>ATTRIBUTE</a>
 					</li>
-				</ul>
-				<ul class="current">
-					<li class="current tsd-kind-enum tsd-parent-kind-module">
+					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.shader_stage.html" class="tsd-kind-icon">SHADER_<wbr>STAGE</a>
-						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#fragment" class="tsd-kind-icon">FRAGMENT</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#none" class="tsd-kind-icon">NONE</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum">
-								<a href="_constants_.shader_stage.html#vertex" class="tsd-kind-icon">VERTEX</a>
-							</li>
-						</ul>
 					</li>
-				</ul>
-				<ul class="after-current">
 					<li class=" tsd-kind-enum tsd-parent-kind-module">
 						<a href="_constants_.shader_uniform.html" class="tsd-kind-icon">SHADER_<wbr>UNIFORM</a>
 					</li>
