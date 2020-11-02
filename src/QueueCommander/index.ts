@@ -108,6 +108,21 @@ export class QueueCommander {
     // Abort here if there's nothing to do
     if (!dataToBufferTransfers.length) return;
 
+    // Flush large buffers
+    for (let ii = 0; ii < dataToBufferTransfers.length; ++ii) {
+      const {buffer, data, offset} = dataToBufferTransfers[ii];
+      // CPU -> GPU copy
+      queue.writeBuffer(buffer, offset, data);
+      // Remove transfer item
+      dataToBufferTransfers.splice(ii--, 1);
+    }
+
+    // Trigger callbacks if necessary
+    for (const {callback} of dataToBufferTransfers) {
+      if (callback instanceof Function) callback();
+    }
+    return;
+
     // Buffer for CPU -> GPU copy operations
     const srcCopyBuffer = this._srcCopyBuffer;
   

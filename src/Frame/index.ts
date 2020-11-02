@@ -92,7 +92,7 @@ export class Frame extends Container {
   /**
    * Update the frame children
    */
-  public async update(renderer: Renderer): Promise<void> {
+  public update(renderer: Renderer): void {
     const children = this.getChildren();
     // First rebuild childs if necessary
     for (let ii = 0; ii < children.length; ++ii) {
@@ -101,8 +101,6 @@ export class Frame extends Container {
       child.update(renderer);
     }
     super.update(renderer);
-    // Flush the renderer (E.g. flushes buffer copy queue)
-    await renderer.flush();
   }
 
   /**
@@ -112,7 +110,6 @@ export class Frame extends Container {
     const children = this.getChildren();
     const device = renderer.getDevice();
     const camera = this.getAttachedCamera();
-    //const backBufferView = renderer.getSwapchain().getCurrentTexture().createView();
     // Create depth texture if necessary
     const depthFrameAttachment = this.getDepthAttachment();
     if (depthFrameAttachment !== null) {
@@ -137,23 +134,22 @@ export class Frame extends Container {
         colorAttachment.create(renderer, descriptor);
       }
     }
-    // Update camera is there is one attached
+    // Update camera if there is one attached
     if (camera instanceof AbstractCamera) {
       camera.update();
     }
     // Render each child
     const commandEncoder = device.createCommandEncoder({});
+    const renderPassDescriptor = RenderPipelineGenerator.generateRenderPassDescriptor(
+      depthFrameAttachment,
+      colorFrameAttachments
+    );
+    const renderPass = commandEncoder.beginRenderPass(renderPassDescriptor);
     for (let ii = 0; ii < children.length; ++ii) {
-      const renderPassDescriptor = RenderPipelineGenerator.generateRenderPassDescriptor(
-        depthFrameAttachment,
-        colorFrameAttachments
-      );
-      //(renderPassDescriptor.colorAttachments as any)[0].attachment = backBufferView;
-      const renderPass = commandEncoder.beginRenderPass(renderPassDescriptor);
       const child = children[ii];
       child.render(renderPass);
-      renderPass.endPass();
     }
+    renderPass.endPass();
     device.defaultQueue.submit([commandEncoder.finish()]);
   }
 

@@ -2,7 +2,7 @@ import {Material} from "../Material";
 import {vec3, quat} from "gl-matrix";
 import {Renderer, IUniformUpdateEntry} from "../Renderer";
 import {GetShaderAttributeComponentSize, IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
-import {IRayTriangleIntersection, Ray, TRIANGLE_FACING} from "../Ray";
+import {IRayTriangleIntersection, Ray} from "../Ray";
 import {Container, IContainerOptions} from "../Container";
 import {AABB, IAABBBounding} from "../AABB";
 

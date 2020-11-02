@@ -441,8 +441,8 @@ export class RenderPipelineGenerator {
     for (const {format, mask, blendMode} of colorOutputs) {
       const colorState: GPUColorStateDescriptor = {
         format: ToWGPUTextureFormat(format),
-        colorBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
-        alphaBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
+        //colorBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
+        //alphaBlend: {srcFactor: "one", dstFactor: "zero", operation: "add"},
         writeMask: ToWGPUColorWrite(mask)
       };
       switch (blendMode) {
@@ -465,13 +465,17 @@ export class RenderPipelineGenerator {
    * @param material - Material object
    */
   public static GenerateDepthStencilStateDescriptor(material: Material): GPUDepthStencilStateDescriptor {
-    const {format, comparisonMode} = material.getDepthOutput();
-    const out: GPUDepthStencilStateDescriptor = {
-      depthWriteEnabled: true,
-      depthCompare: ToWGPUCompareFunction(comparisonMode),
-      format: ToWGPUTextureFormat(format)
-    };
-    return out;
+    const depthOutput = material.getDepthOutput();
+    if (depthOutput !== null) {
+      const {format, comparisonMode} = depthOutput;
+      const out: GPUDepthStencilStateDescriptor = {
+        depthWriteEnabled: true,
+        depthCompare: ToWGPUCompareFunction(comparisonMode),
+        format: ToWGPUTextureFormat(format)
+      };
+      return out;
+    }
+    return null;
   }
 
   /**
