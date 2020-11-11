@@ -92,15 +92,15 @@ export class QueueCommander {
   /**
    * Flush and execute all queued operations
    */
-  public async flush(): Promise<void> {
-    await this._flushDataToBufferTransfers();
+  public flush(): void {
+    this._flushDataToBufferTransfers();
     this._flushDataToTextureTransfers();
   }
 
   /**
    * Flush all data to buffer transfers
    */
-  private async _flushDataToBufferTransfers(): Promise<void> {
+  private _flushDataToBufferTransfers(): void {
     const device = this._device;
     const queue = device.defaultQueue;
 
@@ -127,7 +127,7 @@ export class QueueCommander {
     const srcCopyBuffer = this._srcCopyBuffer;
   
     // Put source copy buffer into mapped state
-    await srcCopyBuffer.mapAsync(GPUMapMode.WRITE, 0x0, SRC_COPY_BUFFER_SIZE);
+    //await srcCopyBuffer.mapAsync(GPUMapMode.WRITE, 0x0, SRC_COPY_BUFFER_SIZE);
 
     // Create view into mapped buffer
     const srcCopyBufferView = new Uint8Array(srcCopyBuffer.getMappedRange(0x0, SRC_COPY_BUFFER_SIZE));

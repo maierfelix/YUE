@@ -3,6 +3,7 @@ import {AbstractRenderer, IRendererOptions} from "./AbstractRenderer";
 import {Frame} from "../Frame";
 import {AbstractCamera} from "../Camera";
 import {IBindGroupResource, RenderPipelineGenerator, ToWGPUTextureFormat} from "../Material/RenderPipelineGenerator";
+import {Buffer} from "../Buffer";
 import {Sampler} from "../Sampler";
 import {Texture} from "../Texture";
 import {QueueCommander} from "../QueueCommander";
@@ -10,7 +11,7 @@ import {QueueCommander} from "../QueueCommander";
 import {LoadGLSLang, GetTimeStamp} from "../utils";
 import {TEXTURE_FORMAT} from "../constants";
 
-export interface IUniformUpdateEntry {
+export interface IUniformBindingEntry {
   id: number;
   data: any;
 }
@@ -133,8 +134,6 @@ export class Renderer extends AbstractRenderer {
     // Make sure the renderer got created successfully
     if (!this.getAdapter() || !this.getDevice())
       throw new ReferenceError(`Method 'create' must be called on 'Renderer' before usage`);
-    // Update the frame
-    //await frame.update(this);
     // Draw the frame
     frame.draw(this);
     this._lastFrameTimestamp = now;
@@ -144,18 +143,17 @@ export class Renderer extends AbstractRenderer {
   /**
    * Flushes all pending operations such as buffer copies
    */
-  public async flush(): Promise<void> {
-    await this.getQueueCommander().flush();
+  public flush(): void {
+    this.getQueueCommander().flush();
   }
 
   /**
-   * Process the uniform update queue
-   * @param queue - The uniform queue to process
+   * Process a uniform binding queue
+   * @param queue - The uniform bindings to process
    * @param resources - The bound uniform resources
    */
-  public processUniformUpdateQueue(queue: IUniformUpdateEntry[], uniformResources: IBindGroupResource[]): void {
-    const queueCommander = this.getQueueCommander();
-    // Samplers and Texture updates can trigger a rebuild
+  public processUniformBindingQueue(queue: IUniformBindingEntry[], uniformResources: IBindGroupResource[]): void {
+    //const queueCommander = this.getQueueCommander();
     // Process and dequeue the entries from the uniform update queue
     for (let ii = 0; ii < queue.length; ++ii) {
       const {id, data} = queue[ii];
@@ -165,13 +163,18 @@ export class Renderer extends AbstractRenderer {
       if (uniformResource === null) {
         throw new ReferenceError(`Failed to resolve uniform resource for uniform '${id}'`);
       }
-      const {resource} = uniformResource;
-      // Enqueue buffer copy operation
-      if (resource instanceof GPUBuffer) {
-        queueCommander.transferDataToBuffer(resource, data, 0x0, null);
+      // Bind buffer
+      if (data instanceof Buffer) {
+        // Create the underlying GPU resource if necessary
+        if (!data.getResource()) {
+          const descriptor = RenderPipelineGenerator.GenerateBufferDescriptor(data);
+          data.create(this, descriptor);
+        }
+        uniformResource.resource = data.getResource();
       }
       // Bind sampler
       else if (data instanceof Sampler) {
+        // Create the underlying GPU resource if necessary
         if (!data.getResource()) {
           const descriptor = RenderPipelineGenerator.GenerateSamplerDescriptor(data);
           data.create(this, descriptor);
@@ -180,6 +183,7 @@ export class Renderer extends AbstractRenderer {
       }
       // Bind texture
       else if (data instanceof Texture) {
+        // Create the underlying GPU resource if necessary
         if (!data.getResource()) {
           const descriptor = RenderPipelineGenerator.GenerateTextureDescriptor(data);
           data.create(this, descriptor);
@@ -191,6 +195,25 @@ export class Renderer extends AbstractRenderer {
       }
       // Remove queue item
       queue.splice(ii--, 1);
+    }
+  }
+
+  /**
+   * Process uniform bindings
+   * @param resources - The uniform bindings to process
+   */
+  public processUniformBindings(bindings: Map<string, (Buffer | Sampler | Texture)>): void {
+    const entries = bindings.entries();
+    for (const [_key, binding] of entries) {
+      if (binding instanceof Buffer) {
+        binding.update(this);
+      }
+      else if (binding instanceof Sampler) {
+        binding.update(this);
+      }
+      else if (binding instanceof Texture) {
+        binding.update(this);
+      }
     }
   }
 

@@ -1,7 +1,8 @@
 import {Material} from ".";
 
-import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, FRAME_COMMAND, MATERIAL_COLOR_MASK, MATERIAL_DEPTH_COMPARISON_MODE} from "../constants";
+import {SHADER_ATTRIBUTE, SHADER_UNIFORM, SHADER_STAGE, SAMPLER_WRAP_MODE, SAMPLER_FILTER_MODE, TEXTURE_FORMAT, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, FRAME_COMMAND, MATERIAL_COLOR_MASK, MATERIAL_DEPTH_COMPARISON_MODE, BUFFER_FORMAT} from "../constants";
 import {Unreachable} from "../utils";
+import {Buffer} from "../Buffer";
 import {Sampler} from "../Sampler";
 import {Texture} from "../Texture";
 import {Shader} from "../Shader";
@@ -22,7 +23,6 @@ export function ToWGPUColorWrite(colorMask: MATERIAL_COLOR_MASK): GPUColorWriteF
   let flags: GPUColorWriteFlags = 0;
   if (colorMask & MATERIAL_COLOR_MASK.RED) {
     flags |= GPUColorWrite.RED;
-    return flags;
   }
   if (colorMask & MATERIAL_COLOR_MASK.GREEN) {
     flags |= GPUColorWrite.GREEN;
@@ -211,6 +211,24 @@ export function ToWGPUCompareFunction(comparisonMode: MATERIAL_DEPTH_COMPARISON_
       return "always";
   }
   Unreachable();
+}
+
+export function ToWGPUBufferUsage(bufferFormat: BUFFER_FORMAT): GPUBufferUsageFlags {
+  let flags: GPUBufferUsageFlags = 0;
+  if (bufferFormat & BUFFER_FORMAT.COPY_SOURCE) {
+    flags |= GPUBufferUsage.COPY_SRC;
+    return flags;
+  }
+  if (bufferFormat & BUFFER_FORMAT.COPY_DESTINATION) {
+    flags |= GPUBufferUsage.COPY_DST;
+  }
+  if (bufferFormat & BUFFER_FORMAT.UNIFORM) {
+    flags |= GPUBufferUsage.UNIFORM;
+  }
+  if (bufferFormat & BUFFER_FORMAT.STORAGE) {
+    flags |= GPUBufferUsage.STORAGE;
+  }
+  return flags;
 }
 
 export function ToWGPUTextureFormat(textureFormat: TEXTURE_FORMAT): GPUTextureFormat {
@@ -506,6 +524,18 @@ export class RenderPipelineGenerator {
   }
 
   /**
+   * Generates the descriptor to constructor a new GPUBuffer
+   * @param buffer - Buffer object
+   */
+  public static GenerateBufferDescriptor(buffer: Buffer): GPUBufferDescriptor {
+    const out: GPUBufferDescriptor = {
+      size: buffer.getByteLength(),
+      usage: ToWGPUBufferUsage(buffer.getFormat()),
+    };
+    return out;
+  }
+
+  /**
    * Generates the vertex state descriptor for the passed material
    * @param material - Material object
    */
@@ -604,37 +634,21 @@ export class RenderPipelineGenerator {
     return out;
   }
 
-  public static generateBindGroupResources(material: Material, filterShared: boolean, device: GPUDevice): IBindGroupResource[] {
+  public static generateBindGroupResources(material: Material, filterShared: boolean, _device: GPUDevice): IBindGroupResource[] {
     const uniforms = material.getUniforms();
     const out: IBindGroupResource[] = [];
     for (const shaderUniform of uniforms) {
-      const {id, type, isShared, byteLength} = shaderUniform;
+      const {id, type, isShared} = shaderUniform;
       if (isShared !== filterShared) {
-        out.push(material.getSharedUniformResourceById(id));
+        out.push(material.getBindingResourceById(id));
         continue;
       }
       switch (type) {
-        case SHADER_UNIFORM.UNIFORM_BUFFER: {
-          const buffer = device.createBuffer({
-            size: byteLength,
-            usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST
-          });
-          out.push({id, resource: buffer});
-        } break;
+        case SHADER_UNIFORM.UNIFORM_BUFFER:
         case SHADER_UNIFORM.STORAGE_BUFFER:
-        case SHADER_UNIFORM.STORAGE_BUFFER_READONLY: {
-          const buffer = device.createBuffer({
-            size: byteLength,
-            usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST
-          });
-          out.push({id, resource: buffer});
-        } break;
-        case SHADER_UNIFORM.SAMPLER: {
-          out.push({id, resource: null});
-        } break;
-        case SHADER_UNIFORM.TEXTURE: {
-          out.push({id, resource: null});
-        } break;
+        case SHADER_UNIFORM.STORAGE_BUFFER_READONLY:
+        case SHADER_UNIFORM.SAMPLER:
+        case SHADER_UNIFORM.TEXTURE:
         case SHADER_UNIFORM.STORAGE_TEXTURE: {
           out.push({id, resource: null});
         } break;
@@ -650,7 +664,7 @@ export class RenderPipelineGenerator {
       const {id, type, isShared} = uniforms[ii];
       let bindGroupResource = null;
       // If the uniform is shared, pick its resource from the material
-      if (isShared) bindGroupResource = material.getSharedUniformResourceById(id);
+      if (isShared) bindGroupResource = material.getBindingResourceById(id);
       // If uniform isn't shared, pick the resource from the mesh
       else bindGroupResource = resources[ii];
       const {resource} = bindGroupResource;
@@ -658,6 +672,8 @@ export class RenderPipelineGenerator {
         case SHADER_UNIFORM.UNIFORM_BUFFER:
         case SHADER_UNIFORM.STORAGE_BUFFER:
         case SHADER_UNIFORM.STORAGE_BUFFER_READONLY: {
+          if (resource === null)
+            throw new ReferenceError(`No buffer bound`);
           bindGroupEntries.push({
             binding: id,
             resource: {buffer: resource as GPUBuffer}
@@ -697,7 +713,7 @@ export class RenderPipelineGenerator {
     return out;
   }
 
-  public static generate(material: Material, device: GPUDevice): IRenderPipeline {
+  public static generateRenderPipeline(material: Material, device: GPUDevice): IRenderPipeline {
     const vertexStateDescriptor = RenderPipelineGenerator.generateVertexStateDescriptor(material);
     const vertexStageDescriptor: GPUProgrammableStageDescriptor = {
       module: material.getVertexShader().getResource(),

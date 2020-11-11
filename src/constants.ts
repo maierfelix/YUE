@@ -131,6 +131,17 @@ export enum FRAME_COMMAND {
 }
 
 /**
+ * Supported buffer formats
+ */
+export enum BUFFER_FORMAT {
+  NONE             = 0 << 0,
+  COPY_SOURCE      = 1 << 0,
+  COPY_DESTINATION = 1 << 1,
+  UNIFORM          = 1 << 2,
+  STORAGE          = 1 << 3
+}
+
+/**
  * Supported texture formats
  */
 export enum TEXTURE_FORMAT {

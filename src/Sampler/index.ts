@@ -83,11 +83,19 @@ export class Sampler {
   }
 
   /**
+   * Update this sampler
+   */
+  public update(_renderer: Renderer): void {
+    
+  }
+
+  /**
    * Destroy this Object
    */
   public destroy(): void {
     this._name = null;
     this._addressMode = null;
+    this._resource = null;
   }
 
 }

@@ -135,11 +135,20 @@ export class Texture {
   }
 
   /**
+   * Update this texture
+   */
+  public update(_renderer: Renderer): void {
+    
+  }
+
+  /**
    * Destroy this Object
    */
   public destroy(): void {
     this._name = null;
     this._data = null;
+    this._resource = null;
+    this._resourceView = null;
   }
 
 }

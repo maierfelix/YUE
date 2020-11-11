@@ -41,6 +41,7 @@ export class Frame extends Container {
 
   private _camera: AbstractCamera = null;
 
+  private _clearFrame: Frame = null;
   private _clearColor: ClearColorType = null;
 
   private _depthAttachment: IFrameAttachment = null;
@@ -48,8 +49,9 @@ export class Frame extends Container {
 
   /**
    * @param options - Create options
+   * @param createClearFrame - Indicates if a clear frame should be attached automatically
    */
-  public constructor(options?: IFrameOptions) {
+  public constructor(options?: IFrameOptions, createClearFrame: boolean = true) {
     super(options);
     // Normalize options
     options = Object.assign({}, FRAME_DEFAULT_OPTIONS, options);
@@ -58,7 +60,8 @@ export class Frame extends Container {
     this._camera = options.camera;
     this._clearColor = options.clearColor;
     this._depthAttachment = options.depthAttachment ? Object.assign({}, FRAME_ATTACHMENT_DEFAULT_OPTIONS, options.depthAttachment) : null;
-    this._colorAttachments = options.colorAttachments.map(a => Object.assign({}, FRAME_ATTACHMENT_DEFAULT_OPTIONS, a));
+    this._colorAttachments = options.colorAttachments ? options.colorAttachments.map(a => Object.assign({}, FRAME_ATTACHMENT_DEFAULT_OPTIONS, a)) : [];
+    if (createClearFrame) this._clearFrame = this._createClearFrame();
   }
 
   /**
@@ -97,14 +100,25 @@ export class Frame extends Container {
     // First rebuild childs if necessary
     for (let ii = 0; ii < children.length; ++ii) {
       const child = children[ii];
-      child.build(renderer);
       child.update(renderer);
     }
     super.update(renderer);
   }
 
   /**
+   * Clear the frame
+   * @param renderer - The renderer to clear with
+   */
+  public clear(renderer: Renderer): void {
+    const clearFrame = this._clearFrame;
+    if (clearFrame !== null) {
+      clearFrame.draw(renderer);
+    }
+  }
+
+  /**
    * Draw the frame
+   * @param renderer - The renderer to draw with
    */
   public draw(renderer: Renderer): void {
     const children = this.getChildren();
@@ -160,6 +174,25 @@ export class Frame extends Container {
     super.destroy();
     this._camera = null;
     this._clearColor = null;
+  }
+
+  /**
+   * Creates a frame to clear this frame
+   */
+  private _createClearFrame(): Frame {
+    const clearDepthAttachment = Object.assign({}, this.getDepthAttachment());
+    clearDepthAttachment.readCommand = FRAME_COMMAND.CLEAR;
+    const clearColorAttachments = this.getColorAttachments().map(a => {
+      const clearColorAttachment = Object.assign({}, a);
+      clearColorAttachment.clearColor = a.clearColor || [0, 0, 0, 0];
+      clearColorAttachment.readCommand = FRAME_COMMAND.CLEAR;
+      return clearColorAttachment;
+    });
+    const out = new Frame({
+      depthAttachment: clearDepthAttachment,
+      colorAttachments: clearColorAttachments
+    }, false);
+    return out;
   }
 
 }

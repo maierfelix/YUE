@@ -1,10 +1,13 @@
 import {Material} from "../Material";
 import {vec3, quat} from "gl-matrix";
-import {Renderer, IUniformUpdateEntry} from "../Renderer";
+import {Renderer, IUniformBindingEntry} from "../Renderer";
 import {GetShaderAttributeComponentSize, IBindGroupResource, RenderPipelineGenerator} from "../Material/RenderPipelineGenerator";
 import {IRayTriangleIntersection, Ray} from "../Ray";
 import {Container, IContainerOptions} from "../Container";
 import {AABB, IAABBBounding} from "../AABB";
+import {Buffer} from "../Buffer";
+import {Sampler} from "../Sampler";
+import {Texture} from "../Texture";
 
 export * from "./StaticMesh";
 
@@ -33,16 +36,19 @@ export const MESH_DEFAULT_OPTIONS: IMeshOptions = {
 export class Mesh extends Container {
 
   private _material: Material = null;
+  private _materialRebuildCount: number = 0;
+
   private _indices: ArrayBufferView = null;
   private _attributes: ArrayBufferView = null;
   private _indexCount: number = 0;
 
   private _vertexBoundings: AABB = null;
 
-  private _uniformBindGroup: GPUBindGroup = null;
-  private _uniformResources: IBindGroupResource[] = [];
+  private _bindGroup: GPUBindGroup = null;
+  private _bindGroupResources: IBindGroupResource[] = [];
 
-  private _uniformUpdateQueue: IUniformUpdateEntry[] = [];
+  private _uniformBindingQueue: IUniformBindingEntry[] = [];
+  private _uniformBindings: Map<string, (Buffer | Sampler | Texture)> = new Map();
 
   private _indexBuffer: GPUBuffer = null;
   private _attributeBuffer: GPUBuffer = null;
@@ -80,9 +86,8 @@ export class Mesh extends Container {
    * @param value - The new material
    */
   public setMaterial(value: Material): void {
-    // In case a new material got assigned, trigger a full rebuild
-    if (this.getMaterial() !== value) this._triggerRebuild();
     this._material = value;
+    this._triggerRebuild();
   }
 
   /**
@@ -158,25 +163,15 @@ export class Mesh extends Container {
         }
       }
     }
-    // We return here in case no intersection OR a back-face intersection happened
     return out;
   }
 
   /**
-   * Add a new data update to the uniform update queue
-   * @param id - The uniform id
-   * @param data - The data to update with
-   */
-  public enqueueUniformUpdate(id: number, data: any): void {
-    this._uniformUpdateQueue.push({id, data});
-  }
-
-  /**
-   * Updates a shader uniform
+   * Bind a uniform
    * @param name - The name of the shader uniform
    * @param data - The data to update with
    */
-  public updateUniform(name: string, data: any): void {
+  public bindUniform(name: string, data: (Buffer | Sampler | Texture)): void {
     // Abort if the mesh is destroyed
     if (this.isDestroyed()) return;
     const uniform = this.getMaterial().getUniformByName(name);
@@ -185,7 +180,14 @@ export class Mesh extends Container {
     if (uniform.isShared)
       throw new Error(`Uniform '${name}' is declared as shared and must be accessed through its material`);
     if (data !== null)
-      this.enqueueUniformUpdate(uniform.id, data);
+      this._uniformBindingQueue.push({id: uniform.id, data});
+    const bindings = this._uniformBindings;
+    // In case a new uniform is provided, trigger a rebuild
+    if (bindings.has(name) && bindings.get(name) !== data) {
+      this._triggerRebuild();
+    }
+    // Save uniform binding
+    bindings.set(name, data);
   }
 
   /**
@@ -194,6 +196,7 @@ export class Mesh extends Container {
    */
   public updateIndices(data: ArrayBufferView): void {
     this._indices = data;
+    this._indexBuffer = null;
   }
 
   /**
@@ -202,6 +205,7 @@ export class Mesh extends Container {
    */
   public updateAttributes(data: ArrayBufferView): void {
     this._attributes = data;
+    this._attributeBuffer = null;
   }
 
   /**
@@ -210,7 +214,6 @@ export class Mesh extends Container {
    * @param renderer - Renderer instance
    */
   public build(renderer: Renderer): void {
-    super.build(renderer);
     // Abort if the mesh is destroyed
     if (this.isDestroyed()) return;
     // Abort if the mesh doesn't need a rebuild
@@ -218,49 +221,51 @@ export class Mesh extends Container {
     const material = this.getMaterial();
     material.build(renderer);
     // Build bind group resources
-    this._uniformResources = RenderPipelineGenerator.generateBindGroupResources(
+    this._bindGroupResources = RenderPipelineGenerator.generateBindGroupResources(
       material, false, renderer.getDevice()
     );
-    this.update(renderer);
-    // Build bind group
-    this._uniformBindGroup = RenderPipelineGenerator.generateBindGroup(
-      material, this._uniformResources, renderer.getDevice()
+    // Process uniform bindings before we create the bind group
+    renderer.processUniformBindingQueue(
+      this._uniformBindingQueue,
+      this._bindGroupResources
     );
-    // Build mesh buffers
-    if (this._indices !== null) {
-      this._indexCount = (this._indices as Uint32Array).length;
-      this._indexBuffer = renderer.getDevice().createBuffer({
-        size: this._indices.byteLength,
-        usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
-      });
-    }
-    if (this._attributes) {
-      this._attributeBuffer = renderer.getDevice().createBuffer({
-        size: this._attributes.byteLength,
-        usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
-      });
-    }
+    // Build bind group
+    this._bindGroup = RenderPipelineGenerator.generateBindGroup(
+      material, this._bindGroupResources, renderer.getDevice()
+    );
     // After the build we disable further builds
     this._resetRebuild();
+    // Perform an immediate update once after building
+    this.update(renderer);
   }
 
   /**
    * Update this mesh
-   * This is an internal method
-   * Used to e.g. process pending uniform resource updates
    * @param renderer - Renderer instance
    */
   public update(renderer: Renderer): void {
     super.update(renderer);
     // Abort if the mesh is destroyed
     if (this.isDestroyed()) return;
+    const material = this.getMaterial();
+    // We are out of sync, the assigned material got rebuilt, now rebuild this mesh too
+    if (material.getRebuildCount() !== this._materialRebuildCount) {
+      this._triggerRebuild();
+      // Synchronize
+      this._materialRebuildCount = material.getRebuildCount();
+    }
+    this.build(renderer);
     // Update the assigned material
-    this.getMaterial()?.update(renderer);
-    renderer.processUniformUpdateQueue(
-      this._uniformUpdateQueue,
-      this._uniformResources
+    material?.update(renderer);
+    // Process uniform bindings on each update
+    renderer.processUniformBindingQueue(
+      this._uniformBindingQueue,
+      this._bindGroupResources
     );
-    // Enqueue copy operation
+    renderer.processUniformBindings(
+      this._uniformBindings
+    );
+    // Create indices
     if (this._indices !== null) {
       // Create index buffer if necessary
       if (this._indexBuffer === null) {
@@ -268,12 +273,12 @@ export class Mesh extends Container {
           size: this._indices.byteLength,
           usage: GPUBufferUsage.INDEX | GPUBufferUsage.COPY_DST
         });
+        this._indexCount = (this._indices as Uint32Array).length;
+        renderer.getQueueCommander().transferDataToBuffer(this._indexBuffer, this._indices, 0x0);
+        if (this._freeAfterUpload) this._indices = null;
       }
-      this._indexCount = (this._indices as Uint32Array).length;
-      renderer.getQueueCommander().transferDataToBuffer(this._indexBuffer, this._indices, 0x0);
-      if (this._freeAfterUpload) this._indices = null;
     }
-    // Enqueue copy operation
+    // Create attributes
     if (this._attributes !== null) {
       // Create attribute buffer if necessary
       if (this._attributeBuffer === null) {
@@ -281,9 +286,9 @@ export class Mesh extends Container {
           size: this._attributes.byteLength,
           usage: GPUBufferUsage.VERTEX | GPUBufferUsage.COPY_DST
         });
+        renderer.getQueueCommander().transferDataToBuffer(this._attributeBuffer, this._attributes, 0x0);
+        if (this._freeAfterUpload) this._attributes = null;
       }
-      renderer.getQueueCommander().transferDataToBuffer(this._attributeBuffer, this._attributes, 0x0);
-      if (this._freeAfterUpload) this._attributes = null;
     }
   }
 
@@ -301,7 +306,7 @@ export class Mesh extends Container {
     if (material?.getRenderPipeline() !== null) {
       const {pipeline} = material.getRenderPipeline();
       encoder.setPipeline(pipeline);
-      encoder.setBindGroup(0, this._uniformBindGroup);
+      encoder.setBindGroup(0, this._bindGroup);
       encoder.setVertexBuffer(0, this._attributeBuffer);
       encoder.setIndexBuffer(this._indexBuffer, "uint32", 0x0, this.getIndexCount() * Uint32Array.BYTES_PER_ELEMENT);
       encoder.drawIndexed(this.getIndexCount(), 1, 0, 0, 0);
@@ -423,9 +428,10 @@ export class Mesh extends Container {
     this._material = null;
     this._indices = null;
     this._attributes = null;
-    this._uniformBindGroup = null;
-    this._uniformResources = null;
-    this._uniformUpdateQueue = null;
+    this._bindGroup = null;
+    this._bindGroupResources = null;
+    this._uniformBindingQueue = null;
+    this._uniformBindings = null;
     this._indexBuffer = null;
     this._attributeBuffer = null;
     this._vertexBoundings = null;

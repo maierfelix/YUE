@@ -1,7 +1,10 @@
 import {SHADER_ATTRIBUTE, SHADER_UNIFORM, MATERIAL_CULL_MODE, MATERIAL_BLEND_MODE, SHADER_STAGE, MATERIAL_DEPTH_COMPARISON_MODE, TEXTURE_FORMAT, MATERIAL_COLOR_MASK} from "../constants";
 import {Shader} from "../";
 import {RenderPipelineGenerator, IRenderPipeline, IBindGroupResource} from "./RenderPipelineGenerator";
-import {Renderer, IUniformUpdateEntry} from "../Renderer";
+import {Renderer, IUniformBindingEntry} from "../Renderer";
+import {Buffer} from "../Buffer";
+import {Texture} from "../Texture";
+import {Sampler} from "../Sampler";
 
 export interface IMaterialUniformOptions {
   id: number;
@@ -99,8 +102,11 @@ export class Material {
 
   private _uniforms: IMaterialUniformOptions[] = [];
   private _renderPipeline: IRenderPipeline = null;
-  private _uniformUpdateQueue: IUniformUpdateEntry[] = [];
-  private _sharedUniformResources: IBindGroupResource[] = [];
+
+  private _bindGroupResources: IBindGroupResource[] = [];
+
+  private _uniformBindingQueue: IUniformBindingEntry[] = [];
+  private _uniformBindings: Map<string, (Buffer | Sampler | Texture)> = new Map();
 
   private _attributeLayoutByteStride: number = 0;
 
@@ -109,6 +115,8 @@ export class Material {
 
   private _depthOutput: IMaterialOutputDepthOptions = null;
   private _colorOutputs: IMaterialOutputColorOptions[] = [];
+
+  private _rebuildCount: number = 0;
 
   /**
    * @param options - Create options
@@ -170,33 +178,24 @@ export class Material {
   }
 
   /**
-   * Returns the given uniform resource based on the provided id
-   * @param id - The id to lookup for
+   * Returns a binding resource based on the provided id
+   * @param id - The id to query for
    */
-  public getSharedUniformResourceById(id: number): IBindGroupResource {
-    const uniformResources = this._sharedUniformResources;
-    for (let ii = 0; ii < uniformResources.length; ++ii) {
-      const resource = uniformResources[ii];
+  public getBindingResourceById(id: number): IBindGroupResource {
+    const bindGroupResources = this._bindGroupResources;
+    for (let ii = 0; ii < bindGroupResources.length; ++ii) {
+      const resource = bindGroupResources[ii];
       if (resource !== null && resource.id === id) return resource;
     }
     return null;
   }
 
   /**
-   * Add a new data update to the uniform update queue
-   * @param id - The uniform id
-   * @param data - The data to update with
-   */
-  public enqueueUniformUpdate(id: number, data: any): void {
-    this._uniformUpdateQueue.push({id, data});
-  }
-
-  /**
-   * Updates a shader uniform
+   * Bind a uniform
    * @param name - The name of the shader uniform
-   * @param data - The data to update with
+   * @param data - The data to bind
    */
-  public updateUniform(name: string, data: any): void {
+  public bindUniform(name: string, data: (Buffer | Sampler | Texture)): void {
     // Abort if the material is destroyed
     if (this.isDestroyed()) return;
     const uniform = this.getUniformByName(name);
@@ -205,7 +204,10 @@ export class Material {
     if (!uniform.isShared)
       throw new Error(`Uniform '${name}' isn't declared as shared and must be accessed through its mesh`);
     if (data !== null)
-      this.enqueueUniformUpdate(uniform.id, data);
+      this._uniformBindingQueue.push({id: uniform.id, data});
+    // Save uniform binding
+    const bindings = this._uniformBindings;
+    bindings.set(name, data);
   }
 
   /**
@@ -237,6 +239,11 @@ export class Material {
    * The material color outputs
    */
   public getColorOutputs(): IMaterialOutputColorOptions[] { return this._colorOutputs; }
+
+  /**
+   * A counter indicating how many times the material got rebuilt
+   */
+  public getRebuildCount(): number { return this._rebuildCount; }
 
   /**
    * The material render pipeline
@@ -273,27 +280,31 @@ export class Material {
       fragmentShader.create(renderer, RenderPipelineGenerator.generateShaderModuleDescriptor(fragmentShader));
     }
     // Generate a new pipeline
-    this._renderPipeline = RenderPipelineGenerator.generate(this, renderer.getDevice());
+    this._renderPipeline = RenderPipelineGenerator.generateRenderPipeline(this, renderer.getDevice());
     // Build bind group resources
-    this._sharedUniformResources = RenderPipelineGenerator.generateBindGroupResources(
+    this._bindGroupResources = RenderPipelineGenerator.generateBindGroupResources(
       this, true, renderer.getDevice()
     );
     this.update(renderer);
+    // Increment rebuild counter
+    this._rebuildCount++;
     // Disable further rebuilds
     this._resetRebuild();
   }
 
   /**
    * Update this material
-   * Used to e.g. process pending uniform resource updates
    * @param renderer - Renderer instance
    */
   public update(renderer: Renderer) {
     // Abort if the material is destroyed
     if (this.isDestroyed()) return;
-    renderer.processUniformUpdateQueue(
-      this._uniformUpdateQueue,
-      this._sharedUniformResources
+    renderer.processUniformBindingQueue(
+      this._uniformBindingQueue,
+      this._bindGroupResources
+    );
+    renderer.processUniformBindings(
+      this._uniformBindings
     );
   }
 
@@ -308,8 +319,9 @@ export class Material {
     this._fragmentShader = null;
     this._uniforms = null;
     this._renderPipeline = null;
-    this._uniformUpdateQueue = null;
-    this._sharedUniformResources = null;
+    this._uniformBindingQueue = null;
+    this._bindGroupResources = null;
+    this._uniformBindings = null;
   }
 
   /**

@@ -100,6 +100,7 @@ export class Shader {
   public destroy(): void {
     this._name = null;
     this._code = null;
+    this._resource = null;
   }
 
 }

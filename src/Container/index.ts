@@ -450,21 +450,6 @@ export class Container {
   }
 
   /**
-   * Build this container
-   * This is an internal method
-   * @param renderer - Renderer instance
-   */
-  public build(renderer: Renderer): void {
-    // Abort if the container is destroyed
-    if (this.isDestroyed()) return;
-    const children = this.getChildren();
-    for (let ii = 0; ii < children.length; ++ii) {
-      const child = children[ii];
-      child.build(renderer);
-    }
-  }
-
-  /**
    * Update this container
    * This is an internal method
    * @param renderer - Renderer instance
